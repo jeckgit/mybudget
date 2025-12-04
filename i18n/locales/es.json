@@ -1,0 +1,40 @@
+{
+  "common": {
+    "dashboard": "Panel",
+    "analytics": "Analítica",
+    "settings": "Ajustes",
+    "add_expense": "Añadir gasto",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "loading": "Cargando..."
+  },
+  "dashboard": {
+    "balance": "Balance",
+    "monthly_limit": "Límite mensual",
+    "recent_transactions": "Transacciones recientes",
+    "no_transactions": "No hay transacciones"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "preferences": "Preferencias",
+    "language": "Idioma",
+    "theme": "Tema",
+    "currency": "Moneda",
+    "data": "Datos",
+    "reset_data": "Restablecer datos",
+    "reset_confirm": "¿Restablecer todos los datos?",
+    "sign_out": "Cerrar sesión",
+    "themes": {
+      "system": "Sistema",
+      "light": "Claro",
+      "dark": "Oscuro"
+    }
+  },
+  "landing": {
+    "hero_title": "Gastos conscientes,",
+    "hero_subtitle": "claridad líquida.",
+    "hero_desc": "Experimenta una aplicación de presupuesto que se siente tan fluida como tu vida. Hermosamente simple, poderosamente perspicaz.",
+    "get_started": "Empezar"
+  }
+}

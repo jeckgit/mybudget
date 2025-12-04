@@ -1,0 +1,2 @@
+- user settings (dark mode, language, currency)
+- language, right now translations english, german, french, spanish

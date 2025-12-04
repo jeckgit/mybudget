@@ -1,0 +1,40 @@
+{
+  "common": {
+    "dashboard": "Übersicht",
+    "analytics": "Analyse",
+    "settings": "Einstellungen",
+    "add_expense": "Ausgabe hinzufügen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "loading": "Laden..."
+  },
+  "dashboard": {
+    "balance": "Kontostand",
+    "monthly_limit": "Monatslimit",
+    "recent_transactions": "Letzte Transaktionen",
+    "no_transactions": "Noch keine Transaktionen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "preferences": "Präferenzen",
+    "language": "Sprache",
+    "theme": "Design",
+    "currency": "Währung",
+    "data": "Daten",
+    "reset_data": "Daten zurücksetzen",
+    "reset_confirm": "Alle Daten zurücksetzen?",
+    "sign_out": "Abmelden",
+    "themes": {
+      "system": "System",
+      "light": "Hell",
+      "dark": "Dunkel"
+    }
+  },
+  "landing": {
+    "hero_title": "Achtsames Ausgeben,",
+    "hero_subtitle": "flüssige Klarheit.",
+    "hero_desc": "Erleben Sie eine Budget-App, die sich so flüssig anfühlt wie Ihr Leben. Wunderschön einfach, kraftvoll aufschlussreich.",
+    "get_started": "Loslegen"
+  }
+}

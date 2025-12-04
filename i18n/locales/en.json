@@ -1,0 +1,40 @@
+{
+  "common": {
+    "dashboard": "Dashboard",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "add_expense": "Add Expense",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "loading": "Loading..."
+  },
+  "dashboard": {
+    "balance": "Balance",
+    "monthly_limit": "Monthly Limit",
+    "recent_transactions": "Recent Transactions",
+    "no_transactions": "No transactions yet"
+  },
+  "settings": {
+    "title": "Settings",
+    "preferences": "Preferences",
+    "language": "Language",
+    "theme": "Theme",
+    "currency": "Currency",
+    "data": "Data",
+    "reset_data": "Reset Data",
+    "reset_confirm": "Reset all data?",
+    "sign_out": "Sign Out",
+    "themes": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    }
+  },
+  "landing": {
+    "hero_title": "Mindful spending,",
+    "hero_subtitle": "liquid clarity.",
+    "hero_desc": "Experience a budgeting app that feels as fluid as your life. Beautifully simple, powerfully insightful.",
+    "get_started": "Get Started"
+  }
+}
