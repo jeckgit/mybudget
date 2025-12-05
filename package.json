@@ -19,6 +19,7 @@
     "@nuxtjs/color-mode": "^4.0.0",
     "@nuxtjs/i18n": "^10.2.1",
     "@nuxtjs/supabase": "^2.0.2",
+    "@supabase/supabase-js": "^2.86.2",
     "@tailwindcss/vite": "^4.1.17",
     "@unhead/vue": "^2.0.3",
     "@vueuse/core": "^11.0.0",

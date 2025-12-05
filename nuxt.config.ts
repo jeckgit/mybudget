@@ -6,9 +6,13 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['./app/assets/css/main.css'],
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ['@supabase/supabase-js']
+    }
   },
   modules: [
+    '@nuxtjs/supabase',
     '@nuxt/eslint',
     '@nuxt/hints',
     '@nuxt/icon',
@@ -16,10 +20,18 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@vueuse/nuxt',
-    '@nuxtjs/supabase',
     '@nuxtjs/i18n',
     '@nuxtjs/color-mode'
   ],
+
+  supabase: {
+    redirect: true,
+    redirectOptions: {
+      login: '/auth/login',
+      callback: '/confirm',
+      exclude: ['/', '/auth/login']
+    }
+  },
 
   i18n: {
     locales: [

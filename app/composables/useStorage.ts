@@ -1,4 +1,4 @@
-import type { AppState, Transaction, BudgetConfig } from '~/types';
+import type { AppState, Transaction } from '~/types';
 import type { Database } from '~/types/database.types';
 
 const DEFAULT_STATE: AppState = {
@@ -13,12 +13,13 @@ const DEFAULT_STATE: AppState = {
 export const useStorage = () => {
   const supabase = useSupabaseClient<Database>();
   const user = useSupabaseUser();
+  const state = useState<AppState>('app-state', () => DEFAULT_STATE);
 
-  // We'll use a local state to keep the UI reactive and sync in background
-  // But for simplicity in this refactor, let's load on mount and save on change.
-
-  const loadState = async (): Promise<AppState> => {
-    if (!user.value) return DEFAULT_STATE;
+  const loadState = async () => {
+    if (!user.value) {
+      state.value = DEFAULT_STATE;
+      return;
+    }
 
     try {
       // Load Profile
@@ -32,10 +33,11 @@ export const useStorage = () => {
         .order('date', { ascending: false });
 
       if (!profile && (!transactions || transactions.length === 0)) {
-        return DEFAULT_STATE;
+        state.value = DEFAULT_STATE;
+        return;
       }
 
-      return {
+      state.value = {
         config: {
           monthlyLimit: Number(profile?.monthly_limit || 0),
           currencySymbol: profile?.currency_symbol || '$',
@@ -53,21 +55,22 @@ export const useStorage = () => {
       };
     } catch (e) {
       console.error('Failed to load state from Supabase', e);
-      return DEFAULT_STATE;
+      state.value = DEFAULT_STATE;
     }
   };
 
-  const saveState = async (state: AppState) => {
+  const saveState = async (newState: AppState) => {
     if (!user.value) return;
+    state.value = newState; // Update local state immediately
 
     try {
       await supabase.from('profiles').upsert({
         id: user.value.id,
-        monthly_limit: state.config.monthlyLimit,
-        currency_symbol: state.config.currencySymbol,
-        onboarding_complete: state.config.onboardingComplete,
-        language: state.config.language,
-        theme: state.config.theme
+        monthly_limit: newState.config.monthlyLimit,
+        currency_symbol: newState.config.currencySymbol,
+        onboarding_complete: newState.config.onboardingComplete,
+        language: newState.config.language,
+        theme: newState.config.theme
       });
     } catch (e) {
       console.error('Failed to save state to Supabase', e);
@@ -76,6 +79,10 @@ export const useStorage = () => {
 
   const addTransaction = async (transaction: Transaction) => {
     if (!user.value) return;
+
+    // Optimistic update
+    state.value.transactions = [transaction, ...state.value.transactions];
+
     const { error } = await supabase.from('transactions').insert({
       user_id: user.value.id,
       amount: transaction.amount,
@@ -83,11 +90,16 @@ export const useStorage = () => {
       note: transaction.note,
       category: transaction.category
     });
-    if (error) console.error('Failed to add transaction', error);
+
+    if (error) {
+      console.error('Failed to add transaction', error);
+      // Revert on error could be implemented here
+    }
   };
 
   const clearState = async () => {
     if (!user.value) return;
+    state.value = DEFAULT_STATE;
 
     try {
       // Delete all transactions
@@ -107,6 +119,7 @@ export const useStorage = () => {
   };
 
   return {
+    state,
     loadState,
     saveState,
     addTransaction,

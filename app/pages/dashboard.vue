@@ -1,3 +1,44 @@
+<script setup lang="ts">
+import { Bell, ArrowUpRight, Wallet } from 'lucide-vue-next';
+import type { AppState } from '~/types';
+
+// Inject state from layout
+const state = inject<Ref<AppState>>('appState');
+
+if (!state) {
+    throw new Error('AppState not provided');
+}
+
+const { formatCurrency, calculateBudgetData } = useBudget();
+
+const budgetData = computed(() => calculateBudgetData(state.value));
+
+const formatTime = (date: string) => {
+    return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+};
+
+// Generate weekly spending data for the chart
+const weeklySpendingData = computed(() => {
+    const today = new Date();
+    const weekData: number[] = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+
+        const daySpending = budgetData.value.monthTransactions
+            .filter((t) => {
+                const txDate = new Date(t.date);
+                return txDate.toDateString() === date.toDateString();
+            })
+            .reduce((sum, tx) => sum + tx.amount, 0);
+
+        weekData.push(daySpending);
+    }
+
+    return weekData;
+});
+</script>
 <template>
     <div class="flex flex-col min-h-screen pb-32 px-6 pt-12">
         <!-- Top Header -->
@@ -33,7 +74,7 @@
                     class="bg-white/40 backdrop-blur-md pl-3 pr-4 py-1.5 rounded-full flex items-center gap-2 border border-white/50">
                     <div :class="['w-2 h-2 rounded-full', budgetData.isOverBudget ? 'bg-red-400' : 'bg-green-400']" />
                     <span class="text-xs font-bold text-slate-700">{{ budgetData.isOverBudget ? 'Over' : 'On Track'
-                        }}</span>
+                    }}</span>
                 </div>
             </div>
 
@@ -109,45 +150,3 @@
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { Bell, ArrowUpRight, Wallet } from 'lucide-vue-next';
-import type { AppState } from '~/types';
-
-// Inject state from layout
-const state = inject<Ref<AppState>>('appState');
-
-if (!state) {
-    throw new Error('AppState not provided');
-}
-
-const { formatCurrency, calculateBudgetData } = useBudget();
-
-const budgetData = computed(() => calculateBudgetData(state.value));
-
-const formatTime = (date: string) => {
-    return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-};
-
-// Generate weekly spending data for the chart
-const weeklySpendingData = computed(() => {
-    const today = new Date();
-    const weekData: number[] = [];
-
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-
-        const daySpending = budgetData.value.monthTransactions
-            .filter((t) => {
-                const txDate = new Date(t.date);
-                return txDate.toDateString() === date.toDateString();
-            })
-            .reduce((sum, tx) => sum + tx.amount, 0);
-
-        weekData.push(daySpending);
-    }
-
-    return weekData;
-});
-</script>

@@ -26,11 +26,4 @@ export interface AppState {
   config: BudgetConfig;
 }
 
-export const ViewState = {
-  ONBOARDING: 'ONBOARDING',
-  DASHBOARD: 'DASHBOARD',
-  ANALYTICS: 'ANALYTICS',
-  SETTINGS: 'SETTINGS'
-} as const;
-
-export type ViewState = (typeof ViewState)[keyof typeof ViewState];
+// ViewState removed as we use Nuxt routing now

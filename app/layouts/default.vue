@@ -1,27 +1,18 @@
 <script setup lang="ts">
-import type { AppState, Transaction, ViewState as ViewStateType } from "~/types";
-import { ViewState } from "~/types";
+import type { AppState, Transaction } from "~/types";
 
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
-const { loadState, saveState, addTransaction } = useStorage();
+const { state, loadState, saveState, addTransaction } = useStorage();
 
 // State
-const state = ref<AppState>({
-    transactions: [],
-    config: {
-        monthlyLimit: 0,
-        currencySymbol: '$',
-        onboardingComplete: false
-    }
-});
 const showAddModal = ref(false);
 const inputValue = ref("");
 
 // Load state on mount
 onMounted(async () => {
     if (user.value) {
-        state.value = await loadState();
+        await loadState();
 
         // Redirect to onboarding if needed
         if (!state.value.config.onboardingComplete && route.path !== '/onboarding') {
@@ -32,9 +23,9 @@ onMounted(async () => {
         }
     } else {
         // Public routes that don't require auth
-        const publicRoutes = ['/', '/login'];
+        const publicRoutes = ['/', '/auth/login'];
         if (!publicRoutes.includes(route.path)) {
-            navigateTo('/login');
+            navigateTo('/auth/login');
         }
     }
 });
@@ -48,7 +39,7 @@ watch(
     { deep: true },
 );
 
-// Provide state to children
+// Provide state to children (optional if they use useStorage, but keeping for compatibility)
 provide('appState', state);
 provide('showAddModal', showAddModal);
 
@@ -75,33 +66,12 @@ const handleAddTransaction = async () => {
         category: randomCategory.emoji,
     };
 
-    // Optimistic update
-    state.value.transactions = [newTx, ...state.value.transactions];
-
-    // Persist
+    // Optimistic update moved to useStorage, but we can just call addTransaction
     await addTransaction(newTx);
 
     inputValue.value = "";
     showAddModal.value = false;
 };
-
-const handleNavChange = (v: ViewStateType | 'ADD') => {
-    if (v === "ADD") {
-        showAddModal.value = true;
-    } else {
-        const routeMap: Record<string, string> = {
-            [ViewState.DASHBOARD]: '/dashboard',
-            [ViewState.ANALYTICS]: '/analytics',
-            [ViewState.SETTINGS]: '/settings',
-            [ViewState.ONBOARDING]: '/onboarding'
-        };
-        const path = routeMap[v];
-        if (path) {
-            navigateTo(path);
-        }
-    }
-};
-
 const handleInput = (n: number) => {
     inputValue.value += n.toString();
 };
@@ -110,20 +80,8 @@ const handleDelete = () => {
     inputValue.value = inputValue.value.slice(0, -1);
 };
 
-// Determine current view for BottomNav based on route
 const route = useRoute();
-const currentView = computed(() => {
-    if (route.path === '/dashboard') return ViewState.DASHBOARD;
-    if (route.path === '/analytics') return ViewState.ANALYTICS;
-    if (route.path === '/settings') return ViewState.SETTINGS;
-    if (route.path === '/onboarding') return ViewState.ONBOARDING;
-    return ViewState.DASHBOARD;
-});
 
-const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigateTo('/login');
-};
 </script>
 
 <template>
@@ -134,8 +92,7 @@ const handleSignOut = async () => {
         <div class="relative z-10">
             <slot />
 
-            <BottomNav v-if="currentView !== ViewState.ONBOARDING && user" :current-view="currentView"
-                @change="handleNavChange" />
+            <BottomNav v-if="user && route.path !== '/onboarding' && route.path !== '/auth/login'" />
         </div>
 
         <!-- Add Transaction Modal -->

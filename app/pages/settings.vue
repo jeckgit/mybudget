@@ -1,3 +1,49 @@
+<script setup lang="ts">
+import { Trash2, Globe, Moon, Sun, Monitor } from 'lucide-vue-next';
+import type { AppState } from '~/types';
+
+const { loadState, clearState } = useStorage();
+const state = inject('appState') as Ref<AppState>;
+const { t, locale, setLocale } = useI18n();
+const colorMode = useColorMode();
+
+const currencies = ['$', '€', '£', '¥', 'CHF'];
+const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'fr', name: 'Français' },
+    { code: 'es', name: 'Español' }
+];
+
+const handleReset = async () => {
+    if (confirm(t('settings.reset_confirm'))) {
+        await clearState();
+        await loadState();
+        navigateTo('/onboarding');
+    }
+};
+
+const updateLanguage = (code: string) => {
+    setLocale(code as any);
+    state.value.config.language = code;
+};
+
+const updateTheme = (theme: string) => {
+    colorMode.preference = theme;
+    state.value.config.theme = theme;
+};
+
+// Sync local state with global settings on mount
+onMounted(() => {
+    if (state.value.config.language && state.value.config.language !== locale.value) {
+        setLocale(state.value.config.language as any);
+    }
+    if (state.value.config.theme) {
+        colorMode.preference = state.value.config.theme;
+    }
+});
+</script>
+
 <template>
     <div class="p-6 pb-32 max-w-lg mx-auto">
         <header class="mb-8">
@@ -8,7 +54,7 @@
             <!-- Preferences -->
             <section>
                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{{ t('settings.preferences')
-                    }}</h2>
+                }}</h2>
                 <GlassCard variant="white" class="p-4 !rounded-2xl space-y-4 dark:!bg-slate-800/80">
 
                     <!-- Language -->
@@ -19,7 +65,7 @@
                                 <Globe class="w-5 h-5" />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
-                                }}</span>
+                            }}</span>
                         </div>
                         <select :value="locale" @change="updateLanguage(($event.target as HTMLSelectElement).value)"
                             class="bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -39,7 +85,7 @@
                                 <Monitor class="w-5 h-5" v-else />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
                             <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
@@ -61,7 +107,7 @@
                                 <span class="text-lg font-bold">$</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex gap-2">
                             <button v-for="c in currencies" :key="c" @click="state.config.currencySymbol = c"
@@ -94,49 +140,3 @@
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import { Trash2, Globe, Moon, Sun, Monitor } from 'lucide-vue-next';
-import type { AppState } from '~/types';
-
-const { loadState, clearState } = useStorage();
-const state = inject('appState') as Ref<AppState>;
-const { t, locale, setLocale } = useI18n();
-const colorMode = useColorMode();
-
-const currencies = ['$', '€', '£', '¥', 'CHF'];
-const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'de', name: 'Deutsch' },
-    { code: 'fr', name: 'Français' },
-    { code: 'es', name: 'Español' }
-];
-
-const handleReset = async () => {
-    if (confirm(t('settings.reset_confirm'))) {
-        await clearState();
-        state.value = await loadState();
-        navigateTo('/onboarding');
-    }
-};
-
-const updateLanguage = (code: string) => {
-    setLocale(code as any);
-    state.value.config.language = code;
-};
-
-const updateTheme = (theme: string) => {
-    colorMode.preference = theme;
-    state.value.config.theme = theme;
-};
-
-// Sync local state with global settings on mount
-onMounted(() => {
-    if (state.value.config.language && state.value.config.language !== locale.value) {
-        setLocale(state.value.config.language as any);
-    }
-    if (state.value.config.theme) {
-        colorMode.preference = state.value.config.theme;
-    }
-});
-</script>
