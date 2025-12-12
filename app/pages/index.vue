@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { ArrowRight, PieChart, Receipt, ShieldCheck } from 'lucide-vue-next';
+import { ArrowRight } from 'lucide-vue-next';
+const user = useSupabaseUser()
+definePageMeta({
+  layout: 'marketing'
+})
 
-// Explicitly disable layout for landing page or keep simple if default is fine
-// Using default but content overrides effectively
+onMounted(() => {
+  if (user.value) {
+    navigateTo('/dashboard');
+  }
+})
 </script>
 
 <template>

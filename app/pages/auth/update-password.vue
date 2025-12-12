@@ -1,10 +1,37 @@
 <script setup lang="ts">
 const supabase = useSupabaseClient()
+const user = useSupabaseUser()
 const password = ref('')
 const loading = ref(false)
 const errorMsg = ref('')
+const verifying = ref(true)
+
+onMounted(async () => {
+    // Wait a brief moment for the session to be restored from the hash
+    setTimeout(() => {
+        if (!user.value) {
+            // If still no user, check if we have a session in the URL to establish
+            supabase.auth.onAuthStateChange((event, session) => {
+                if (event === 'PASSWORD_RECOVERY' || session) {
+                    verifying.value = false;
+                } else if (event === 'SIGNED_OUT') {
+                    // If we end up signed out, the link might be invalid or expired
+                    errorMsg.value = 'Invalid or expired password reset link.';
+                    verifying.value = false;
+                }
+            });
+        } else {
+            verifying.value = false;
+        }
+    }, 1000);
+});
 
 const handleUpdate = async () => {
+    if (!user.value) {
+        errorMsg.value = 'Session expired. Please request a new password reset link.';
+        return;
+    }
+
     loading.value = true
     errorMsg.value = ''
     try {
@@ -12,6 +39,10 @@ const handleUpdate = async () => {
             password: password.value
         })
         if (error) throw error
+
+        // Sign out then redirect to login to force fresh login with new password
+        // Or just redirect to dashboard if we want to keep them logged in. 
+        // Best practice often is to keep them logged in.
         navigateTo('/dashboard')
     } catch (e: any) {
         errorMsg.value = e.message
@@ -30,7 +61,12 @@ const handleUpdate = async () => {
                 <p class="text-slate-500">Enter your new password</p>
             </div>
 
-            <form @submit.prevent="handleUpdate" class="space-y-4">
+            <div v-if="verifying" class="text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900 mb-4"></div>
+                <p class="text-slate-500 font-medium">Verifying reset link...</p>
+            </div>
+
+            <form v-else @submit.prevent="handleUpdate" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">New
                         Password</label>

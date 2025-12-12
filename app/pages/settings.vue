@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { Trash2, Globe, Moon, Sun, Monitor } from 'lucide-vue-next';
-import type { AppState } from '~/types';
+import { Trash2, Globe, Moon, Sun, Monitor, LogOut } from 'lucide-vue-next';
 
-const { loadState, clearState } = useStorage();
-const state = inject('appState') as Ref<AppState>;
+const { state, loadState, clearState, updateConfig } = useStorage();
 const { t, locale, setLocale } = useI18n();
 const colorMode = useColorMode();
+const supabase = useSupabaseClient();
 
 const currencies = ['$', '€', '£', '¥', 'CHF'];
 const languages = [
@@ -23,15 +22,22 @@ const handleReset = async () => {
     }
 };
 
+const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) console.error(error);
+    navigateTo('/auth/login');
+};
+
 const updateLanguage = (code: string) => {
     setLocale(code as any);
-    state.value.config.language = code;
+    updateConfig({ language: code });
 };
 
 const updateTheme = (theme: string) => {
     colorMode.preference = theme;
-    state.value.config.theme = theme;
+    updateConfig({ theme });
 };
+
 
 // Sync local state with global settings on mount
 onMounted(() => {
@@ -54,10 +60,8 @@ onMounted(() => {
             <!-- Preferences -->
             <section>
                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{{ t('settings.preferences')
-                }}</h2>
+                    }}</h2>
                 <GlassCard variant="white" class="p-4 !rounded-2xl space-y-4 dark:!bg-slate-800/80">
-
-                    <!-- Language -->
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div
@@ -75,31 +79,32 @@ onMounted(() => {
                         </select>
                     </div>
 
-                    <!-- Theme -->
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                                <Moon class="w-5 h-5" v-if="colorMode.value === 'dark'" />
-                                <Sun class="w-5 h-5" v-else-if="colorMode.value === 'light'" />
-                                <Monitor class="w-5 h-5" v-else />
+                                <ClientOnly>
+                                    <Moon class="w-5 h-5" v-if="colorMode.value === 'dark'" />
+                                    <Sun class="w-5 h-5" v-else-if="colorMode.value === 'light'" />
+                                    <Monitor class="w-5 h-5" v-else />
+                                </ClientOnly>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
                             }}</span>
                         </div>
                         <div class="flex bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
-                            <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
-                                @click="updateTheme(theme)" class="p-2 rounded-md transition-all"
-                                :class="colorMode.preference === theme ? 'bg-white dark:bg-slate-600 shadow-sm text-purple-600 dark:text-purple-300' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'"
-                                :title="t(`settings.themes.${theme}`)">
-                                <Sun class="w-4 h-4" v-if="theme === 'light'" />
-                                <Monitor class="w-4 h-4" v-if="theme === 'system'" />
-                                <Moon class="w-4 h-4" v-if="theme === 'dark'" />
-                            </button>
+                            <ClientOnly>
+                                <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
+                                    @click="updateTheme(theme)" class="p-2 rounded-md transition-all"
+                                    :class="colorMode.preference === theme ? 'bg-white dark:bg-slate-600 shadow-sm text-purple-600 dark:text-purple-300' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'"
+                                    :title="t(`settings.themes.${theme}`)">
+                                    <Sun class="w-4 h-4" v-if="theme === 'light'" />
+                                    <Monitor class="w-4 h-4" v-if="theme === 'system'" />
+                                    <Moon class="w-4 h-4" v-if="theme === 'dark'" />
+                                </button>
+                            </ClientOnly>
                         </div>
                     </div>
-
-                    <!-- Currency -->
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div
@@ -110,14 +115,13 @@ onMounted(() => {
                             }}</span>
                         </div>
                         <div class="flex gap-2">
-                            <button v-for="c in currencies" :key="c" @click="state.config.currencySymbol = c"
-                                class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all"
+                            <button v-for="c in currencies" :key="c" @click="updateConfig({ currencySymbol: c })"
+                                class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all hover:cursor-pointer"
                                 :class="state.config.currencySymbol === c ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900' : 'bg-slate-100 text-slate-400 hover:bg-slate-200 dark:bg-slate-700'">
                                 {{ c }}
                             </button>
                         </div>
                     </div>
-
                 </GlassCard>
             </section>
 
@@ -133,6 +137,23 @@ onMounted(() => {
                                 <Trash2 class="w-5 h-5" />
                             </div>
                             <span class="font-medium">{{ t('settings.reset_data') }}</span>
+                        </div>
+                    </button>
+                </GlassCard>
+            </section>
+
+            <!-- Account -->
+            <section>
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Account</h2>
+                <GlassCard variant="white" class="p-4 !rounded-2xl dark:!bg-slate-800/80">
+                    <button @click="handleLogout"
+                        class="w-full flex items-center justify-between p-2 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-xl transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-slate-200 dark:group-hover:bg-slate-600 transition-colors">
+                                <LogOut class="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                            </div>
+                            <span class="font-medium">Logout</span>
                         </div>
                     </button>
                 </GlassCard>

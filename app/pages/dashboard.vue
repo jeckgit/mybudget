@@ -2,12 +2,14 @@
 import { Bell, ArrowUpRight, Wallet } from 'lucide-vue-next';
 import type { AppState } from '~/types';
 
-// Inject state from layout
-const state = inject<Ref<AppState>>('appState');
+// Inject state directly from storage
+// Inject state directly from storage
+const { state, loadState } = useStorage();
 
-if (!state) {
-    throw new Error('AppState not provided');
-}
+await useAsyncData('dashboard-state', async () => {
+    await loadState();
+    return true;
+});
 
 const { formatCurrency, calculateBudgetData } = useBudget();
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Home, BarChart3, Plus, Settings, User } from 'lucide-vue-next';
 
-// Inject the modal state provided by default.vue
-const showAddModal = inject<Ref<boolean>>('showAddModal');
+// Shared modal state
+const showAddModal = useState<boolean>('showAddModal');
 
 const navItems = [
   { label: 'Dashboard', to: '/dashboard', icon: Home },

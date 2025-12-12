@@ -18,29 +18,29 @@ export type Database = {
         Row: {
           created_at: string | null
           currency_symbol: string | null
-          id: string
           language: string | null
           monthly_limit: number | null
           onboarding_complete: boolean | null
           theme: string | null
+          user: string
         }
         Insert: {
           created_at?: string | null
           currency_symbol?: string | null
-          id: string
           language?: string | null
           monthly_limit?: number | null
           onboarding_complete?: boolean | null
           theme?: string | null
+          user: string
         }
         Update: {
           created_at?: string | null
           currency_symbol?: string | null
-          id?: string
           language?: string | null
           monthly_limit?: number | null
           onboarding_complete?: boolean | null
           theme?: string | null
+          user?: string
         }
         Relationships: []
       }
@@ -52,7 +52,7 @@ export type Database = {
           date: string | null
           id: string
           note: string | null
-          user_id: string
+          user: string
         }
         Insert: {
           amount: number
@@ -61,7 +61,7 @@ export type Database = {
           date?: string | null
           id?: string
           note?: string | null
-          user_id: string
+          user: string
         }
         Update: {
           amount?: number
@@ -70,7 +70,7 @@ export type Database = {
           date?: string | null
           id?: string
           note?: string | null
-          user_id?: string
+          user?: string
         }
         Relationships: []
       }

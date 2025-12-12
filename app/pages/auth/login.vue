@@ -16,8 +16,7 @@ watchEffect(() => {
 });
 
 const toggleSignup = () => {
-    console.log('toggling');
-    // isSignUp.value = !isSignUp.value;
+    isSignUp.value = !isSignUp.value;
 };
 
 const handleAuth = async () => {

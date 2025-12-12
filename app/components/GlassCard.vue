@@ -1,15 +1,12 @@
 <template>
-  <div 
-    :class="[
-      'relative overflow-hidden backdrop-blur-3xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[2.5rem]',
-      variantClasses,
-      props.class
-    ]"
-    v-bind="$attrs"
-  >
+  <div :class="[
+    'relative overflow-hidden backdrop-blur-3xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[2.5rem]',
+    variantClasses,
+    props.class
+  ]" v-bind="$attrs">
     <!-- The "Liquid Shine" overlay -->
     <div class="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent opacity-60 pointer-events-none" />
-    
+
     <!-- Content wrapper to ensure z-index above the shine -->
     <div class="relative z-10 h-full">
       <slot />
@@ -30,7 +27,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const variantClasses = computed(() => {
   const baseStyles = "relative overflow-hidden backdrop-blur-3xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]";
-  
+
   switch (props.variant) {
     case 'glass':
       return `${baseStyles} bg-gradient-to-br from-white/60 to-white/30`;

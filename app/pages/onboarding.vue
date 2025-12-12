@@ -31,26 +31,18 @@
 import { Wallet } from 'lucide-vue-next';
 import type { AppState } from '~/types';
 
-// Inject state from layout
-const state = inject<Ref<AppState>>('appState');
-
-if (!state) {
-    throw new Error('AppState not provided');
-}
+// Use storage
+const { state, updateConfig } = useStorage();
 
 const budgetInput = ref('');
 
-const handleSetBudget = () => {
+const handleSetBudget = async () => {
     const amount = Number(budgetInput.value);
     if (amount > 0) {
-        state.value = {
-            ...state.value,
-            config: {
-                ...state.value.config,
-                monthlyLimit: amount,
-                onboardingComplete: true,
-            },
-        };
+        await updateConfig({
+            monthlyLimit: amount,
+            onboardingComplete: true
+        });
         navigateTo('/');
     }
 };

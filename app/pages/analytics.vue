@@ -2,12 +2,13 @@
 import { ChevronLeft, Coffee, MoreHorizontal, ShoppingBag } from 'lucide-vue-next';
 import type { AppState } from '~/types';
 
-// Inject state from layout
-const state = inject<Ref<AppState>>('appState');
+// Use storage directly
+const { state, loadState } = useStorage();
 
-if (!state) {
-    throw new Error('AppState not provided');
-}
+await useAsyncData('analytics-state', async () => {
+    await loadState();
+    return true;
+});
 
 const { formatCurrency, calculateBudgetData } = useBudget();
 
