@@ -20,8 +20,7 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@vueuse/nuxt',
-    '@nuxtjs/i18n',
-    '@nuxtjs/color-mode'
+    '@nuxtjs/i18n'
   ],
 
   supabase: {
@@ -42,12 +41,6 @@ export default defineNuxtConfig({
     ],
     defaultLocale: 'en',
     strategy: 'no_prefix'
-  },
-
-  colorMode: {
-    classSuffix: '',
-    preference: 'system',
-    fallback: 'light'
   },
   build: {
     transpile: ['vue-echarts', 'echarts']

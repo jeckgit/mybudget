@@ -7,13 +7,42 @@
     "save": "Speichern",
     "cancel": "Abbrechen",
     "delete": "Löschen",
-    "loading": "Laden..."
+    "loading": "Laden...",
+    "add": "Hinzufügen",
+    "assistant": "Assistent",
+    "profile": "Profil",
+    "guest": "Gast",
+    "user": "Benutzer",
+    "see_all": "Alle anzeigen",
+    "add_expense_modal": "Ausgabe hinzufügen",
+    "confirm_expense": "Ausgabe bestätigen"
   },
   "dashboard": {
-    "balance": "Kontostand",
-    "monthly_limit": "Monatslimit",
-    "recent_transactions": "Letzte Transaktionen",
+    "good_morning": "Guten Morgen",
+    "available_daily": "Täglich verfügbar",
+    "over_budget": "Drüber",
+    "on_track": "Im Plan",
+    "monthly_goal": "Monatsziel",
+    "spending": "Ausgaben",
+    "week": "WOCHE",
+    "budget_health": "Budget-Gesundheit",
+    "recent": "Aktuell",
+    "default_note": "Einkauf",
     "no_transactions": "Noch keine Transaktionen"
+  },
+  "analytics": {
+    "title": "Statistiken",
+    "total_spent": "Gesamtausgaben",
+    "categories": "Kategorien",
+    "no_data": "Noch keine Ausgabendaten"
+  },
+  "categories": {
+    "shopping": "Einkaufen",
+    "food": "Essen",
+    "transport": "Transport",
+    "entertainment": "Unterhaltung",
+    "coffee": "Kaffee",
+    "utilities": "Nebenkosten"
   },
   "settings": {
     "title": "Einstellungen",
@@ -29,12 +58,39 @@
       "system": "System",
       "light": "Hell",
       "dark": "Dunkel"
-    }
+    },
+    "global_settings": "Allgemeine Einstellungen",
+    "monthly_budget": "Monatliches Budget"
   },
   "landing": {
     "hero_title": "Achtsames Ausgeben,",
     "hero_subtitle": "flüssige Klarheit.",
     "hero_desc": "Erleben Sie eine Budget-App, die sich so flüssig anfühlt wie Ihr Leben. Wunderschön einfach, kraftvoll aufschlussreich.",
     "get_started": "Loslegen"
+  },
+  "profile": {
+    "title": "Mein Profil",
+    "personal_info": "Persönliche Informationen",
+    "member_since": "Mitglied seit {date}",
+    "account_security": "Kontosicherheit",
+    "email_label": "E-Mail Adresse",
+    "email_placeholder": "Neue E-Mail eingeben",
+    "email_hint": "Das Ändern Ihrer E-Mail erfordert eine Bestätigung sowohl von Ihrer alten als auch von Ihrer neuen Adresse.",
+    "update_email": "E-Mail aktualisieren",
+    "confirmation_sent": "Bestätigungslink an beide E-Mails gesendet.",
+    "logout": "Abmelden"
+  },
+  "assistant": {
+    "title": "Assistent",
+    "subtitle": "Ihr persönlicher Finanzberater",
+    "coming_soon": "Kommt bald",
+    "description": "Unser KI-gestützter Finanzassistent wird derzeit trainiert. Schauen Sie bald wieder vorbei für personalisierte Einblicke und smarte Budget-Tipps!",
+    "notify_me": "Benachrichtigen"
+  },
+  "onboarding": {
+    "welcome": "MySaldo",
+    "tagline": "Achtsames Ausgeben, flüssige Klarheit.",
+    "monthly_goal": "Monatsziel",
+    "start_journey": "Reise starten"
   }
 }

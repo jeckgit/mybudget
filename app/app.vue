@@ -1,5 +1,9 @@
 <script setup lang="ts">
-// Logic moved to layouts/default.vue and pages/
+const { initTheme } = useTheme();
+
+onMounted(() => {
+    initTheme();
+});
 </script>
 
 <template>

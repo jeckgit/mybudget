@@ -7,13 +7,42 @@
     "save": "Save",
     "cancel": "Cancel",
     "delete": "Delete",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "add": "Add",
+    "assistant": "Assistant",
+    "profile": "Profile",
+    "guest": "Guest",
+    "user": "User",
+    "see_all": "See All",
+    "add_expense_modal": "Add Expense",
+    "confirm_expense": "Confirm Expense"
   },
   "dashboard": {
-    "balance": "Balance",
-    "monthly_limit": "Monthly Limit",
-    "recent_transactions": "Recent Transactions",
+    "good_morning": "Good Morning",
+    "available_daily": "Available Daily",
+    "over_budget": "Over",
+    "on_track": "On Track",
+    "monthly_goal": "Monthly Goal",
+    "spending": "Spending",
+    "week": "WEEK",
+    "budget_health": "Budget Health",
+    "recent": "Recent",
+    "default_note": "Purchase",
     "no_transactions": "No transactions yet"
+  },
+  "analytics": {
+    "title": "Statistics",
+    "total_spent": "Total Spent",
+    "categories": "Categories",
+    "no_data": "No spending data yet"
+  },
+  "categories": {
+    "shopping": "Shopping",
+    "food": "Food",
+    "transport": "Transport",
+    "entertainment": "Entertainment",
+    "coffee": "Coffee",
+    "utilities": "Utilities"
   },
   "settings": {
     "title": "Settings",
@@ -29,12 +58,39 @@
       "system": "System",
       "light": "Light",
       "dark": "Dark"
-    }
+    },
+    "global_settings": "Global Settings",
+    "monthly_budget": "Monthly Budget"
   },
   "landing": {
     "hero_title": "Mindful spending,",
     "hero_subtitle": "liquid clarity.",
     "hero_desc": "Experience a budgeting app that feels as fluid as your life. Beautifully simple, powerfully insightful.",
     "get_started": "Get Started"
+  },
+  "profile": {
+    "title": "My Profile",
+    "personal_info": "Personal Information",
+    "member_since": "Member since {date}",
+    "account_security": "Account Security",
+    "email_label": "Email Address",
+    "email_placeholder": "Enter new email",
+    "email_hint": "Changing your email requires confirmation from both your old and new email addresses.",
+    "update_email": "Update Email",
+    "confirmation_sent": "Confirmation link sent to both emails.",
+    "logout": "Logout"
+  },
+  "assistant": {
+    "title": "Assistant",
+    "subtitle": "Your personal financial guide",
+    "coming_soon": "Coming Soon",
+    "description": "Our AI-powered financial assistant is currently in training. Check back soon for personalized insights and smart budgeting tips!",
+    "notify_me": "Notify Me"
+  },
+  "onboarding": {
+    "welcome": "MySaldo",
+    "tagline": "Mindful spending, liquid clarity.",
+    "monthly_goal": "Monthly Goal",
+    "start_journey": "Start Journey"
   }
 }

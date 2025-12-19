@@ -7,13 +7,42 @@
     "save": "Guardar",
     "cancel": "Cancelar",
     "delete": "Eliminar",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "add": "Añadir",
+    "assistant": "Asistente",
+    "profile": "Perfil",
+    "guest": "Invitado",
+    "user": "Usuario",
+    "see_all": "Ver todo",
+    "add_expense_modal": "Añadir gasto",
+    "confirm_expense": "Confirmar Gasto"
   },
   "dashboard": {
-    "balance": "Balance",
-    "monthly_limit": "Límite mensual",
-    "recent_transactions": "Transacciones recientes",
+    "good_morning": "Buenos días",
+    "available_daily": "Disponible diariamente",
+    "over_budget": "Excedido",
+    "on_track": "En camino",
+    "monthly_goal": "Meta mensual",
+    "spending": "Gastos",
+    "week": "SEMANA",
+    "budget_health": "Salud del presupuesto",
+    "recent": "Reciente",
+    "default_note": "Compra",
     "no_transactions": "No hay transacciones"
+  },
+  "analytics": {
+    "title": "Estadísticas",
+    "total_spent": "Total gastado",
+    "categories": "Categorías",
+    "no_data": "No hay datos de gastos aún"
+  },
+  "categories": {
+    "shopping": "Compras",
+    "food": "Comida",
+    "transport": "Transporte",
+    "entertainment": "Entretenimiento",
+    "coffee": "Café",
+    "utilities": "Servicios"
   },
   "settings": {
     "title": "Ajustes",
@@ -29,12 +58,39 @@
       "system": "Sistema",
       "light": "Claro",
       "dark": "Oscuro"
-    }
+    },
+    "global_settings": "Ajustes Globales",
+    "monthly_budget": "Presupuesto Mensual"
   },
   "landing": {
     "hero_title": "Gastos conscientes,",
     "hero_subtitle": "claridad líquida.",
     "hero_desc": "Experimenta una aplicación de presupuesto que se siente tan fluida como tu vida. Hermosamente simple, poderosamente perspicaz.",
     "get_started": "Empezar"
+  },
+  "profile": {
+    "title": "Mi Perfil",
+    "personal_info": "Información Personal",
+    "member_since": "Miembro desde {date}",
+    "account_security": "Seguridad de la Cuenta",
+    "email_label": "Dirección de Correo",
+    "email_placeholder": "Introduce nuevo correo",
+    "email_hint": "Cambiar tu correo requiere confirmación tanto desde tu antigua como desde tu nueva dirección.",
+    "update_email": "Actualizar Correo",
+    "confirmation_sent": "Enlace de confirmación enviado a ambos correos.",
+    "logout": "Cerrar Sesión"
+  },
+  "assistant": {
+    "title": "Asistente",
+    "subtitle": "Tu guía financiero personal",
+    "coming_soon": "Próximamente",
+    "description": "Nuestro asistente financiero impulsado por IA se está entrenando. ¡Vuelve pronto para obtener consejos personalizados!",
+    "notify_me": "Notificarme"
+  },
+  "onboarding": {
+    "welcome": "MySaldo",
+    "tagline": "Gastos conscientes, claridad líquida.",
+    "monthly_goal": "Meta mensual",
+    "start_journey": "Comenzar Viaje"
   }
 }

@@ -4,6 +4,7 @@ import type { AppState } from '~/types';
 
 // Use storage directly
 const { state, loadState } = useStorage();
+const { t } = useI18n();
 
 await useAsyncData('analytics-state', async () => {
     await loadState();
@@ -53,33 +54,33 @@ const categoryData = computed(() => {
 const categories = computed(() =>
     [
         {
-            name: 'Shopping',
+            name: t('categories.shopping'),
             icon: ShoppingBag,
-            bgColor: 'bg-pink-50 text-pink-500',
+            bgColor: 'bg-pink-50 text-pink-500 dark:bg-pink-900/20 dark:text-pink-300',
             color: '#F472B6',
             percentage: categoryData.value.find((c) => c.category === '🛍️')?.percentage || 0,
             amount: categoryData.value.find((c) => c.category === '🛍️')?.amount || 0
         },
         {
-            name: 'Food',
+            name: t('categories.food'),
             icon: Coffee,
-            bgColor: 'bg-orange-50 text-orange-500',
+            bgColor: 'bg-orange-50 text-orange-500 dark:bg-orange-900/20 dark:text-orange-300',
             color: '#F87171',
             percentage: categoryData.value.find((c) => c.category === '🍔')?.percentage || 0,
             amount: categoryData.value.find((c) => c.category === '🍔')?.amount || 0
         },
         {
-            name: 'Transport',
+            name: t('categories.transport'),
             icon: ShoppingBag,
-            bgColor: 'bg-blue-50 text-blue-500',
+            bgColor: 'bg-blue-50 text-blue-500 dark:bg-blue-900/20 dark:text-blue-300',
             color: '#60A5FA',
             percentage: categoryData.value.find((c) => c.category === '🚗')?.percentage || 0,
             amount: categoryData.value.find((c) => c.category === '🚗')?.amount || 0
         },
         {
-            name: 'Entertainment',
+            name: t('categories.entertainment'),
             icon: Coffee,
-            bgColor: 'bg-purple-50 text-purple-500',
+            bgColor: 'bg-purple-50 text-purple-500 dark:bg-purple-900/20 dark:text-purple-300',
             color: '#C084FC',
             percentage: categoryData.value.find((c) => c.category === '🎬')?.percentage || 0,
             amount: categoryData.value.find((c) => c.category === '🎬')?.amount || 0
@@ -91,21 +92,22 @@ const categories = computed(() =>
     <div class="min-h-screen pb-32 px-6 pt-12">
         <div class="flex items-center gap-4 mb-8">
             <NuxtLink to="/"
-                class="w-10 h-10 rounded-full bg-white/40 flex items-center justify-center border border-white/50">
-                <ChevronLeft :size="24" class="text-slate-600" />
+                class="w-10 h-10 rounded-full bg-white/40 flex items-center justify-center border border-white/50 dark:bg-white/10 dark:border-white/20">
+                <ChevronLeft :size="24" class="text-slate-600 dark:text-white" />
             </NuxtLink>
-            <h2 class="text-2xl font-bold text-slate-800">Statistics</h2>
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-white">{{ t('analytics.title') }}</h2>
             <div
-                class="ml-auto w-10 h-10 rounded-full bg-white/40 flex items-center justify-center shadow-sm border border-white/50">
-                <MoreHorizontal :size="20" class="text-slate-500" />
+                class="ml-auto w-10 h-10 rounded-full bg-white/40 flex items-center justify-center shadow-sm border border-white/50 dark:bg-white/10 dark:border-white/20">
+                <MoreHorizontal :size="20" class="text-slate-500 dark:text-white" />
             </div>
         </div>
 
-        <GlassCard variant="glass" class="p-6 mb-6">
+        <GlassCard variant="glass" class="p-6 mb-6 dark:bg-white/5 dark:border-white/10">
             <div class="flex items-center justify-between mb-8">
                 <div>
-                    <p class="text-sm text-slate-500 font-medium mb-1">Total Spent</p>
-                    <h3 class="text-3xl font-bold text-slate-800">
+                    <p class="text-sm text-slate-500 font-medium mb-1 dark:text-slate-400">{{ t('analytics.total_spent')
+                        }}</p>
+                    <h3 class="text-3xl font-bold text-slate-800 dark:text-white">
                         {{ formatCurrency(budgetData.totalSpentMonth, state.config.currencySymbol) }}
                     </h3>
                 </div>
@@ -114,7 +116,7 @@ const categories = computed(() =>
                         :progress="budgetData.totalSpentMonth / state.config.monthlyLimit" color="#F472B6"
                         track-color="rgba(0,0,0,0.05)" />
                     <span
-                        class="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-slate-600">
+                        class="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-slate-600 dark:text-slate-300">
                         {{ Math.round((budgetData.totalSpentMonth / state.config.monthlyLimit) * 100) }}%
                     </span>
                 </div>
@@ -123,31 +125,31 @@ const categories = computed(() =>
             <SpendingChart :data="dailyData" :daily-limit="budgetData.avgDaily" />
         </GlassCard>
 
-        <h3 class="font-bold text-lg text-slate-800 mb-4 px-1">Categories</h3>
+        <h3 class="font-bold text-lg text-slate-800 mb-4 px-1 dark:text-white">{{ t('analytics.categories') }}</h3>
         <div class="space-y-3">
             <GlassCard v-for="cat in categories" :key="cat.name" variant="white"
-                class="flex items-center justify-between p-4 !rounded-[1.5rem] !bg-white/50">
+                class="flex items-center justify-between p-4 !rounded-[1.5rem] !bg-white/50 dark:!bg-white/5 dark:!border dark:!border-white/10">
                 <div class="flex items-center gap-4">
                     <div :class="[
-                        'w-12 h-12 rounded-2xl flex items-center justify-center border border-white/60 shadow-sm',
+                        'w-12 h-12 rounded-2xl flex items-center justify-center border border-white/60 shadow-sm dark:border-white/20',
                         cat.bgColor
                     ]">
                         <component :is="cat.icon" :size="20" />
                     </div>
                     <div class="flex-1">
-                        <p class="font-bold text-slate-700 text-sm">{{ cat.name }}</p>
-                        <div class="w-24 h-1.5 bg-slate-200/50 rounded-full mt-2 overflow-hidden">
+                        <p class="font-bold text-slate-700 text-sm dark:text-white">{{ cat.name }}</p>
+                        <div class="w-24 h-1.5 bg-slate-200/50 rounded-full mt-2 overflow-hidden dark:bg-white/10">
                             <div class="h-full rounded-full"
                                 :style="{ width: cat.percentage + '%', backgroundColor: cat.color }" />
                         </div>
                     </div>
                 </div>
-                <span class="font-bold text-slate-800">${{ Math.round(cat.amount) }}</span>
+                <span class="font-bold text-slate-800 dark:text-white">${{ Math.round(cat.amount) }}</span>
             </GlassCard>
 
             <div v-if="categories.length === 0"
-                class="text-center py-12 text-slate-400 bg-white/30 backdrop-blur-md rounded-[2rem] border border-dashed border-white/50">
-                No spending data yet
+                class="text-center py-12 text-slate-400 bg-white/30 backdrop-blur-md rounded-[2rem] border border-dashed border-white/50 dark:text-slate-500 dark:bg-white/5 dark:border-white/10">
+                {{ t('analytics.no_data') }}
             </div>
         </div>
     </div>
