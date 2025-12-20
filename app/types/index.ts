@@ -1,9 +1,16 @@
+export interface Category {
+  id: string;
+  emoji: string;
+  name: string;
+  user_id?: string;
+}
+
 export interface Transaction {
   id: string;
   amount: number;
   date: string; // ISO date string
   note?: string;
-  category?: string; // Emoji
+  category: string; // Category ID
 }
 
 export interface BudgetConfig {
@@ -23,6 +30,7 @@ export interface DailyStats {
 
 export interface AppState {
   transactions: Transaction[];
+  categories: Category[];
   config: BudgetConfig;
 }
 

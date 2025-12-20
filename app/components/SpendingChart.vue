@@ -67,14 +67,20 @@ const chartOption = computed(() => ({
   ],
   tooltip: {
     trigger: 'axis',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderColor: 'rgba(226, 232, 240, 1)',
+    borderWidth: 1,
+    padding: [12, 16],
     textStyle: {
-      color: '#475569'
+      color: '#1E293B',
+      fontWeight: 'bold',
+      fontSize: 12
     },
+    extraCssText: 'border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border: none backdrop-filter: blur(8px); shadow: none;',
     formatter: (params: any) => {
       const data = params[0];
-      return `Day ${data.axisValue}<br/>Spent: $${data.value}`;
+      return `<div style="font-size: 10px; opacity: 0.6; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em">Day ${data.axisValue}</div>
+              <div style="font-size: 14px">$${data.value}</div>`;
     }
   }
 }));

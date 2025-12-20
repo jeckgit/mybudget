@@ -29,6 +29,9 @@ export default defineNuxtConfig({
       login: '/auth/login',
       callback: '/confirm',
       exclude: ['/', '/auth/login']
+    },
+    cookieOptions: {
+      secure: process.env.NODE_ENV === 'production'
     }
   },
 

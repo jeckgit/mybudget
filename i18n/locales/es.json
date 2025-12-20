@@ -15,11 +15,21 @@
     "user": "Usuario",
     "see_all": "Ver todo",
     "add_expense_modal": "Añadir gasto",
-    "confirm_expense": "Confirmar Gasto"
+    "confirm_expense": "Confirmar Gasto",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "select_category": "Seleccionar Categoría",
+    "manage_categories": "Gestionar Categorías",
+    "edit_expense": "Editar Gasto",
+    "delete_confirm": "¿Estás seguro de que quieres eliminar este gasto?",
+    "error_occurred": "Ha ocurrido un error. Por favor, inténtalo de nuevo.",
+    "add_category": "Añadir Categoría",
+    "edit_category": "Editar Categoría",
+    "delete_category": "Eliminar Categoría"
   },
   "dashboard": {
     "good_morning": "Buenos días",
-    "available_daily": "Disponible diariamente",
+    "spent_today": "Ya gastado hoy",
     "over_budget": "Excedido",
     "on_track": "En camino",
     "monthly_goal": "Meta mensual",
@@ -28,13 +38,15 @@
     "budget_health": "Salud del presupuesto",
     "recent": "Reciente",
     "default_note": "Compra",
-    "no_transactions": "No hay transacciones"
+    "no_transactions": "No hay transacciones aún"
   },
   "analytics": {
     "title": "Estadísticas",
     "total_spent": "Total gastado",
     "categories": "Categorías",
-    "no_data": "No hay datos de gastos aún"
+    "no_data": "No hay datos de gastos aún",
+    "export_csv": "Exportar como CSV",
+    "export_json": "Exportar como JSON"
   },
   "categories": {
     "shopping": "Compras",
@@ -42,7 +54,10 @@
     "transport": "Transporte",
     "entertainment": "Entretenimiento",
     "coffee": "Café",
-    "utilities": "Servicios"
+    "utilities": "Servicios",
+    "add_new": "Añadir Nueva Categoría",
+    "category_name": "Nombre de la Categoría",
+    "spending": "Gasto"
   },
   "settings": {
     "title": "Ajustes",
@@ -60,7 +75,8 @@
       "dark": "Oscuro"
     },
     "global_settings": "Ajustes Globales",
-    "monthly_budget": "Presupuesto Mensual"
+    "monthly_budget": "Presupuesto Mensual",
+    "save_settings": "Guardar Ajustes"
   },
   "landing": {
     "hero_title": "Gastos conscientes,",
@@ -78,7 +94,9 @@
     "email_hint": "Cambiar tu correo requiere confirmación tanto desde tu antigua como desde tu nueva dirección.",
     "update_email": "Actualizar Correo",
     "confirmation_sent": "Enlace de confirmación enviado a ambos correos.",
-    "logout": "Cerrar Sesión"
+    "settings_saved": "Ajustes guardados correctamente",
+    "logout": "Cerrar Sesión",
+    "preferences": "Ajustes de Categoría"
   },
   "assistant": {
     "title": "Asistente",
@@ -92,5 +110,13 @@
     "tagline": "Gastos conscientes, claridad líquida.",
     "monthly_goal": "Meta mensual",
     "start_journey": "Comenzar Viaje"
+  },
+  "day_selector": {
+    "today": "Hoy",
+    "selected_date": "Fecha seleccionada",
+    "daily_spending": "Gasto diario",
+    "available": "Disponible",
+    "details_title": "Detalles diarios",
+    "back": "Volver"
   }
 }

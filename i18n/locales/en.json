@@ -15,11 +15,21 @@
     "user": "User",
     "see_all": "See All",
     "add_expense_modal": "Add Expense",
-    "confirm_expense": "Confirm Expense"
+    "confirm_expense": "Confirm Expense",
+    "next": "Next",
+    "back": "Back",
+    "select_category": "Select Category",
+    "manage_categories": "Manage Categories",
+    "edit_expense": "Edit Expense",
+    "delete_confirm": "Are you sure you want to delete this expense?",
+    "error_occurred": "An error occurred. Please try again.",
+    "add_category": "Add Category",
+    "edit_category": "Edit Category",
+    "delete_category": "Delete Category"
   },
   "dashboard": {
     "good_morning": "Good Morning",
-    "available_daily": "Available Daily",
+    "spent_today": "Already spent today",
     "over_budget": "Over",
     "on_track": "On Track",
     "monthly_goal": "Monthly Goal",
@@ -34,7 +44,9 @@
     "title": "Statistics",
     "total_spent": "Total Spent",
     "categories": "Categories",
-    "no_data": "No spending data yet"
+    "no_data": "No spending data yet",
+    "export_csv": "Export as CSV",
+    "export_json": "Export as JSON"
   },
   "categories": {
     "shopping": "Shopping",
@@ -42,7 +54,10 @@
     "transport": "Transport",
     "entertainment": "Entertainment",
     "coffee": "Coffee",
-    "utilities": "Utilities"
+    "utilities": "Utilities",
+    "add_new": "Add New Category",
+    "category_name": "Category Name",
+    "spending": "Spending"
   },
   "settings": {
     "title": "Settings",
@@ -60,7 +75,8 @@
       "dark": "Dark"
     },
     "global_settings": "Global Settings",
-    "monthly_budget": "Monthly Budget"
+    "monthly_budget": "Monthly Budget",
+    "save_settings": "Save Settings"
   },
   "landing": {
     "hero_title": "Mindful spending,",
@@ -78,7 +94,9 @@
     "email_hint": "Changing your email requires confirmation from both your old and new email addresses.",
     "update_email": "Update Email",
     "confirmation_sent": "Confirmation link sent to both emails.",
-    "logout": "Logout"
+    "settings_saved": "Settings saved successfully",
+    "logout": "Logout",
+    "preferences": "Category Settings"
   },
   "assistant": {
     "title": "Assistant",
@@ -92,5 +110,13 @@
     "tagline": "Mindful spending, liquid clarity.",
     "monthly_goal": "Monthly Goal",
     "start_journey": "Start Journey"
+  },
+  "day_selector": {
+    "today": "Today",
+    "selected_date": "Selected Date",
+    "daily_spending": "Daily Spending",
+    "available": "Available",
+    "details_title": "Daily Details",
+    "back": "Back"
   }
 }

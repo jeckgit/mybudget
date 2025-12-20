@@ -3,6 +3,7 @@ import type { Database } from '~/types/database.types';
 
 const DEFAULT_STATE: AppState = {
   transactions: [],
+  categories: [],
   config: {
     monthlyLimit: 0,
     currencySymbol: '$',
@@ -26,7 +27,7 @@ export const useStorage = () => {
       const { data: profile, error: profileError } = await client
         .from('profiles')
         .select('*')
-        .eq('user', user.value.sub)
+        .eq('user_id', user.value.sub)
         .maybeSingle();
 
       if (profileError) console.error('Error loading profile:', profileError);
@@ -35,13 +36,21 @@ export const useStorage = () => {
       const { data: transactions, error: txError } = await client
         .from('transactions')
         .select('*')
-        .eq('user', user.value.sub)
+        .eq('user_id', user.value.sub)
         .order('date', { ascending: false });
 
       if (txError) console.error('Error loading transactions:', txError);
 
-      // If we have no data at all (no profile AND no transactions), default
-      if (!profile && (!transactions || transactions.length === 0)) {
+      // Load Categories
+      const { data: categories, error: catError } = await client
+        .from('categories')
+        .select('*')
+        .eq('user_id', user.value.sub);
+
+      if (catError) console.error('Error loading categories:', catError);
+
+      // If we have no data at all (no profile AND no transactions AND no categories), default
+      if (!profile && (!transactions || transactions.length === 0) && (!categories || categories.length === 0)) {
         state.value = DEFAULT_STATE;
         return;
       }
@@ -54,6 +63,12 @@ export const useStorage = () => {
           language: profile?.language || 'en',
           theme: profile?.theme || 'system'
         },
+        categories: (categories || []).map((c) => ({
+          id: c.id,
+          emoji: c.emoji,
+          name: c.name,
+          user_id: c.user_id
+        })),
         transactions: (transactions || []).map((t) => ({
           id: t.id,
           amount: Number(t.amount),
@@ -78,7 +93,7 @@ export const useStorage = () => {
 
     try {
       const { error } = await client.from('profiles').upsert({
-        user: user.value.sub,
+        user_id: user.value.sub,
         monthly_limit: newState.config.monthlyLimit,
         currency_symbol: newState.config.currencySymbol,
         onboarding_complete: newState.config.onboardingComplete,
@@ -95,20 +110,77 @@ export const useStorage = () => {
   const addTransaction = async (transaction: Transaction) => {
     if (!user.value?.sub) return;
 
-    // Optimistic update
+    // Optimistic update with temporary ID
+    // We keep a reference to the temporary ID to replace it later
+    const tempId = transaction.id;
     state.value.transactions = [transaction, ...state.value.transactions];
 
-    const { error } = await client.from('transactions').insert({
-      user: user.value.sub,
-      amount: transaction.amount,
-      date: transaction.date,
-      note: transaction.note,
-      category: transaction.category
-    });
+    const { data, error } = await client
+      .from('transactions')
+      .insert({
+        user_id: user.value.sub,
+        amount: transaction.amount,
+        date: transaction.date,
+        note: transaction.note,
+        category: transaction.category
+      })
+      .select()
+      .single();
 
     if (error) {
-      console.error('Failed to add transaction', error);
-      // Revert on error could be implemented here
+      console.error('[addTransaction] Failed to add transaction:', error);
+      // Remove the optimistic transaction on error
+      state.value.transactions = state.value.transactions.filter((t) => t.id !== tempId);
+      return;
+    }
+
+    // Update the local transaction with the real ID from database
+    if (data) {
+      const index = state.value.transactions.findIndex((t) => t.id === tempId);
+      if (index !== -1 && state.value.transactions[index]) {
+        // MUTATE the existing object reference so that any UI components (like the open modal)
+        // holding a reference to this transaction see the updated ID immediately.
+        state.value.transactions[index]!.id = data.id;
+      } else {
+        console.warn('[addTransaction] Could not find optimistic transaction to update ID:', tempId);
+      }
+    }
+  };
+
+  const updateTransaction = async (updatedTx: Transaction) => {
+    if (!user.value?.sub) return;
+
+    // Optimistic update
+    const index = state.value.transactions.findIndex((t) => t.id === updatedTx.id);
+    if (index !== -1) {
+      state.value.transactions[index] = updatedTx;
+    }
+    const { data: updateData, error } = await client
+      .from('transactions')
+      .update({
+        amount: updatedTx.amount,
+        date: updatedTx.date,
+        note: updatedTx.note,
+        category: updatedTx.category
+      })
+      .eq('id', updatedTx.id)
+      .select();
+
+    if (error) {
+      console.error('[updateTransaction] Failed to update transaction:', error);
+    }
+  };
+
+  const removeTransaction = async (id: string) => {
+    if (!user.value?.sub) return;
+
+    // Optimistic update
+    state.value.transactions = state.value.transactions.filter((t) => t.id !== id);
+
+    const { error } = await client.from('transactions').delete().eq('id', id);
+
+    if (error) {
+      console.error('[removeTransaction] Failed to delete transaction:', error);
     }
   };
 
@@ -118,7 +190,7 @@ export const useStorage = () => {
 
     try {
       // Delete all transactions
-      await client.from('transactions').delete().eq('user', user.value.sub);
+      await client.from('transactions').delete().eq('user_id', user.value.sub);
 
       // Reset profile
       await client
@@ -127,7 +199,10 @@ export const useStorage = () => {
           monthly_limit: 0,
           onboarding_complete: false
         })
-        .eq('user', user.value.sub);
+        .eq('user_id', user.value.sub);
+
+      // Delete all categories
+      await client.from('categories').delete().eq('user_id', user.value.sub);
     } catch (e) {
       console.error('Failed to clear state', e);
     }
@@ -140,7 +215,7 @@ export const useStorage = () => {
     state.value.config = { ...state.value.config, ...partialConfig };
     try {
       const { error } = await client.from('profiles').upsert({
-        user: user.value.sub,
+        user_id: user.value.sub,
         monthly_limit: state.value.config.monthlyLimit,
         currency_symbol: state.value.config.currencySymbol,
         onboarding_complete: state.value.config.onboardingComplete,
@@ -175,6 +250,8 @@ export const useStorage = () => {
     loadState,
     saveState,
     updateConfig,
+    updateTransaction,
+    removeTransaction,
     addTransaction,
     clearState
   };

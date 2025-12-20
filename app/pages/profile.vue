@@ -1,12 +1,21 @@
 <script setup lang="ts">
-import { User, Mail, Save, AlertCircle, CheckCircle2, Trash2, Globe, Moon, Sun, Monitor, LogOut } from 'lucide-vue-next';
+import { User, Mail, Save, AlertCircle, CheckCircle2, Trash2, Globe, Moon, Sun, Monitor, LogOut, Tag, ChevronRight } from 'lucide-vue-next';
 
 // Composables
 const user = useSupabaseUser();
 const client = useSupabaseClient();
 const { t, locale, setLocale } = useI18n();
-const { state, loadState, clearState, updateConfig } = useStorage();
 const { colorMode, updateTheme } = useTheme();
+const { state, loadState, clearState, updateConfig } = useStorage();
+const { seedDefaultCategories } = useCategories();
+
+// Ensure state is loaded for SSR to prevent hydration mismatches
+await useAsyncData('profile-init', async () => {
+    if (import.meta.server) {
+        await loadState();
+    }
+    return true;
+});
 
 // --- Profile/Email Logic ---
 const loading = ref(false);
@@ -14,10 +23,64 @@ const errorMsg = ref('');
 const successMsg = ref('');
 const newEmail = ref('');
 
+// --- Settings Logic ---
+const currencies = ['$', '€', '£', '¥', 'CHF'];
+const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'fr', name: 'Français' },
+    { code: 'es', name: 'Español' }
+];
+
+// Local state for settings to allow manual save
+const localLanguage = ref(locale.value as string);
+const localCurrency = ref(state.value.config.currencySymbol);
+const localBudget = ref(state.value.config.monthlyLimit);
+
+const hasChanges = computed(() => {
+    return localLanguage.value !== locale.value ||
+        localCurrency.value !== state.value.config.currencySymbol ||
+        localBudget.value !== state.value.config.monthlyLimit;
+});
+
+const isSaving = ref(false);
+
+const handleSaveSettings = async () => {
+    isSaving.value = true;
+    try {
+        // Update language if changed
+        if (localLanguage.value !== locale.value) {
+            setLocale(localLanguage.value as any);
+        }
+
+        // Update global storage config
+        await updateConfig({
+            language: localLanguage.value,
+            currencySymbol: localCurrency.value,
+            monthlyLimit: localBudget.value
+        });
+
+        successMsg.value = t('profile.settings_saved');
+        setTimeout(() => { successMsg.value = ''; }, 3000);
+    } catch (e: any) {
+        errorMsg.value = e.message;
+    } finally {
+        isSaving.value = false;
+    }
+};
+
 // Initialize newEmail with current email
 watchEffect(() => {
     if (user.value?.email) {
         newEmail.value = user.value.email;
+    }
+    // Sync local state if global state changes (e.g. on load)
+    if (state.value.config) {
+        localCurrency.value = state.value.config.currencySymbol;
+        localBudget.value = state.value.config.monthlyLimit;
+    }
+    if (locale.value) {
+        localLanguage.value = locale.value;
     }
 });
 
@@ -48,18 +111,10 @@ const displayName = computed(() => {
     return user.value.user_metadata?.full_name || user.value.email?.split('@')[0] || t('common.user');
 });
 
-// --- Settings Logic ---
-const currencies = ['$', '€', '£', '¥', 'CHF'];
-const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'de', name: 'Deutsch' },
-    { code: 'fr', name: 'Français' },
-    { code: 'es', name: 'Español' }
-];
-
 const handleReset = async () => {
     if (confirm(t('settings.reset_confirm'))) {
         await clearState();
+        await seedDefaultCategories();
         await loadState();
         navigateTo('/onboarding');
     }
@@ -71,15 +126,11 @@ const handleLogout = async () => {
     navigateTo('/auth/login');
 };
 
-const updateLanguage = (code: string) => {
-    setLocale(code as any);
-    updateConfig({ language: code });
-};
-
 // Sync local state with global settings on mount
 onMounted(() => {
     if (state.value.config.language && state.value.config.language !== locale.value) {
         setLocale(state.value.config.language as any);
+        localLanguage.value = state.value.config.language;
     }
 });
 </script>
@@ -91,32 +142,28 @@ onMounted(() => {
         </header>
 
         <div class="space-y-6">
-            <!-- User Info Card -->
+            <!-- Preferences Section -->
             <section>
                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 dark:text-slate-500">
-                    {{ t('settings.preferences') }}
+                    {{ t('profile.preferences') }}
                 </h2>
-                <GlassCard variant="white" class="p-6 !rounded-2xl flex-col space-y-4">
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="w-24 h-24 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 dark:text-slate-500 mb-2">
-                            <User class="w-10 h-10" />
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-slate-800 dark:text-white">{{ displayName }}</h3>
-                            <p class="text-sm text-slate-500 dark:text-slate-400">{{ t('profile.member_since', {
-                                date:
-                                    new
-                                        Date(user?.created_at
-                                            || '').toLocaleDateString()
-                            }) }}</p>
-                        </div>
-                    </div>
-                </GlassCard>
-            </section>
 
-            <!-- Preferences Section (Moved from Settings) -->
-            <section>
+                <NuxtLink to="/categories" class="block mb-6">
+                    <GlassCard variant="white"
+                        class="p-4 !rounded-2xl flex items-center justify-between group active:scale-[0.98] transition-all">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center dark:bg-purple-900/20 dark:text-purple-300">
+                                <Tag class="w-5 h-5" />
+                            </div>
+                            <span class="font-bold text-slate-700 dark:text-slate-200">{{ t('common.manage_categories')
+                                }}</span>
+                            <ChevronRight
+                                class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors group-active:translate-x-1" />
+                        </div>
+                    </GlassCard>
+                </NuxtLink>
+
                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 dark:text-slate-500">
                     {{ t('settings.global_settings') }}
                 </h2>
@@ -131,8 +178,8 @@ onMounted(() => {
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
                             }}</span>
                         </div>
-                        <select :value="locale" @change="updateLanguage(($event.target as HTMLSelectElement).value)"
-                            class="bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <select v-model="localLanguage"
+                            class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
                             <option v-for="lang in languages" :key="lang.code" :value="lang.code"
                                 class="text-slate-800 bg-white dark:bg-slate-900">
                                 {{ lang.name }}
@@ -154,11 +201,11 @@ onMounted(() => {
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
                             }}</span>
                         </div>
-                        <div class="flex bg-slate-100 dark:bg-white/10 rounded-lg p-1">
+                        <div class="flex bg-slate-100 dark:bg-white/10 rounded-lg p-1 w-32">
                             <ClientOnly>
                                 <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
                                     @click="updateTheme(theme as 'light' | 'system' | 'dark')"
-                                    class="p-2 rounded-md transition-all"
+                                    class="flex-1 p-2 rounded-md transition-all flex items-center justify-center"
                                     :class="colorMode === theme ? 'bg-white dark:bg-white shadow-sm text-purple-600 dark:text-black' : 'text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-white'"
                                     :title="t(`settings.themes.${theme}`)">
                                     <Sun class="w-4 h-4" v-if="theme === 'light'" />
@@ -174,17 +221,21 @@ onMounted(() => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
-                                <span class="text-lg font-bold">$</span>
+                                <ClientOnly>
+                                    <span class="text-lg font-bold">{{ state.config.currencySymbol }}</span>
+                                </ClientOnly>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
                             }}</span>
                         </div>
                         <div class="flex gap-2">
-                            <button v-for="c in currencies" :key="c" @click="updateConfig({ currencySymbol: c })"
-                                class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all hover:cursor-pointer"
-                                :class="state.config.currencySymbol === c ? 'bg-slate-800 text-white dark:bg-white dark:text-slate-900' : 'bg-slate-100 text-slate-400 hover:bg-slate-200 dark:bg-slate-700'">
-                                {{ c }}
-                            </button>
+                            <select v-model="localCurrency"
+                                class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option v-for="c in currencies" :key="c" :value="c"
+                                    class="text-slate-800 bg-white dark:bg-slate-900">
+                                    {{ c }}
+                                </option>
+                            </select>
                         </div>
                     </div>
                     <!-- Monthly Budget -->
@@ -192,19 +243,33 @@ onMounted(() => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-600 dark:text-pink-400">
-                                <span class="text-xs font-bold">{{ state.config.currencySymbol }}</span>
+                                <ClientOnly>
+                                    <span class="text-xs font-bold">{{ state.config.currencySymbol }}</span>
+                                </ClientOnly>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{
                                 t('settings.monthly_budget') }}</span>
                         </div>
                         <div class="relative w-32">
-                            <span
-                                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-sm">{{
-                                    state.config.currencySymbol }}</span>
-                            <input :value="state.config.monthlyLimit" type="number"
-                                @change="updateConfig({ monthlyLimit: Number(($event.target as HTMLInputElement).value) })"
+                            <ClientOnly>
+                                <span
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-sm">{{
+                                        localCurrency }}</span>
+                            </ClientOnly>
+                            <input v-model="localBudget" type="number"
                                 class="w-full bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-white rounded-lg pl-8 pr-3 py-2 text-right text-sm font-bold focus:outline-none focus:ring-2 focus:ring-purple-500" />
                         </div>
+                    </div>
+
+                    <!-- Save Settings Button -->
+                    <div class="pt-2">
+                        <button @click="handleSaveSettings" :disabled="isSaving || !hasChanges"
+                            class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-slate-200 dark:disabled:bg-white/5 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                            <span v-if="isSaving"
+                                class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                            <Save v-else class="w-4 h-4" />
+                            {{ t('settings.save_settings') }}
+                        </button>
                     </div>
                 </GlassCard>
             </section>

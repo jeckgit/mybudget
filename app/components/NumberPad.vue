@@ -12,7 +12,7 @@
     <div class="col-span-3 mt-4">
       <GlassButton variant="primary" :full-width="true" @click="$emit('submit')" :disabled="!value || value === '0'"
         class="!py-5 !bg-black !text-lg !rounded-[2rem] dark:!bg-white dark:!text-black">
-        {{ t('common.confirm_expense') }}
+        {{ submitLabel || t('common.confirm_expense') }}
       </GlassButton>
     </div>
   </div>
@@ -21,6 +21,7 @@
 <script setup lang="ts">
 interface Props {
   value: string;
+  submitLabel?: string;
 }
 
 const props = defineProps<Props>();

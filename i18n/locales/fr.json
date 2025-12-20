@@ -15,11 +15,21 @@
     "user": "Utilisateur",
     "see_all": "Voir tout",
     "add_expense_modal": "Ajouter une dépense",
-    "confirm_expense": "Confirmer la dépense"
+    "confirm_expense": "Confirmer la dépense",
+    "next": "Suivant",
+    "back": "Retour",
+    "select_category": "Choisir une catégorie",
+    "manage_categories": "Gérer les catégories",
+    "edit_expense": "Modifier la dépense",
+    "delete_confirm": "Êtes-vous sûr de vouloir supprimer cette dépense ?",
+    "error_occurred": "Une erreur est survenue. Veuillez réessayer.",
+    "add_category": "Ajouter une catégorie",
+    "edit_category": "Modifier la catégorie",
+    "delete_category": "Supprimer la catégorie"
   },
   "dashboard": {
     "good_morning": "Bonjour",
-    "available_daily": "Disponible quotidiennement",
+    "spent_today": "Déjà dépensé aujourd'hui",
     "over_budget": "Dépassé",
     "on_track": "En bonne voie",
     "monthly_goal": "Objectif mensuel",
@@ -28,13 +38,15 @@
     "budget_health": "Santé budgétaire",
     "recent": "Récent",
     "default_note": "Achat",
-    "no_transactions": "Aucune transaction"
+    "no_transactions": "Aucune transaction pour le moment"
   },
   "analytics": {
     "title": "Statistiques",
     "total_spent": "Total dépensé",
     "categories": "Catégories",
-    "no_data": "Aucune donnée de dépense"
+    "no_data": "Aucune donnée de dépense",
+    "export_csv": "Exporter au format CSV",
+    "export_json": "Exporter au format JSON"
   },
   "categories": {
     "shopping": "Shopping",
@@ -42,7 +54,10 @@
     "transport": "Transport",
     "entertainment": "Divertissement",
     "coffee": "Café",
-    "utilities": "Utilitaires"
+    "utilities": "Utilitaires",
+    "add_new": "Ajouter une nouvelle catégorie",
+    "category_name": "Nom de la catégorie",
+    "spending": "Dépenses"
   },
   "settings": {
     "title": "Paramètres",
@@ -60,7 +75,8 @@
       "dark": "Sombre"
     },
     "global_settings": "Paramètres globaux",
-    "monthly_budget": "Budget Mensuel"
+    "monthly_budget": "Budget mensuel",
+    "save_settings": "Enregistrer les paramètres"
   },
   "landing": {
     "hero_title": "Dépenses conscientes,",
@@ -78,7 +94,9 @@
     "email_hint": "La modification de votre e-mail nécessite une confirmation de votre part sur l'ancienne et la nouvelle adresse.",
     "update_email": "Mettre à jour l'e-mail",
     "confirmation_sent": "Lien de confirmation envoyé aux deux e-mails.",
-    "logout": "Se déconnecter"
+    "settings_saved": "Paramètres enregistrés avec succès",
+    "logout": "Se déconnecter",
+    "preferences": "Paramètres de catégorie"
   },
   "assistant": {
     "title": "Assistant",
@@ -92,5 +110,13 @@
     "tagline": "Dépenses conscientes, clarté liquide.",
     "monthly_goal": "Objectif mensuel",
     "start_journey": "Commencer le voyage"
+  },
+  "day_selector": {
+    "today": "Aujourd'hui",
+    "selected_date": "Date sélectionnée",
+    "daily_spending": "Dépense quotidienne",
+    "available": "Disponible",
+    "details_title": "Détails quotidiens",
+    "back": "Retour"
   }
 }

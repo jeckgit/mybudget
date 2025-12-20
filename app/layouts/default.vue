@@ -9,8 +9,7 @@ const showAddModal = useState('showAddModal', () => false);
 </script>
 
 <template>
-    <div
-        class="relative min-h-screen text-slate-800 font-sans selection:bg-purple-200 overflow-x-hidden dark:text-white">
+    <div class="relative min-h-screen text-slate-800 font-sans selection:bg-purple-200 dark:text-white">
         <BackgroundMesh />
 
         <!-- Main Content -->
@@ -20,6 +19,6 @@ const showAddModal = useState('showAddModal', () => false);
             <BottomNav v-if="user && route.path !== '/onboarding' && route.path !== '/auth/login'" />
         </div>
 
-        <AddExpenseModal v-if="showAddModal" @close="showAddModal = false" />
+        <AddExpenseModal :is-open="showAddModal" @close="showAddModal = false" />
     </div>
 </template>

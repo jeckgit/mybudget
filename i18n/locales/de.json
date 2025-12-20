@@ -15,14 +15,24 @@
     "user": "Benutzer",
     "see_all": "Alle anzeigen",
     "add_expense_modal": "Ausgabe hinzufügen",
-    "confirm_expense": "Ausgabe bestätigen"
+    "confirm_expense": "Ausgabe bestätigen",
+    "next": "Weiter",
+    "back": "Zurück",
+    "select_category": "Kategorie wählen",
+    "manage_categories": "Kategorien bearbeiten",
+    "edit_expense": "Ausgabe bearbeiten",
+    "delete_confirm": "Möchten Sie diese Ausgabe wirklich löschen?",
+    "error_occurred": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "add_category": "Kategorie hinzufügen",
+    "edit_category": "Kategorie bearbeiten",
+    "delete_category": "Kategorie löschen"
   },
   "dashboard": {
     "good_morning": "Guten Morgen",
-    "available_daily": "Täglich verfügbar",
+    "spent_today": "Heute ausgegeben",
     "over_budget": "Drüber",
     "on_track": "Im Plan",
-    "monthly_goal": "Monatsziel",
+    "monthly_goal": "Monatsbudget",
     "spending": "Ausgaben",
     "week": "WOCHE",
     "budget_health": "Budget-Gesundheit",
@@ -34,7 +44,9 @@
     "title": "Statistiken",
     "total_spent": "Gesamtausgaben",
     "categories": "Kategorien",
-    "no_data": "Noch keine Ausgabendaten"
+    "no_data": "Noch keine Ausgabendaten",
+    "export_csv": "Als CSV exportieren",
+    "export_json": "Als JSON exportieren"
   },
   "categories": {
     "shopping": "Einkaufen",
@@ -42,7 +54,10 @@
     "transport": "Transport",
     "entertainment": "Unterhaltung",
     "coffee": "Kaffee",
-    "utilities": "Nebenkosten"
+    "utilities": "Nebenkosten",
+    "add_new": "Neue Kategorie hinzufügen",
+    "category_name": "Kategorie-Name",
+    "spending": "Ausgaben"
   },
   "settings": {
     "title": "Einstellungen",
@@ -60,7 +75,8 @@
       "dark": "Dunkel"
     },
     "global_settings": "Allgemeine Einstellungen",
-    "monthly_budget": "Monatliches Budget"
+    "monthly_budget": "Monatliches Budget",
+    "save_settings": "Einstellungen speichern"
   },
   "landing": {
     "hero_title": "Achtsames Ausgeben,",
@@ -78,7 +94,9 @@
     "email_hint": "Das Ändern Ihrer E-Mail erfordert eine Bestätigung sowohl von Ihrer alten als auch von Ihrer neuen Adresse.",
     "update_email": "E-Mail aktualisieren",
     "confirmation_sent": "Bestätigungslink an beide E-Mails gesendet.",
-    "logout": "Abmelden"
+    "settings_saved": "Einstellungen erfolgreich gespeichert",
+    "logout": "Abmelden",
+    "preferences": "Kategorie-Einstellungen"
   },
   "assistant": {
     "title": "Assistent",
@@ -90,7 +108,15 @@
   "onboarding": {
     "welcome": "MySaldo",
     "tagline": "Achtsames Ausgeben, flüssige Klarheit.",
-    "monthly_goal": "Monatsziel",
+    "monthly_goal": "Monatsbudget",
     "start_journey": "Reise starten"
+  },
+  "day_selector": {
+    "today": "Heute",
+    "selected_date": "Ausgewähltes Datum",
+    "daily_spending": "Tagesausgaben",
+    "available": "Verfügbar",
+    "details_title": "Tagesdetails",
+    "back": "Zurück"
   }
 }
