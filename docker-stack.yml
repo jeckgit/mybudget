@@ -1,0 +1,21 @@
+services:
+  web:
+    image: ghcr.io/jeckgit/mybudget:${GIT_COMMIT_HASH:-latest}
+    networks:
+      - proxy-net
+    environment:
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+    deploy:
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.http.services.budget_web.loadbalancer.server.port=3000'
+        - 'traefik.http.routers.budget_web.rule=Host(`mybudget.zeitnode.com`)'
+        - 'traefik.http.routers.budget_web.entrypoints=websecure'
+        - 'traefik.http.routers.budget_web.tls.certresolver=myresolver'
+      update_config:
+        order: start-first
+
+networks:
+  proxy-net:
+    external: true
