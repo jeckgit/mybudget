@@ -24,7 +24,7 @@ const successMsg = ref('');
 const newEmail = ref('');
 
 // --- Settings Logic ---
-const currencies = ['$', '€', '£', '¥', 'CHF'];
+const currencies = ['€', '$', '£', '¥', 'CHF'];
 const languages = [
     { code: 'en', name: 'English' },
     { code: 'de', name: 'Deutsch' },
@@ -69,18 +69,25 @@ const handleSaveSettings = async () => {
     }
 };
 
-// Initialize newEmail with current email
+// Initialize newEmail and local state from global config
 watchEffect(() => {
-    if (user.value?.email) {
+    if (user.value?.email && !newEmail.value) {
         newEmail.value = user.value.email;
     }
-    // Sync local state if global state changes (e.g. on load)
+
+    // Sync local state if global state changes (e.g. on initial load)
     if (state.value.config) {
-        localCurrency.value = state.value.config.currencySymbol;
-        localBudget.value = state.value.config.monthlyLimit;
-    }
-    if (locale.value) {
-        localLanguage.value = locale.value;
+        // We only want to sync these if the local value isn't already set or if we want to force refresh
+        // For simplicity, we sync them once when the state is loaded
+        if (state.value.config.currencySymbol) {
+            localCurrency.value = state.value.config.currencySymbol;
+        }
+        if (state.value.config.monthlyLimit) {
+            localBudget.value = state.value.config.monthlyLimit;
+        }
+        if (state.value.config.language) {
+            localLanguage.value = state.value.config.language;
+        }
     }
 });
 
@@ -125,14 +132,6 @@ const handleLogout = async () => {
     if (error) console.error(error);
     navigateTo('/auth/login');
 };
-
-// Sync local state with global settings on mount
-onMounted(() => {
-    if (state.value.config.language && state.value.config.language !== locale.value) {
-        setLocale(state.value.config.language as any);
-        localLanguage.value = state.value.config.language;
-    }
-});
 </script>
 
 <template>

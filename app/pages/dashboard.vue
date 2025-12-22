@@ -14,6 +14,9 @@ const displayName = computed(() => {
 
 await useAsyncData('dashboard-state', async () => {
     await loadState();
+    if (state.value.config && !state.value.config.onboardingComplete) {
+        navigateTo('/onboarding');
+    }
     return true;
 });
 
@@ -86,7 +89,7 @@ const navigateToDetail = () => {
                     <div :class="['w-2 h-2 rounded-full', budgetData.isOverBudget ? 'bg-red-400' : 'bg-green-400']" />
                     <span class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ budgetData.isOverBudget ?
                         t('dashboard.over_budget') : t('dashboard.on_track')
-                    }}</span>
+                        }}</span>
                 </div>
             </div>
 

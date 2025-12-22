@@ -118,5 +118,14 @@
     "available": "Verfügbar",
     "details_title": "Tagesdetails",
     "back": "Zurück"
+  },
+  "verification_banner": {
+    "title": "E-Mail bestätigen",
+    "title_sent": "Bestätigungslink gesendet",
+    "desc": "Bestätigen Sie Ihre E-Mail, um Ihr Konto zu sichern.",
+    "desc_sent": "Bitte prüfen Sie Ihren Posteingang (und Spam-Ordner).",
+    "resend": "Erneut senden",
+    "sending": "Wird gesendet...",
+    "sent": "Gesendet!"
   }
 }

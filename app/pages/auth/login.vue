@@ -25,14 +25,18 @@ const handleAuth = async () => {
 
     try {
         if (isSignUp.value) {
-            const { error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email: email.value,
                 password: password.value,
             });
             if (error) throw error;
-            // Create profile record if needed, though triggers are better. 
-            // For now we rely on the user being created.
-            alert('Check your email for the login link!');
+
+            // If "Confirm email" is disabled in Supabase, data.session will be present
+            if (data.session) {
+                navigateTo('/dashboard');
+            } else {
+                alert('Check your email for the login link!');
+            }
         } else {
             const { error } = await supabase.auth.signInWithPassword({
                 email: email.value,
@@ -104,17 +108,18 @@ const handleOAuth = async (provider: 'google' | 'github') => {
 
             <form @submit.prevent="handleAuth" class="space-y-4">
                 <div>
-                    <label
+                    <label for="email"
                         class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">Email</label>
-                    <input v-model="email" type="email" required
+                    <input id="email" v-model="email" type="email" name="email" autocomplete="username" required
                         class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
                         placeholder="hello@example.com" />
                 </div>
 
                 <div>
-                    <label
+                    <label for="password"
                         class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">Password</label>
-                    <input v-model="password" type="password" required
+                    <input id="password" v-model="password" type="password" name="password"
+                        :autocomplete="isSignUp ? 'new-password' : 'current-password'" required
                         class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
                         placeholder="••••••••" />
                     <div class="flex justify-end mt-1">

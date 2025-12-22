@@ -1,25 +1,40 @@
-import type { Category } from '~/types';
+import type { Category, AppState } from '~/types';
 import type { Database } from '~/types/database.types';
 
 export const useCategories = () => {
   const { t } = useI18n();
   const client = useSupabaseClient<Database>();
   const user = useSupabaseUser();
-  const { state } = useStorage();
+  const state = useState<AppState>('app-state');
 
   const categories = computed(() => state.value.categories);
 
-  const seedDefaultCategories = async () => {
+  const DEFAULT_CATEGORIES = [
+    { emoji: '🛍️', name: t('categories.shopping') },
+    { emoji: '🍔', name: t('categories.food') },
+    { emoji: '🚗', name: t('categories.transport') },
+    { emoji: '🎬', name: t('categories.entertainment') },
+    { emoji: '☕', name: t('categories.coffee') },
+    { emoji: '🏠', name: t('categories.utilities') }
+  ];
+
+  const seedDefaultCategories = async (force = false) => {
     if (!user.value?.sub) return;
 
-    const defaults = [
-      { user_id: user.value.sub, emoji: '🛍️', name: t('categories.shopping') },
-      { user_id: user.value.sub, emoji: '🍔', name: t('categories.food') },
-      { user_id: user.value.sub, emoji: '🚗', name: t('categories.transport') },
-      { user_id: user.value.sub, emoji: '🎬', name: t('categories.entertainment') },
-      { user_id: user.value.sub, emoji: '☕', name: t('categories.coffee') },
-      { user_id: user.value.sub, emoji: '🏠', name: t('categories.utilities') }
-    ];
+    if (!force) {
+      // Check if categories already exist to prevent duplicates
+      const { count } = await client
+        .from('categories')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.value.sub);
+
+      if (count && count > 0) return;
+    }
+
+    const defaults = DEFAULT_CATEGORIES.map((cat) => ({
+      user_id: user.value!.sub,
+      ...cat
+    }));
 
     const { data, error } = await client.from('categories').insert(defaults).select();
 
@@ -35,29 +50,6 @@ export const useCategories = () => {
         name: c.name,
         user_id: c.user_id
       }));
-    }
-  };
-
-  const loadCategories = async () => {
-    if (!user.value?.sub) return;
-
-    const { data, error } = await client.from('categories').select('*').eq('user_id', user.value.sub);
-
-    if (error) {
-      console.error('Error loading categories:', error);
-      return;
-    }
-
-    if (data && data.length > 0) {
-      state.value.categories = data.map((c) => ({
-        id: c.id,
-        emoji: c.emoji,
-        name: c.name,
-        user_id: c.user_id
-      }));
-    } else {
-      // If no categories found, seed them automatically
-      await seedDefaultCategories();
     }
   };
 
@@ -127,7 +119,6 @@ export const useCategories = () => {
 
   return {
     categories,
-    loadCategories,
     addCategory,
     updateCategory,
     deleteCategory,

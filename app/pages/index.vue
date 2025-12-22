@@ -5,7 +5,7 @@ definePageMeta({
   layout: 'marketing'
 })
 
-onMounted(() => {
+watchEffect(() => {
   if (user.value) {
     navigateTo('/dashboard');
   }

@@ -118,5 +118,14 @@
     "available": "Available",
     "details_title": "Daily Details",
     "back": "Back"
+  },
+  "verification_banner": {
+    "title": "Verify your email",
+    "title_sent": "Verification Link Sent",
+    "desc": "Confirm your email to secure your account.",
+    "desc_sent": "Please check your inbox (and spam folder).",
+    "resend": "Resend",
+    "sending": "Sending...",
+    "sent": "Sent!"
   }
 }

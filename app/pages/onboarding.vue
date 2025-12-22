@@ -17,7 +17,8 @@
                 </label>
                 <div class="relative mb-8">
                     <span
-                        class="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-medium text-slate-400 dark:text-slate-500">$</span>
+                        class="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-medium text-slate-400 dark:text-slate-500">{{
+                            state.config.currencySymbol }}</span>
                     <input v-model="budgetInput" type="number"
                         class="w-full bg-transparent border-b-2 border-slate-200/50 py-2 pl-8 text-5xl font-bold text-slate-800 focus:outline-none focus:border-purple-400 transition-colors placeholder-slate-200 dark:text-white dark:border-white/10 dark:placeholder-slate-700"
                         placeholder="0" />
@@ -38,6 +39,13 @@ const { state, updateConfig } = useStorage();
 const { t } = useI18n();
 
 const budgetInput = ref('');
+
+// Redirect if already complete
+watchEffect(() => {
+    if (state.value.config?.onboardingComplete) {
+        navigateTo('/dashboard');
+    }
+});
 
 const handleSetBudget = async () => {
     const amount = Number(budgetInput.value);

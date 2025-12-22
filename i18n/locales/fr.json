@@ -118,5 +118,14 @@
     "available": "Disponible",
     "details_title": "Détails quotidiens",
     "back": "Retour"
+  },
+  "verification_banner": {
+    "title": "Vérifiez votre e-mail",
+    "title_sent": "Lien de vérification envoyé",
+    "desc": "Confirmez votre e-mail pour sécuriser votre compte.",
+    "desc_sent": "Veuillez vérifier votre boîte de réception (et vos spams).",
+    "resend": "Renvoyer",
+    "sending": "Envoi...",
+    "sent": "Envoyé !"
   }
 }

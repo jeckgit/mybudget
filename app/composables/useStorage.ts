@@ -6,7 +6,7 @@ const DEFAULT_STATE: AppState = {
   categories: [],
   config: {
     monthlyLimit: 0,
-    currencySymbol: '$',
+    currencySymbol: '€',
     onboardingComplete: false
   }
 };
@@ -14,11 +14,24 @@ const DEFAULT_STATE: AppState = {
 export const useStorage = () => {
   const client = useSupabaseClient<Database>();
   const user = useSupabaseUser();
+  const { t, setLocale, locale } = useI18n();
   const state = useState<AppState>('app-state', () => DEFAULT_STATE);
+  const { seedDefaultCategories } = useCategories();
+
+  // Sync i18n locale with state language
+  watch(
+    () => state.value.config.language,
+    (newLang) => {
+      if (newLang && newLang !== locale.value) {
+        setLocale(newLang as any);
+      }
+    },
+    { immediate: true }
+  );
 
   const loadState = async () => {
     if (!user.value?.sub) {
-      state.value = DEFAULT_STATE;
+      state.value = { ...DEFAULT_STATE };
       return;
     }
 
@@ -49,21 +62,49 @@ export const useStorage = () => {
 
       if (catError) console.error('Error loading categories:', catError);
 
-      // If we have no data at all (no profile AND no transactions AND no categories), default
-      if (!profile && (!transactions || transactions.length === 0) && (!categories || categories.length === 0)) {
-        state.value = DEFAULT_STATE;
-        return;
+      let finalProfile = profile;
+      let finalCategories = categories || [];
+
+      // INITIALIZATION FOR NEW USERS
+      // If no profile found, create one with defaults
+      if (!finalProfile) {
+        const { data: newProfile, error: pError } = await client
+          .from('profiles')
+          .upsert(
+            {
+              user_id: user.value!.sub,
+              currency_symbol: '€',
+              onboarding_complete: false,
+              language: 'en',
+              theme: 'system'
+            },
+            { onConflict: 'user_id' }
+          )
+          .select()
+          .single();
+
+        if (pError) console.error('Error initializing profile:', pError);
+        if (newProfile) finalProfile = newProfile;
+      }
+
+      // If no categories found, seed them automatically
+      if (finalCategories.length === 0) {
+        await seedDefaultCategories();
+
+        // Reload categories after seeding to get the final list with IDs
+        const { data: refreshedCats } = await client.from('categories').select('*').eq('user_id', user.value!.sub);
+        if (refreshedCats) finalCategories = refreshedCats;
       }
 
       state.value = {
         config: {
-          monthlyLimit: Number(profile?.monthly_limit || 0),
-          currencySymbol: profile?.currency_symbol || '$',
-          onboardingComplete: profile?.onboarding_complete || false,
-          language: profile?.language || 'en',
-          theme: profile?.theme || 'system'
+          monthlyLimit: Number(finalProfile?.monthly_limit || 0),
+          currencySymbol: finalProfile?.currency_symbol || '€',
+          onboardingComplete: finalProfile?.onboarding_complete || false,
+          language: finalProfile?.language || 'en',
+          theme: finalProfile?.theme || 'system'
         },
-        categories: (categories || []).map((c) => ({
+        categories: finalCategories.map((c) => ({
           id: c.id,
           emoji: c.emoji,
           name: c.name,
