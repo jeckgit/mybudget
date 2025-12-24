@@ -5,7 +5,7 @@ import { onClickOutside } from '@vueuse/core';
 // Use storage directly
 const { state, loadState } = useStorage();
 const { t, locale } = useI18n();
-const { categories } = useCategories();
+const { categories, getCategoryName } = useCategories();
 const { formatCurrency, calculateBudgetData } = useBudget();
 
 // Month Navigation State
@@ -97,7 +97,7 @@ const exportAsCSV = () => {
     const rows = budgetData.value.monthTransactions.map(t => [
         new Date(t.date).toLocaleDateString(),
         t.amount,
-        categories.value.find(c => c.id === t.category)?.name || t.category,
+        getCategoryName(categories.value.find(c => c.id === t.category)) || t.category,
         t.note || ""
     ]);
 
@@ -114,7 +114,7 @@ const exportAsJSON = () => {
     const data = budgetData.value.monthTransactions.map(t => ({
         date: t.date,
         amount: t.amount,
-        category: categories.value.find(c => c.id === t.category)?.name || t.category,
+        category: getCategoryName(categories.value.find(c => c.id === t.category)) || t.category,
         note: t.note
     }));
 
@@ -225,7 +225,8 @@ const exportAsJSON = () => {
                         </div>
                         <div class="flex-1">
                             <div class="flex items-center justify-between mb-1">
-                                <p class="font-bold text-slate-700 text-sm dark:text-white">{{ cat.name }}</p>
+                                <p class="font-bold text-slate-700 text-sm dark:text-white">{{ getCategoryName(cat) }}
+                                </p>
                                 <p class="text-[10px] font-bold text-slate-400">{{ Math.round(cat.percentage) }}%</p>
                             </div>
                             <div class="w-full h-1.5 bg-slate-200/50 rounded-full overflow-hidden dark:bg-white/10">

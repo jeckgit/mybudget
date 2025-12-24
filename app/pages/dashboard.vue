@@ -89,14 +89,14 @@ const navigateToDetail = () => {
                     <div :class="['w-2 h-2 rounded-full', budgetData.isOverBudget ? 'bg-red-400' : 'bg-green-400']" />
                     <span class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ budgetData.isOverBudget ?
                         t('dashboard.over_budget') : t('dashboard.on_track')
-                        }}</span>
+                    }}</span>
                 </div>
             </div>
 
             <div class="flex items-end justify-between relative z-10 mt-6">
                 <div>
                     <p class="text-xs text-slate-500 font-medium mb-1 uppercase tracking-wide dark:text-slate-400">
-                        {{ t('dashboard.monthly_goal') }}</p>
+                        {{ t('dashboard.monthly_budget') }}</p>
                     <p class="font-bold text-xl text-slate-800 opacity-80 dark:text-white">
                         {{ formatCurrency(state.config.monthlyLimit, state.config.currencySymbol) }}
                     </p>

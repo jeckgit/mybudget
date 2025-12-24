@@ -4,7 +4,7 @@ import type { Transaction } from '~/types';
 
 const route = useRoute();
 const { state, loadState } = useStorage();
-const { categories, getCategoryById } = useCategories();
+const { categories, getCategoryById, getCategoryName } = useCategories();
 const { t, locale } = useI18n();
 const dateStr = route.params.date as string;
 
@@ -113,7 +113,8 @@ const handleModalClose = () => {
                             </div>
                             <div>
                                 <p class="font-bold text-slate-800 text-sm dark:text-white">
-                                    {{ getCategoryById(tx.category)?.name || tx.note || t('dashboard.default_note') }}
+                                    {{ getCategoryName(getCategoryById(tx.category)) || tx.note ||
+                                    t('dashboard.default_note') }}
                                 </p>
                                 <p class="text-xs text-slate-400 font-medium dark:text-slate-400">
                                     {{ formatTime(tx.date) }}

@@ -2,6 +2,7 @@ export interface Category {
   id: string;
   emoji: string;
   name: string;
+  key?: string; // Translation key for default categories (e.g., 'shopping', 'food')
   user_id?: string;
 }
 

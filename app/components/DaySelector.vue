@@ -164,43 +164,50 @@ const formatMonthYear = (date: Date) => {
                 style="-webkit-overflow-scrolling: touch;">
                 <div class="flex flex-col gap-3 day-list">
                     <button v-for="(date, index) in visibleDays" :key="index" @click="handleDayClick(date)" :class="[
-                        'w-full p-4 flex items-center justify-between rounded-[1.8rem] transition-all duration-300 border active:scale-[0.98] snap-center',
+                        'w-full p-4 flex items-center gap-4 rounded-[1.8rem] transition-all duration-300 border active:scale-[0.98] snap-center',
                         isToday(date)
                             ? 'bg-slate-800 text-white border-slate-800 shadow-xl shadow-slate-200 dark:bg-white/15 dark:text-white dark:border-white/20 dark:shadow-purple-900/20'
                             : 'bg-white border-slate-100 text-slate-700 shadow-sm shadow-slate-200/50 hover:bg-slate-50 dark:bg-white/5 dark:border-white/5 dark:text-slate-300'
                     ]">
-                        <div class="flex items-center gap-4">
-                            <div class="flex flex-col items-center min-w-[40px]">
-                                <span
-                                    :class="['text-[10px] font-bold uppercase tracking-widest leading-none mb-1 opacity-60', isToday(date) ? 'text-white/70 dark:text-white/60' : 'text-slate-400']">
-                                    {{ formatDay(date) }}
-                                </span>
-                                <span class="text-xl font-bold leading-none tracking-tighter">{{ formatDate(date)
-                                }}</span>
-                            </div>
-                            <div v-if="isToday(date)" class="h-8 w-[1px] bg-white/20 dark:bg-white/10" />
-                            <div v-else class="h-8 w-[1px] bg-slate-100 dark:bg-white/5" />
+                        <!-- Left: Date -->
+                        <div class="flex flex-col items-center min-w-[50px]">
+                            <span
+                                :class="['text-[10px] font-bold uppercase tracking-widest leading-none mb-1 opacity-60', isToday(date) ? 'text-white/70 dark:text-white/60' : 'text-slate-400']">
+                                {{ formatDay(date) }}
+                            </span>
+                            <span class="text-xl font-bold leading-none tracking-tighter">{{ formatDate(date) }}</span>
                         </div>
-                        <div class="flex flex-col items-end gap-1">
-                            <span class="text-sm font-bold tracking-tight">
-                                <ClientOnly>
-                                    <span>{{ state.config.currencySymbol }}</span>
-                                </ClientOnly>
-                                {{ getBudgetForDate(date).spent.toFixed(2) }}
+
+                        <!-- Divider -->
+                        <div
+                            :class="['h-10 w-[1px]', isToday(date) ? 'bg-white/20 dark:bg-white/10' : 'bg-slate-100 dark:bg-white/5']" />
+
+                        <!-- Center: Available Budget (Dominant) -->
+                        <div class="flex-1 flex flex-col items-center">
+                            <span
+                                :class="['text-[9px] font-black uppercase tracking-[0.2em] mb-0.5 opacity-60', isToday(date) ? 'text-white/60' : 'text-slate-400']">
+                                {{ t('day_selector.available') }}
                             </span>
                             <div :class="[
-                                'flex items-center gap-1 px-2 py-0.5 rounded-full border text-[9px] font-black uppercase tracking-widest',
+                                'text-2xl font-black tracking-tighter transition-colors',
                                 getBudgetForDate(date).available >= 0
-                                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:bg-emerald-400/10 dark:border-emerald-400/20 dark:text-emerald-400'
-                                    : 'bg-rose-500/10 border-rose-500/20 text-rose-600 dark:bg-rose-400/10 dark:border-rose-400/20 dark:text-rose-400'
+                                    ? (isToday(date) ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400')
+                                    : (isToday(date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
                             ]">
-                                <span class="opacity-60">{{ t('day_selector.available') }}</span>
-                                <ClientOnly>
-                                    <span>{{ state.config.currencySymbol }}{{
-                                        getBudgetForDate(date).available.toFixed(2)
-                                        }}</span>
-                                </ClientOnly>
+                                <span>{{ state.config.currencySymbol }}</span>
+                                {{ getBudgetForDate(date).available.toFixed(2) }}
                             </div>
+                        </div>
+
+                        <!-- Right: Spent (Secondary) -->
+                        <div class="flex flex-col items-end min-w-[60px]">
+                            <span class="text-[9px] font-bold uppercase tracking-widest opacity-40 mb-0.5">
+                                {{ t('dashboard.spending') }}
+                            </span>
+                            <span
+                                :class="['text-xs font-bold tracking-tight', isToday(date) ? 'text-white/80' : 'text-slate-500']">
+                                {{ getBudgetForDate(date).spent.toFixed(2) }}
+                            </span>
                         </div>
                     </button>
                 </div>

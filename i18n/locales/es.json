@@ -32,7 +32,7 @@
     "spent_today": "Ya gastado hoy",
     "over_budget": "Excedido",
     "on_track": "En camino",
-    "monthly_goal": "Meta mensual",
+    "monthly_budget": "Presupuesto mensual",
     "spending": "Gastos",
     "week": "SEMANA",
     "budget_health": "Salud del presupuesto",
@@ -108,7 +108,7 @@
   "onboarding": {
     "welcome": "MySaldo",
     "tagline": "Gastos conscientes, claridad líquida.",
-    "monthly_goal": "Meta mensual",
+    "monthly_budget": "Presupuesto mensual",
     "start_journey": "Comenzar Viaje"
   },
   "day_selector": {

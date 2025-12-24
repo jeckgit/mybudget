@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronLeft, Plus, Settings2, Trash2, Edit2, Check, X } from 'lucide-vue-next';
-const { categories, addCategory, updateCategory, deleteCategory } = useCategories();
+const { categories, addCategory, updateCategory, deleteCategory, getCategoryName } = useCategories();
 const { state, loadState } = useStorage();
 const { t } = useI18n();
 const router = useRouter();
@@ -34,7 +34,7 @@ const handleAdd = async () => {
 const startEdit = (cat: any) => {
     editingId.value = cat.id;
     editEmoji.value = cat.emoji;
-    editName.value = cat.name;
+    editName.value = getCategoryName(cat);
 };
 
 const handleUpdate = async () => {
@@ -111,7 +111,7 @@ const cancelEdit = () => {
                                     class="w-12 h-12 flex items-center justify-center text-3xl bg-slate-50 dark:bg-white/5 rounded-2xl">
                                     {{ cat.emoji }}
                                 </div>
-                                <span class="font-bold text-slate-800 dark:text-white">{{ cat.name }}</span>
+                                <span class="font-bold text-slate-800 dark:text-white">{{ getCategoryName(cat) }}</span>
                             </div>
                             <div class="flex items-center gap-1">
                                 <button @click="startEdit(cat)"

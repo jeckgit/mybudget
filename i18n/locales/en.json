@@ -32,7 +32,7 @@
     "spent_today": "Already spent today",
     "over_budget": "Over",
     "on_track": "On Track",
-    "monthly_goal": "Monthly Goal",
+    "monthly_budget": "Monthly Budget",
     "spending": "Spending",
     "week": "WEEK",
     "budget_health": "Budget Health",
@@ -108,7 +108,7 @@
   "onboarding": {
     "welcome": "MySaldo",
     "tagline": "Mindful spending, liquid clarity.",
-    "monthly_goal": "Monthly Goal",
+    "monthly_budget": "Monthly Budget",
     "start_journey": "Start Journey"
   },
   "day_selector": {

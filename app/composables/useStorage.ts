@@ -107,7 +107,8 @@ export const useStorage = () => {
         categories: finalCategories.map((c) => ({
           id: c.id,
           emoji: c.emoji,
-          name: c.name,
+          name: c.name || '', // Handle nullable name for default categories
+          key: c.key || undefined,
           user_id: c.user_id
         })),
         transactions: (transactions || []).map((t) => ({

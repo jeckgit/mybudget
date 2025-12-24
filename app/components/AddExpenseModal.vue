@@ -9,7 +9,7 @@ const props = defineProps<{
 
 const route = useRoute();
 const { state, loadState, saveState, addTransaction, updateTransaction, removeTransaction } = useStorage();
-const { categories, getCategoryByEmoji, getCategoryById } = useCategories();
+const { categories, getCategoryByEmoji, getCategoryById, getCategoryName } = useCategories();
 const { t, locale } = useI18n();
 const emit = defineEmits(['close']);
 
@@ -127,9 +127,6 @@ const handleDelete = () => {
     inputValue.value = inputValue.value.slice(0, -1);
 }
 
-const getCategoryName = (id: string) => {
-    return getCategoryById(id)?.name || id;
-}
 
 
 // Swipe to Close Logic
@@ -195,10 +192,8 @@ const modalCardStyle = computed(() => {
                                         {{ editingTransaction ? t('common.edit_expense') : t('common.add_expense') }}
                                     </p>
                                     <div class="flex items-center justify-center gap-1">
-                                        <ClientOnly>
-                                            <span class="text-4xl text-slate-300 font-medium dark:text-slate-600">{{
-                                                state.config.currencySymbol }}</span>
-                                        </ClientOnly>
+                                        <span class="text-4xl text-slate-300 font-medium dark:text-slate-600">{{
+                                            state.config.currencySymbol }}</span>
                                         <span
                                             class="text-7xl font-bold text-slate-800 tracking-tighter dark:text-white">
                                             {{ inputValue || "0" }}
@@ -226,9 +221,7 @@ const modalCardStyle = computed(() => {
                                             {{ t('common.select_category') }}
                                         </p>
                                         <p class="text-2xl font-bold text-slate-800 dark:text-white">
-                                            <ClientOnly>
-                                                <span>{{ state.config.currencySymbol }}</span>
-                                            </ClientOnly>
+                                            <span>{{ state.config.currencySymbol }}</span>
                                             {{ inputValue }}
                                         </p>
                                     </div>
@@ -254,7 +247,7 @@ const modalCardStyle = computed(() => {
                                         :class="{ '!bg-purple-50 !border-purple-200 !text-purple-600 dark:!bg-purple-900/20 dark:!border-purple-500/30': selectedCategory.id === cat.id }">
                                         <span class="text-4xl mb-2">{{ cat.emoji }}</span>
                                         <span class="text-xs font-bold uppercase tracking-wider opacity-80">{{
-                                            cat.name }}</span>
+                                            getCategoryName(cat) }}</span>
                                     </button>
                                 </div>
                             </template>

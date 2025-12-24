@@ -156,7 +156,7 @@ const handleLogout = async () => {
                                 <Tag class="w-5 h-5" />
                             </div>
                             <span class="font-bold text-slate-700 dark:text-slate-200">{{ t('common.manage_categories')
-                                }}</span>
+                            }}</span>
                             <ChevronRight
                                 class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors group-active:translate-x-1" />
                         </div>
@@ -175,7 +175,7 @@ const handleLogout = async () => {
                                 <Globe class="w-5 h-5" />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
-                            }}</span>
+                                }}</span>
                         </div>
                         <select v-model="localLanguage"
                             class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -191,27 +191,23 @@ const handleLogout = async () => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
-                                <ClientOnly>
-                                    <Moon class="w-5 h-5" v-if="colorMode === 'dark'" />
-                                    <Sun class="w-5 h-5" v-else-if="colorMode === 'light'" />
-                                    <Monitor class="w-5 h-5" v-else />
-                                </ClientOnly>
+                                <Moon class="w-5 h-5" v-if="colorMode === 'dark'" />
+                                <Sun class="w-5 h-5" v-else-if="colorMode === 'light'" />
+                                <Monitor class="w-5 h-5" v-else />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex bg-slate-100 dark:bg-white/10 rounded-lg p-1 w-32">
-                            <ClientOnly>
-                                <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
-                                    @click="updateTheme(theme as 'light' | 'system' | 'dark')"
-                                    class="flex-1 p-2 rounded-md transition-all flex items-center justify-center"
-                                    :class="colorMode === theme ? 'bg-white dark:bg-white shadow-sm text-purple-600 dark:text-black' : 'text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-white'"
-                                    :title="t(`settings.themes.${theme}`)">
-                                    <Sun class="w-4 h-4" v-if="theme === 'light'" />
-                                    <Monitor class="w-4 h-4" v-if="theme === 'system'" />
-                                    <Moon class="w-4 h-4" v-if="theme === 'dark'" />
-                                </button>
-                            </ClientOnly>
+                            <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
+                                @click="updateTheme(theme as 'light' | 'system' | 'dark')"
+                                class="flex-1 p-2 rounded-md transition-all flex items-center justify-center"
+                                :class="colorMode === theme ? 'bg-white dark:bg-white shadow-sm text-purple-600 dark:text-black' : 'text-slate-400 hover:text-slate-600 dark:text-slate-400 dark:hover:text-white'"
+                                :title="t(`settings.themes.${theme}`)">
+                                <Sun class="w-4 h-4" v-if="theme === 'light'" />
+                                <Monitor class="w-4 h-4" v-if="theme === 'system'" />
+                                <Moon class="w-4 h-4" v-if="theme === 'dark'" />
+                            </button>
                         </div>
                     </div>
 
@@ -220,12 +216,10 @@ const handleLogout = async () => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
-                                <ClientOnly>
-                                    <span class="text-lg font-bold">{{ state.config.currencySymbol }}</span>
-                                </ClientOnly>
+                                <span class="text-lg font-bold">{{ state.config.currencySymbol }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex gap-2">
                             <select v-model="localCurrency"
@@ -242,19 +236,15 @@ const handleLogout = async () => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-600 dark:text-pink-400">
-                                <ClientOnly>
-                                    <span class="text-xs font-bold">{{ state.config.currencySymbol }}</span>
-                                </ClientOnly>
+                                <span class="text-xs font-bold">{{ state.config.currencySymbol }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{
                                 t('settings.monthly_budget') }}</span>
                         </div>
                         <div class="relative w-32">
-                            <ClientOnly>
-                                <span
-                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-sm">{{
-                                        localCurrency }}</span>
-                            </ClientOnly>
+                            <span
+                                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-sm">{{
+                                    localCurrency }}</span>
                             <input v-model="localBudget" type="number"
                                 class="w-full bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-white rounded-lg pl-8 pr-3 py-2 text-right text-sm font-bold focus:outline-none focus:ring-2 focus:ring-purple-500" />
                         </div>
