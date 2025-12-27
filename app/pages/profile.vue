@@ -22,6 +22,9 @@ const loading = ref(false);
 const errorMsg = ref('');
 const successMsg = ref('');
 const newEmail = ref('');
+const showDeleteConfirm = ref(false);
+const deleteEmailInput = ref('');
+const isDeleting = ref(false);
 
 // --- Settings Logic ---
 const currencies = ['€', '$', '£', '¥', 'CHF'];
@@ -132,6 +135,33 @@ const handleLogout = async () => {
     if (error) console.error(error);
     navigateTo('/auth/login');
 };
+
+const handleDeleteAccount = async () => {
+    if (deleteEmailInput.value !== user.value?.email) return;
+
+    isDeleting.value = true;
+    try {
+        // 1. Delete all user data via RLS (client side)
+        // Note: RLS policies must allow deletion for this to work
+        await Promise.all([
+            client.from('transactions').delete().eq('user_id', user.value.id),
+            client.from('categories').delete().eq('user_id', user.value.id),
+            client.from('profiles').delete().eq('id', user.value.id) // If profiles exists
+        ]);
+
+        // 2. Sign out
+        await client.auth.signOut();
+
+        // 3. Redirect
+        navigateTo('/');
+    } catch (e) {
+        console.error("Deletion failed", e);
+        errorMsg.value = t('common.error_occurred');
+        showDeleteConfirm.value = false;
+    } finally {
+        isDeleting.value = false;
+    }
+};
 </script>
 
 <template>
@@ -156,7 +186,7 @@ const handleLogout = async () => {
                                 <Tag class="w-5 h-5" />
                             </div>
                             <span class="font-bold text-slate-700 dark:text-slate-200">{{ t('common.manage_categories')
-                            }}</span>
+                                }}</span>
                             <ChevronRight
                                 class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors group-active:translate-x-1" />
                         </div>
@@ -175,7 +205,7 @@ const handleLogout = async () => {
                                 <Globe class="w-5 h-5" />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
-                                }}</span>
+                            }}</span>
                         </div>
                         <select v-model="localLanguage"
                             class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -196,7 +226,7 @@ const handleLogout = async () => {
                                 <Monitor class="w-5 h-5" v-else />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex bg-slate-100 dark:bg-white/10 rounded-lg p-1 w-32">
                             <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
@@ -219,7 +249,7 @@ const handleLogout = async () => {
                                 <span class="text-lg font-bold">{{ state.config.currencySymbol }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex gap-2">
                             <select v-model="localCurrency"
@@ -308,17 +338,32 @@ const handleLogout = async () => {
             <section>
                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 dark:text-slate-500">{{
                     t('settings.data') }}</h2>
-                <GlassCard variant="white" class="p-4 !rounded-2xl">
+                <GlassCard variant="white" class="p-4 !rounded-2xl space-y-2">
                     <button @click="handleReset"
-                        class="w-full flex items-center justify-between p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors group">
+                        class="w-full flex items-center justify-between p-2 text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-white/5 rounded-xl transition-colors group">
                         <div class="flex items-center gap-3">
                             <div
-                                class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center group-hover:bg-red-200 dark:group-hover:bg-red-900/50 transition-colors">
+                                class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
                                 <Trash2 class="w-5 h-5" />
                             </div>
                             <span class="font-medium">{{ t('settings.reset_data') }}</span>
                         </div>
                     </button>
+                    <!-- Danger Zone Section -->
+                    <div class="pt-4 mt-2 border-t border-slate-100 dark:border-white/5">
+                        <h3 class="text-xs font-bold text-red-500 tracking-wider mb-3 px-1">{{
+                            t('profile.danger_zone') }}</h3>
+
+                        <div class="space-y-3">
+                            <p class="text-xs text-slate-400 dark:text-slate-500 px-1">{{
+                                t('profile.delete_account_desc') }}</p>
+                            <button @click="showDeleteConfirm = true"
+                                class="w-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30 dark:hover:bg-red-900/20 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                                <AlertCircle class="w-5 h-5" />
+                                {{ t('profile.delete_account') }}
+                            </button>
+                        </div>
+                    </div>
                 </GlassCard>
             </section>
 
@@ -331,5 +376,49 @@ const handleLogout = async () => {
                 </button>
             </section>
         </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div v-if="showDeleteConfirm" class="fixed inset-0 z-50 flex items-center justify-center p-6">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            @click="showDeleteConfirm = false" />
+        <GlassCard variant="white"
+            class="w-full max-w-sm p-6 relative z-10 space-y-6 animate-in fade-in zoom-in-95 duration-200 !rounded-[2rem]">
+            <div class="text-center space-y-2">
+                <div
+                    class="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-red-500 shadow-sm border border-red-100 dark:border-red-900/30">
+                    <AlertCircle class="w-8 h-8" stroke-width="1.5" />
+                </div>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white">{{ t('profile.delete_account') }}</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed px-4">
+                    {{ t('profile.delete_confirmation') }}
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="space-y-2 text-center">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">
+
+                        {{ t('profile.type_email_to_confirm', { email: user?.email }) }}
+                    </label>
+                    <input v-model="deleteEmailInput" type="email"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500 transition-all text-center font-medium text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600"
+                        :placeholder="user?.email" />
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button @click="showDeleteConfirm = false"
+                    class="flex-1 py-3.5 font-bold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors dark:text-slate-300 dark:bg-white/10 dark:hover:bg-white/20">
+                    {{ t('common.cancel') }}
+                </button>
+                <button @click="handleDeleteAccount" :disabled="deleteEmailInput !== user?.email || isDeleting"
+                    class="flex-1 py-3.5 text-sm text-white bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-[0.98] flex items-center justify-center gap-2">
+                    <span v-if="isDeleting"
+                        class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span v-else>{{ t('common.delete') }}</span>
+                </button>
+            </div>
+        </GlassCard>
     </div>
 </template>

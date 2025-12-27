@@ -29,7 +29,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   data: () => [30, 45, 25, 60, 40, 75, 50],
   highlightIndex: 5,
-  highlightColor: 'bg-pink-400',
+  highlightColor: 'bg-accent',
   defaultColor: 'bg-slate-300',
   barWidth: '12px'
 });

@@ -1,75 +1,98 @@
-# Nuxt Minimal Starter
+# MySaldo
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+> A minimalist, aesthetically sophisticated budgeting app designed to transform daily money management into a serene ritual.
 
-## Setup
+MySaldo (concept name: _Lume_) is a Nuxt 4 application that focuses on **daily spending allowances** rather than strict monthly buckets. It features a beautiful glassmorphism UI/UX, gentle gamification, and a privacy-focused architecture on top of Supabase.
 
-Make sure to install dependencies:
+## ✨ Features
 
-```bash
-# npm
-npm install
+- **Daily Budgeting**: Automatically calculates your daily spending limit based on your monthly budget.
+- **Glassmorphism Design**: A premium, "ambient luxury" interface with translucent layers and soft animations.
+- **Internationalization**: Fully localized in English, German (Deutsch), French (Français), and Spanish (Español).
+- **Dark Mode**: Native support for dark and light themes.
+- **Data Privacy**: Built on Supabase with Row Level Security (RLS).
+- **PWA Ready**: Mobile-first design.
 
-# pnpm
-pnpm install
+## 🛠 Tech Stack
 
-# yarn
-yarn install
+- **Framework**: [Nuxt 4](https://nuxt.com)
+- **Database & Auth**: [Supabase](https://supabase.com)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com) (v4 with Vite) + Custom Glassmorphism
+- **Icons**: [Lucide Vue Next](https://lucide.dev)
+- **Charts**: [ECharts](https://echarts.apache.org) / vue-echarts
+- **Utilities**: [VueUse](https://vueuse.org)
 
-# bun
-bun install
-```
+## 🚀 Getting Started
 
-## Development Server
+### Prerequisites
 
-Start the development server on `http://localhost:3000`:
+- Node.js (Latest LTS recommended)
+- pnpm (recommended) or npm/yarn
 
-```bash
-# npm
-npm run dev
+### Installation
 
-# pnpm
-pnpm dev
+1.  **Clone the repository:**
 
-# yarn
-yarn dev
+    ```bash
+    git clone <repository-url>
+    cd mysaldo-nuxt
+    ```
 
-# bun
-bun run dev
-```
+2.  **Install dependencies:**
 
-## Production
+    ```bash
+    pnpm install
+    ```
+
+3.  **Environment Setup:**
+
+    Copy the example environment file:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+    Update `.env` with your Supabase credentials:
+
+    ```env
+    SUPABASE_URL=your-project-url
+    SUPABASE_KEY=your-anon-key
+    ```
+
+4.  **Start Development Server:**
+    ```bash
+    pnpm dev
+    ```
+    The app will be available at `http://localhost:3000`.
+
+## 📦 Build & Deployment
+
+### Production Build
 
 Build the application for production:
 
 ```bash
-# npm
-npm run build
-
-# pnpm
 pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+Preview the production build locally:
 
 ```bash
-# npm
-npm run preview
-
-# pnpm
 pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+### Docker
+
+This project includes a `Dockerfile` and `docker-stack.yml` for containerized deployment.
+
+```bash
+# Build the image
+docker build -t mybudget .
+
+# Run container
+docker run -p 3000:3000 mybudget
+```
+
+## 📄 License
+
+[MIT](LICENSE)

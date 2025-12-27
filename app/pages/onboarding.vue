@@ -3,8 +3,8 @@
         <div class="max-w-md w-full transition-all duration-500 ease-in-out">
             <!-- Icon / Logo Area -->
             <div
-                class="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-white/80 to-white/20 backdrop-blur-xl border border-white/60 flex items-center justify-center shadow-2xl shadow-purple-200/50 mb-8 mx-auto dark:from-white/10 dark:to-white/5 dark:border-white/10 dark:shadow-purple-900/20">
-                <Wallet class="w-10 h-10 text-purple-500" :stroke-width="1.5" />
+                class="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-white/80 to-white/20 backdrop-blur-xl border border-white/60 flex items-center justify-center shadow-2xl shadow-accent/30 mb-8 mx-auto dark:from-white/10 dark:to-white/5 dark:border-white/10 dark:shadow-accent/20">
+                <Wallet class="w-10 h-10 text-mint" :stroke-width="1.5" />
             </div>
 
             <!-- Step 1: Language Selection -->
@@ -26,7 +26,7 @@
             <div v-else-if="currentStep === 'budget'" class="animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.welcome')
-                }}</h1>
+                    }}</h1>
                 <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.tagline') }}</p>
 
                 <GlassCard variant="glass" class="p-8 dark:bg-white/5 dark:border-white/10">
@@ -39,7 +39,7 @@
                             class="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-medium text-slate-400 dark:text-slate-500">{{
                                 state.config.currencySymbol }}</span>
                         <input v-model="budgetInput" type="number"
-                            class="w-full bg-transparent border-b-2 border-slate-200/50 py-2 pl-8 text-5xl font-bold text-slate-800 focus:outline-none focus:border-purple-400 transition-colors placeholder-slate-200 dark:text-white dark:border-white/10 dark:placeholder-slate-700"
+                            class="w-full bg-transparent border-b-2 border-slate-200/50 py-2 pl-8 text-5xl font-bold text-slate-800 focus:outline-none focus:border-accent transition-colors placeholder-slate-200 dark:text-white dark:border-white/10 dark:placeholder-slate-700"
                             placeholder="0" />
                     </div>
                     <div class="flex flex-col gap-3">
@@ -64,14 +64,14 @@
                     <div class="flex flex-col items-center gap-6">
                         <!-- Animated pulse circles -->
                         <div class="relative w-20 h-20">
-                            <div class="absolute inset-0 rounded-full bg-purple-500/20 animate-ping"></div>
-                            <div class="absolute inset-0 rounded-full bg-purple-500/40 animate-pulse"></div>
+                            <div class="absolute inset-0 rounded-full bg-accent/20 animate-ping"></div>
+                            <div class="absolute inset-0 rounded-full bg-accent/40 animate-pulse"></div>
                             <div class="absolute inset-0 flex items-center justify-center">
-                                <div class="w-12 h-12 rounded-full bg-purple-500"></div>
+                                <div class="w-12 h-12 rounded-full bg-accent"></div>
                             </div>
                         </div>
                         <p class="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">
-                            Setting up your budget...
+                            {{ t('onboarding.setting_up') }}
                         </p>
                     </div>
                 </GlassCard>

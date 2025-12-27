@@ -96,7 +96,12 @@
     "confirmation_sent": "Confirmation link sent to both emails.",
     "settings_saved": "Settings saved successfully",
     "logout": "Logout",
-    "preferences": "Category Settings"
+    "preferences": "Category Settings",
+    "danger_zone": "Danger Zone",
+    "delete_account": "Delete Account",
+    "delete_account_desc": "Permanently delete your data and account.",
+    "delete_confirmation": "Are you sure? This cannot be undone.",
+    "type_email_to_confirm": "Type your email {email} to confirm."
   },
   "assistant": {
     "title": "Assistant",
@@ -109,7 +114,8 @@
     "welcome": "MySaldo",
     "tagline": "Mindful spending, liquid clarity.",
     "monthly_budget": "Monthly Budget",
-    "start_journey": "Start Journey"
+    "start_journey": "Start Journey",
+    "setting_up": "Setting up your budget..."
   },
   "day_selector": {
     "today": "Today",
@@ -117,7 +123,8 @@
     "daily_spending": "Daily Spending",
     "available": "Available",
     "details_title": "Daily Details",
-    "back": "Back"
+    "back": "Back",
+    "over": "Over by"
   },
   "verification_banner": {
     "title": "Verify your email",

@@ -186,7 +186,8 @@ const formatMonthYear = (date: Date) => {
                         <div class="flex-1 flex flex-col items-center">
                             <span
                                 :class="['text-[9px] font-black uppercase tracking-[0.2em] mb-0.5 opacity-60', isToday(date) ? 'text-white/60' : 'text-slate-400']">
-                                {{ t('day_selector.available') }}
+                                {{ getBudgetForDate(date).available >= 0 ? t('day_selector.available') :
+                                    t('day_selector.over') }}
                             </span>
                             <div :class="[
                                 'text-2xl font-black tracking-tighter transition-colors',
@@ -195,7 +196,7 @@ const formatMonthYear = (date: Date) => {
                                     : (isToday(date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
                             ]">
                                 <span>{{ state.config.currencySymbol }}</span>
-                                {{ getBudgetForDate(date).available.toFixed(2) }}
+                                {{ Math.abs(getBudgetForDate(date).available).toFixed(2) }}
                             </div>
                         </div>
 

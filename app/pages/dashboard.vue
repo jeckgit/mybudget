@@ -102,7 +102,7 @@ const navigateToDetail = () => {
                     </p>
                 </div>
                 <div @click="navigateToDetail"
-                    class="w-14 h-14 rounded-full bg-white/30 backdrop-blur-xl border border-white/50 flex items-center justify-center shadow-lg shadow-purple-900/5 text-slate-700 active:scale-90 transition-all cursor-pointer dark:text-white dark:bg-white/10 dark:border-white/20">
+                    class="w-14 h-14 rounded-full bg-white/30 backdrop-blur-xl border border-white/50 flex items-center justify-center shadow-lg shadow-accent/10 text-slate-700 active:scale-90 transition-all cursor-pointer dark:text-white dark:bg-white/10 dark:border-white/20">
                     <ArrowUpRight :size="24" />
                 </div>
             </div>

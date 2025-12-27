@@ -111,7 +111,7 @@ const handleOAuth = async (provider: 'google' | 'github') => {
                     <label for="email"
                         class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">Email</label>
                     <input id="email" v-model="email" type="email" name="email" autocomplete="username" required
-                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
                         placeholder="hello@example.com" />
                 </div>
 
@@ -120,11 +120,11 @@ const handleOAuth = async (provider: 'google' | 'github') => {
                         class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">Password</label>
                     <input id="password" v-model="password" type="password" name="password"
                         :autocomplete="isSignUp ? 'new-password' : 'current-password'" required
-                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
                         placeholder="••••••••" />
                     <div class="flex justify-end mt-1">
                         <NuxtLink to="/auth/forgot-password"
-                            class="text-xs text-slate-500 hover:text-purple-600 transition-colors dark:text-slate-400 dark:hover:text-white">
+                            class="text-xs text-slate-500 hover:text-accent transition-colors dark:text-slate-400 dark:hover:text-white">
                             Forgot Password?
                         </NuxtLink>
                     </div>
@@ -142,7 +142,7 @@ const handleOAuth = async (provider: 'google' | 'github') => {
 
             <div class="mt-6 text-center">
                 <button @click="toggleSignup" type="button"
-                    class="cursor-pointer text-sm text-slate-500 hover:text-purple-600 font-medium transition-colors dark:text-slate-400 dark:hover:text-white">
+                    class="cursor-pointer text-sm text-slate-500 hover:text-accent font-medium transition-colors dark:text-slate-400 dark:hover:text-white">
                     {{ isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up" }}
                 </button>
             </div>

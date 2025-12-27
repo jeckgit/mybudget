@@ -96,7 +96,12 @@
     "confirmation_sent": "Enlace de confirmación enviado a ambos correos.",
     "settings_saved": "Ajustes guardados correctamente",
     "logout": "Cerrar Sesión",
-    "preferences": "Ajustes de Categoría"
+    "preferences": "Ajustes de Categoría",
+    "danger_zone": "Zona de Peligro",
+    "delete_account": "Eliminar Cuenta",
+    "delete_account_desc": "Elimina permanentemente tus datos y cuenta.",
+    "delete_confirmation": "¿Estás seguro? Esto no se puede deshacer.",
+    "type_email_to_confirm": "Escribe tu correo {email} para confirmar."
   },
   "assistant": {
     "title": "Asistente",
@@ -109,7 +114,8 @@
     "welcome": "MySaldo",
     "tagline": "Gastos conscientes, claridad líquida.",
     "monthly_budget": "Presupuesto mensual",
-    "start_journey": "Comenzar Viaje"
+    "start_journey": "Comenzar Viaje",
+    "setting_up": "Configurando tu presupuesto..."
   },
   "day_selector": {
     "today": "Hoy",
@@ -117,7 +123,8 @@
     "daily_spending": "Gasto diario",
     "available": "Disponible",
     "details_title": "Detalles diarios",
-    "back": "Volver"
+    "back": "Volver",
+    "over": "Excedido por"
   },
   "verification_banner": {
     "title": "Verifica tu correo",
