@@ -100,8 +100,20 @@
     "danger_zone": "Zone de Danger",
     "delete_account": "Supprimer le compte",
     "delete_account_desc": "Supprimez définitivement vos données et votre compte.",
-    "delete_confirmation": "Êtes-vous sûr ? Cela ne peut pas être annulé.",
-    "type_email_to_confirm": "Tapez votre e-mail {email} pour confirmer."
+    "delete_confirmation": "Êtes-vous sûr ? Cela ne peut pas être annulé."
+  },
+  "legal": {
+    "title": "Mentions Légales",
+    "imprint": "Mentions Légales",
+    "privacy": "Politique de Confidentialité",
+    "disclaimer": "Avertissement",
+    "back": "Retour"
+  },
+  "cookies": {
+    "text": "Nous utilisons des cookies pour assurer les fonctionnalités de base du site et améliorer votre expérience.",
+    "accept": "Tout accepter",
+    "essential": "Essentiels seulement",
+    "privacy_link": "Politique de confidentialité"
   },
   "assistant": {
     "title": "Assistant",

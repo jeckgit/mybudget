@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { User, Mail, Save, AlertCircle, CheckCircle2, Trash2, Globe, Moon, Sun, Monitor, LogOut, Tag, ChevronRight } from 'lucide-vue-next';
+import { User, Mail, Save, AlertCircle, CheckCircle2, Trash2, Globe, Moon, Sun, Monitor, LogOut, Tag, ChevronRight, Scale } from 'lucide-vue-next';
 
 // Composables
 const user = useSupabaseUser();
@@ -332,6 +332,27 @@ const handleDeleteAccount = async () => {
                         {{ t('profile.update_email') }}
                     </button>
                 </GlassCard>
+            </section>
+
+            <!-- Legal Section -->
+            <section>
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 dark:text-slate-500">{{
+                    t('legal.title') }}</h2>
+                <NuxtLink to="/legal">
+                    <GlassCard variant="white"
+                        class="p-4 !rounded-2xl flex items-center justify-between group active:scale-[0.98] transition-all">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center">
+                                <Scale class="w-5 h-5" />
+                            </div>
+                            <span class="font-bold text-slate-700 dark:text-slate-200">{{ t('legal.imprint') }} / {{
+                                t('legal.privacy') }}</span>
+                        </div>
+                        <ChevronRight
+                            class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors group-active:translate-x-1" />
+                    </GlassCard>
+                </NuxtLink>
             </section>
 
             <!-- Data Management -->

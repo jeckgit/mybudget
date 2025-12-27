@@ -100,8 +100,20 @@
     "danger_zone": "Danger Zone",
     "delete_account": "Delete Account",
     "delete_account_desc": "Permanently delete your data and account.",
-    "delete_confirmation": "Are you sure? This cannot be undone.",
-    "type_email_to_confirm": "Type your email {email} to confirm."
+    "delete_confirmation": "Are you sure? This cannot be undone."
+  },
+  "legal": {
+    "title": "Legal",
+    "imprint": "Imprint",
+    "privacy": "Privacy Policy",
+    "disclaimer": "Disclaimer",
+    "back": "Back to Overview"
+  },
+  "cookies": {
+    "text": "We use cookies to ensure the basic functionality of the website and to enhance your experience.",
+    "accept": "Accept All",
+    "essential": "Essential Only",
+    "privacy_link": "Privacy Policy"
   },
   "assistant": {
     "title": "Assistant",

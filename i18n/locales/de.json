@@ -100,8 +100,20 @@
     "danger_zone": "Gefahrenzone",
     "delete_account": "Konto löschen",
     "delete_account_desc": "Löschen Sie dauerhaft Ihre Daten und Ihr Konto.",
-    "delete_confirmation": "Sind Sie sicher? Dies kann nicht rückgängig gemacht werden.",
-    "type_email_to_confirm": "Geben Sie Ihre E-Mail {email} zur Bestätigung ein."
+    "delete_confirmation": "Sind Sie sicher? Dies kann nicht rückgängig gemacht werden."
+  },
+  "legal": {
+    "title": "Rechtliches",
+    "imprint": "Impressum",
+    "privacy": "Datenschutzerklärung",
+    "disclaimer": "Haftungsausschluss",
+    "back": "Zurück zur Übersicht"
+  },
+  "cookies": {
+    "text": "Wir verwenden Cookies, um die grundlegende Funktionalität der Website zu gewährleisten und Ihr Erlebnis zu verbessern.",
+    "accept": "Alle akzeptieren",
+    "essential": "Nur Essenzielle",
+    "privacy_link": "Datenschutzerklärung"
   },
   "assistant": {
     "title": "Assistent",

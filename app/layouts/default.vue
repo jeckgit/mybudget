@@ -21,5 +21,6 @@ const showAddModal = useState('showAddModal', () => false);
         </div>
 
         <AddExpenseModal :is-open="showAddModal" @close="showAddModal = false" />
+        <CookieBanner />
     </div>
 </template>

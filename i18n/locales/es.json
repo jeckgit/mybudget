@@ -100,8 +100,20 @@
     "danger_zone": "Zona de Peligro",
     "delete_account": "Eliminar Cuenta",
     "delete_account_desc": "Elimina permanentemente tus datos y cuenta.",
-    "delete_confirmation": "¿Estás seguro? Esto no se puede deshacer.",
-    "type_email_to_confirm": "Escribe tu correo {email} para confirmar."
+    "delete_confirmation": "¿Estás seguro? Esto no se puede deshacer."
+  },
+  "legal": {
+    "title": "Legal",
+    "imprint": "Aviso Legal",
+    "privacy": "Política de Privacidad",
+    "disclaimer": "Descargo de responsabilidad",
+    "back": "Volver"
+  },
+  "cookies": {
+    "text": "Utilizamos cookies para garantizar la funcionalidad básica del sitio web y mejorar su experiencia.",
+    "accept": "Aceptar todo",
+    "essential": "Solo esenciales",
+    "privacy_link": "Política de Privacidad"
   },
   "assistant": {
     "title": "Asistente",

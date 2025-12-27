@@ -3,5 +3,6 @@
 
         <!-- Slot for page content -->
         <slot />
+        <CookieBanner />
     </div>
 </template>
