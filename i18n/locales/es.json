@@ -127,7 +127,11 @@
     "tagline": "Gastos conscientes, claridad líquida.",
     "monthly_budget": "Presupuesto mensual",
     "start_journey": "Comenzar Viaje",
-    "setting_up": "Configurando tu presupuesto..."
+    "setting_up": "Configurando tu presupuesto...",
+    "categories_title": "Categorías",
+    "categories_subtitle": "Tus hábitos de gasto",
+    "categories_desc": "Hemos configurado algunas categorías por defecto. Puedes modificarlas en cualquier momento en tu perfil.",
+    "continue": "Continuar"
   },
   "day_selector": {
     "today": "Hoy",

@@ -54,7 +54,55 @@
                 </GlassCard>
             </div>
 
-            <!-- Step 3: Completing / Setup Screen -->
+            <!-- Step 3: Categories Info -->
+            <div v-else-if="currentStep === 'categories'" class="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
+                    t('onboarding.categories_title') }}</h1>
+                <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.categories_subtitle')
+                    }}</p>
+
+                <GlassCard variant="glass" class="p-8 dark:bg-white/5 dark:border-white/10">
+                    <div class="grid grid-cols-3 gap-4 mb-8">
+                        <div class="flex flex-col items-center gap-2">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-orange-100 flex items-center justify-center text-2xl dark:bg-orange-500/20">
+                                🛍️</div>
+                            <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ t('categories.shopping')
+                                }}</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-2xl dark:bg-blue-500/20">
+                                🍔</div>
+                            <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ t('categories.food')
+                                }}</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center text-2xl dark:bg-green-500/20">
+                                🚌</div>
+                            <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{
+                                t('categories.transport') }}</span>
+                        </div>
+                    </div>
+
+                    <p class="text-sm text-slate-500 text-center mb-8 leading-relaxed dark:text-slate-400">
+                        {{ t('onboarding.categories_desc') }}
+                    </p>
+
+                    <div class="flex flex-col gap-3">
+                        <GlassButton :full-width="true" @click="handleFinish">
+                            {{ t('onboarding.continue') }}
+                        </GlassButton>
+                        <button @click="currentStep = 'budget'"
+                            class="text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors py-2">
+                            {{ t('common.back') }}
+                        </button>
+                    </div>
+                </GlassCard>
+            </div>
+
+            <!-- Step 4: Completing / Setup Screen -->
             <div v-else-if="currentStep === 'completing'" class="animate-in fade-in duration-700">
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.welcome') }}</h1>
@@ -88,7 +136,7 @@ const { state, updateConfig } = useStorage();
 const { t, setLocale } = useI18n();
 
 const budgetInput = ref('');
-const currentStep = ref<'language' | 'budget' | 'completing'>('language');
+const currentStep = ref<'language' | 'budget' | 'categories' | 'completing'>('language');
 
 const languages = [
     { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
@@ -113,17 +161,24 @@ const handleSelectLanguage = async (code: string) => {
 const handleSetBudget = async () => {
     const amount = Number(budgetInput.value);
     if (amount > 0) {
-        // Immediately switch to completing state to prevent flash
-        currentStep.value = 'completing';
-
+        currentStep.value = 'categories';
+        
         await updateConfig({
-            monthlyLimit: amount,
-            onboardingComplete: true
+            monthlyLimit: amount
         });
-
-        // Small delay to show the setup screen, then navigate
-        await new Promise(resolve => setTimeout(resolve, 800));
-        navigateTo('/');
     }
+};
+
+const handleFinish = async () => {
+    // Immediately switch to completing state to prevent flash
+    currentStep.value = 'completing';
+
+    await updateConfig({
+        onboardingComplete: true
+    });
+
+    // Small delay to show the setup screen, then navigate
+    await new Promise(resolve => setTimeout(resolve, 800));
+    navigateTo('/');
 };
 </script>

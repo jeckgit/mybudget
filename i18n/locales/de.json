@@ -127,7 +127,11 @@
     "tagline": "Achtsames Ausgeben, flüssige Klarheit.",
     "monthly_budget": "Monatsbudget",
     "start_journey": "Reise starten",
-    "setting_up": "Budget wird erstellt..."
+    "setting_up": "Budget wird erstellt...",
+    "categories_title": "Kategorien",
+    "categories_subtitle": "Deine Ausgabegewohnheiten",
+    "categories_desc": "Wir haben einige Standardkategorien für dich eingerichtet. Du kannst sie jederzeit in deinem Profil anpassen.",
+    "continue": "Weiter"
   },
   "day_selector": {
     "today": "Heute",

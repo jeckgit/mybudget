@@ -127,7 +127,11 @@
     "tagline": "Dépenses conscientes, clarté liquide.",
     "monthly_budget": "Budget mensuel",
     "start_journey": "Commencer le voyage",
-    "setting_up": "Configuration de votre budget..."
+    "setting_up": "Configuration de votre budget...",
+    "categories_title": "Catégories",
+    "categories_subtitle": "Vos habitudes de dépenses",
+    "categories_desc": "Nous avons configuré quelques catégories par défaut. Vous pouvez les modifier à tout moment dans votre profil.",
+    "continue": "Continuer"
   },
   "day_selector": {
     "today": "Aujourd'hui",

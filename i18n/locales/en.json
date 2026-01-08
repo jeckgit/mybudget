@@ -127,7 +127,11 @@
     "tagline": "Mindful spending, liquid clarity.",
     "monthly_budget": "Monthly Budget",
     "start_journey": "Start Journey",
-    "setting_up": "Setting up your budget..."
+    "setting_up": "Setting up your budget...",
+    "categories_title": "Categories",
+    "categories_subtitle": "Your Spending Habits",
+    "categories_desc": "We've set up some default categories for you. You can add, edit, or remove them anytime in your Profile.",
+    "continue": "Continue"
   },
   "day_selector": {
     "today": "Today",
