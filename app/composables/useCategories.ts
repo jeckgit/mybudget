@@ -1,8 +1,9 @@
-import type { AppState, Category } from '~/types';
-import type { Database } from '~/types/database.types';
+import type { AppState, Category } from '~/../shared/types';
+import type { Database } from '~/../shared/types/database.types';
 
 export const useCategories = () => {
-  const { t } = useI18n();
+  const { $i18n } = useNuxtApp();
+  const { t } = $i18n as any;
   const client = useSupabaseClient<Database>();
   const user = useSupabaseUser();
   const state = useState<AppState>('app-state');

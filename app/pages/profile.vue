@@ -9,13 +9,8 @@ const { colorMode, updateTheme } = useTheme();
 const { state, loadState, clearState, updateConfig } = useStorage();
 const { seedDefaultCategories } = useCategories();
 
-// Ensure state is loaded for SSR to prevent hydration mismatches
-await useAsyncData('profile-init', async () => {
-    if (import.meta.server) {
-        await loadState();
-    }
-    return true;
-});
+// Ensure state is loaded (calls loadState which has built-in dedup)
+await loadState();
 
 // --- Profile/Email Logic ---
 const loading = ref(false);
@@ -148,7 +143,7 @@ const handleDeleteAccount = async () => {
             const results = await Promise.all([
                 client.from('transactions').delete().eq('user_id', userId),
                 client.from('categories').delete().eq('user_id', userId),
-                client.from('profiles').delete().eq('id', userId)
+                client.from('profiles').delete().eq('user_id', userId)
             ]);
 
             // Check for errors in any of the results
@@ -158,10 +153,18 @@ const handleDeleteAccount = async () => {
                 throw new Error("Failed to delete some data");
             }
         }
-        // 2. Sign out
+        // 2. Delete the auth user (requires the RPC function to be created)
+        const { error: rpcError } = await client.rpc('delete_user_account');
+        if (rpcError) {
+            console.error("Failed to delete auth user:", rpcError);
+            // We don't throw here to allow the client to finish the logout flow
+            // even if the auth deletion fails (e.g. if the RPC doesn't exist yet)
+        }
+
+        // 3. Sign out
         await client.auth.signOut();
 
-        // 3. Redirect
+        // 4. Redirect
         navigateTo('/');
     } catch (e) {
         console.error("Deletion failed", e);

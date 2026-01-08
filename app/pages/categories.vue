@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import { ChevronLeft, Plus, Settings2, Trash2, Edit2, Check, X } from 'lucide-vue-next';
+import { Check, ChevronLeft, Edit2, Plus, Trash2, X } from 'lucide-vue-next';
 const { categories, addCategory, updateCategory, deleteCategory, getCategoryName } = useCategories();
 const { state, loadState } = useStorage();
 const { t } = useI18n();
 const router = useRouter();
 
-// Ensure state is loaded for SSR
-await useAsyncData('categories-init', async () => {
-    await loadState();
-    return true;
-});
+// Ensure state is loaded (calls loadState which has built-in dedup)
+await loadState();
 
 const isAdding = ref(false);
 const editingId = ref<string | null>(null);

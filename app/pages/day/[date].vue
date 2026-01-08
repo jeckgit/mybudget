@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronLeft } from 'lucide-vue-next';
-import type { Transaction } from '~/types';
+import type { Transaction } from '~/../shared/types';
 
 const route = useRoute();
 const { state, loadState } = useStorage();
@@ -12,10 +12,8 @@ const dateStr = route.params.date as string;
 const isModalOpen = ref(false);
 const selectedTransaction = ref<Transaction | null>(null);
 
-await useAsyncData(`day-detail-${dateStr}`, async () => {
-    await loadState();
-    return true;
-});
+// Ensure state is loaded (calls loadState which has built-in dedup)
+await loadState();
 
 const dayTransactions = computed(() => {
     return state.value.transactions.filter(tx => {
@@ -114,7 +112,7 @@ const handleModalClose = () => {
                             <div>
                                 <p class="font-bold text-slate-800 text-sm dark:text-white">
                                     {{ getCategoryName(getCategoryById(tx.category)) || tx.note ||
-                                    t('dashboard.default_note') }}
+                                        t('dashboard.default_note') }}
                                 </p>
                                 <p class="text-xs text-slate-400 font-medium dark:text-slate-400">
                                     {{ formatTime(tx.date) }}

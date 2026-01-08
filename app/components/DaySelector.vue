@@ -2,17 +2,15 @@
 import { ref, computed, onMounted } from 'vue';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
-const { state, loadState } = useStorage();
+const { state } = useStorage();
 const { t, locale } = useI18n();
 
 const scrollRef = ref<HTMLElement | null>(null);
 const currentMonthDate = ref(new Date());
 
 onMounted(async () => {
-    await loadState();
-    await loadState();
-    // Default to today if needed, or just let it stay. 
-    // If we want to ensure we see today on load:
+    // State is loaded by parent page/app.vue - no need to call loadState here
+    // Just scroll to today if needed
     if (isToday(new Date())) {
         scrollToToday();
     }

@@ -29,10 +29,8 @@ const nextMonth = () => {
     currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1);
 };
 
-await useAsyncData('analytics-state', async () => {
-    await loadState();
-    return true;
-});
+// Ensure state is loaded (calls loadState which has built-in dedup)
+await loadState();
 
 const budgetData = computed(() => calculateBudgetData(state.value, currentDate.value));
 

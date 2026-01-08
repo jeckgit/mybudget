@@ -1,5 +1,5 @@
-import type { AppState, Transaction } from '~/types';
-import type { Database } from '~/types/database.types';
+import type { AppState, Transaction } from '~/../shared/types';
+import type { Database } from '~/../shared/types/database.types';
 
 const DEFAULT_STATE: AppState = {
   transactions: [],
@@ -11,10 +11,13 @@ const DEFAULT_STATE: AppState = {
   }
 };
 
+let globalLoadingPromise: Promise<any> | null = null;
+
 export const useStorage = () => {
+  const { $i18n } = useNuxtApp();
   const client = useSupabaseClient<Database>();
   const user = useSupabaseUser();
-  const { t, setLocale, locale } = useI18n();
+  const { t, setLocale, locale } = $i18n as any;
   const state = useState<AppState>('app-state', () => DEFAULT_STATE);
   const { seedDefaultCategories } = useCategories();
 
@@ -29,103 +32,117 @@ export const useStorage = () => {
     { immediate: true }
   );
 
-  const loadState = async () => {
+  // Track if state has been loaded for the current user
+  const isLoaded = useState<string | null>('budget-loaded-user', () => null);
+
+  const loadState = async (force = false) => {
     if (!user.value?.sub) {
       state.value = { ...DEFAULT_STATE };
+      isLoaded.value = null;
       return;
     }
 
+    // Skip if already loaded for this user (unless forced)
+    if (!force && isLoaded.value === user.value.sub) {
+      return;
+    }
+
+    // Return existing promise if loading is already in progress to prevent duplicate requests
+    if (globalLoadingPromise) {
+      return globalLoadingPromise;
+    }
+
+    const loadTask = async () => {
+      try {
+        // Load Data in Parallel
+        const [
+          { data: profile, error: profileError },
+          { data: transactions, error: txError },
+          { data: categories, error: catError }
+        ] = await Promise.all([
+          client.from('profiles').select('*').eq('user_id', user.value!.sub).maybeSingle(),
+          client.from('transactions').select('*').eq('user_id', user.value!.sub).order('date', { ascending: false }),
+          client.from('categories').select('*').eq('user_id', user.value!.sub)
+        ]);
+
+        if (profileError) console.error('Error loading profile:', profileError);
+        if (txError) console.error('Error loading transactions:', txError);
+        if (catError) console.error('Error loading categories:', catError);
+
+        let finalProfile = profile;
+        let finalCategories = categories || [];
+
+        // INITIALIZATION FOR NEW USERS
+        // If no profile found, create one with defaults
+        if (!finalProfile) {
+          const { data: newProfile, error: pError } = await client
+            .from('profiles')
+            .upsert(
+              {
+                user_id: user.value!.sub,
+                currency_symbol: '€',
+                onboarding_complete: false,
+                language: 'en',
+                theme: 'system'
+              },
+              { onConflict: 'user_id' }
+            )
+            .select()
+            .single();
+
+          if (pError) console.error('Error initializing profile:', pError);
+          if (newProfile) finalProfile = newProfile;
+        }
+
+        // If no categories found, seed them automatically
+        if (finalCategories.length === 0) {
+          await seedDefaultCategories();
+
+          // Reload categories after seeding to get the final list with IDs
+          const { data: refreshedCats } = await client.from('categories').select('*').eq('user_id', user.value!.sub);
+          if (refreshedCats) finalCategories = refreshedCats;
+        }
+
+        state.value = {
+          config: {
+            monthlyLimit: Number(finalProfile?.monthly_limit || 0),
+            currencySymbol: finalProfile?.currency_symbol || '€',
+            onboardingComplete: finalProfile?.onboarding_complete || false,
+            language: finalProfile?.language || 'en',
+            theme: finalProfile?.theme || 'system'
+          },
+          categories: finalCategories.map((c) => ({
+            id: c.id,
+            emoji: c.emoji,
+            name: c.name || '', // Handle nullable name for default categories
+            key: c.key || undefined,
+            user_id: c.user_id
+          })),
+          transactions: (transactions || []).map((t) => ({
+            id: t.id,
+            amount: Number(t.amount),
+            date: t.date || new Date().toISOString(),
+            note: t.note || '',
+            category: t.category || ''
+          }))
+        };
+      } catch (e) {
+        console.error('Failed to load state from Supabase', e);
+        // Do not overwrite state with default on error to preserve potentially optimistic state
+        // or at least don't wipe it unless necessary. But for now reverting to default on CATASTROPHIC error might be safe?
+        // actually, if network fails, we probably shouldn't wipe local state if we had it.
+        // But here we are loading FRESH state.
+        state.value = DEFAULT_STATE;
+      }
+    };
+
+    globalLoadingPromise = loadTask();
     try {
-      // Load Profile
-      const { data: profile, error: profileError } = await client
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.value.sub)
-        .maybeSingle();
-
-      if (profileError) console.error('Error loading profile:', profileError);
-
-      // Load Transactions
-      const { data: transactions, error: txError } = await client
-        .from('transactions')
-        .select('*')
-        .eq('user_id', user.value.sub)
-        .order('date', { ascending: false });
-
-      if (txError) console.error('Error loading transactions:', txError);
-
-      // Load Categories
-      const { data: categories, error: catError } = await client
-        .from('categories')
-        .select('*')
-        .eq('user_id', user.value.sub);
-
-      if (catError) console.error('Error loading categories:', catError);
-
-      let finalProfile = profile;
-      let finalCategories = categories || [];
-
-      // INITIALIZATION FOR NEW USERS
-      // If no profile found, create one with defaults
-      if (!finalProfile) {
-        const { data: newProfile, error: pError } = await client
-          .from('profiles')
-          .upsert(
-            {
-              user_id: user.value!.sub,
-              currency_symbol: '€',
-              onboarding_complete: false,
-              language: 'en',
-              theme: 'system'
-            },
-            { onConflict: 'user_id' }
-          )
-          .select()
-          .single();
-
-        if (pError) console.error('Error initializing profile:', pError);
-        if (newProfile) finalProfile = newProfile;
-      }
-
-      // If no categories found, seed them automatically
-      if (finalCategories.length === 0) {
-        await seedDefaultCategories();
-
-        // Reload categories after seeding to get the final list with IDs
-        const { data: refreshedCats } = await client.from('categories').select('*').eq('user_id', user.value!.sub);
-        if (refreshedCats) finalCategories = refreshedCats;
-      }
-
-      state.value = {
-        config: {
-          monthlyLimit: Number(finalProfile?.monthly_limit || 0),
-          currencySymbol: finalProfile?.currency_symbol || '€',
-          onboardingComplete: finalProfile?.onboarding_complete || false,
-          language: finalProfile?.language || 'en',
-          theme: finalProfile?.theme || 'system'
-        },
-        categories: finalCategories.map((c) => ({
-          id: c.id,
-          emoji: c.emoji,
-          name: c.name || '', // Handle nullable name for default categories
-          key: c.key || undefined,
-          user_id: c.user_id
-        })),
-        transactions: (transactions || []).map((t) => ({
-          id: t.id,
-          amount: Number(t.amount),
-          date: t.date || new Date().toISOString(),
-          note: t.note || '',
-          category: t.category || ''
-        }))
-      };
-    } catch (e) {
-      console.error('Failed to load state from Supabase', e);
-      // Do not overwrite state with default on error to preserve potentially optimistic state
-      // or at least don't wipe it unless necessary. But for now reverting to default on CATASTROPHIC error might be safe?
-      // actually, if network fails, we probably shouldn't wipe local state if we had it.
-      // But here we are loading FRESH state.
-      state.value = DEFAULT_STATE;
+      await globalLoadingPromise;
+      // Mark as loaded for this user
+      isLoaded.value = user.value?.sub || null;
+    } finally {
+      globalLoadingPromise = null;
     }
   };
 
@@ -271,21 +288,6 @@ export const useStorage = () => {
       // Ideally revert state here if critical
     }
   };
-
-  // Automatically load state if user is logged in and not already loaded (or on server)
-  // useAsyncData ensures this runs on server and hydrates, or runs on client.
-  useAsyncData(
-    'budget-data',
-    async () => {
-      if (user.value?.sub) {
-        await loadState();
-      }
-      return true;
-    },
-    {
-      watch: [user] // Re-fetch if user changes
-    }
-  );
 
   return {
     state,

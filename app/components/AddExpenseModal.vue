@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Transaction } from '~/types';
+import type { Transaction } from '~/../shared/types';
 import { Trash2 } from 'lucide-vue-next';
 
 const props = defineProps<{

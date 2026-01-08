@@ -12,13 +12,13 @@ const displayName = computed(() => {
     return user.value.user_metadata?.full_name || user.value.email?.split('@')[0] || t('common.user');
 });
 
-await useAsyncData('dashboard-state', async () => {
-    await loadState();
-    if (state.value.config && !state.value.config.onboardingComplete) {
-        navigateTo('/onboarding');
-    }
-    return true;
-});
+// Ensure state is loaded (calls loadState which has built-in dedup)
+await loadState();
+
+// Redirect to onboarding if not completed
+if (state.value.config && !state.value.config.onboardingComplete) {
+    navigateTo('/onboarding');
+}
 
 const { formatCurrency, calculateBudgetData } = useBudget();
 
@@ -85,7 +85,7 @@ const navigateToDetail = () => {
                     <div :class="['w-2 h-2 rounded-full', budgetData.isOverBudget ? 'bg-red-400' : 'bg-green-400']" />
                     <span class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ budgetData.isOverBudget ?
                         t('dashboard.over_budget') : t('dashboard.on_track')
-                        }}</span>
+                    }}</span>
                 </div>
             </div>
 

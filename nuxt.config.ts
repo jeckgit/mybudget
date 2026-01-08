@@ -3,6 +3,9 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+  future: {
+    compatibilityVersion: 4
+  },
   devtools: { enabled: true },
   css: ['./app/assets/css/main.css'],
   vite: {
@@ -20,10 +23,22 @@ export default defineNuxtConfig({
     '@nuxt/scripts',
     '@nuxt/test-utils',
     '@vueuse/nuxt',
-    '@nuxtjs/i18n'
+    '@nuxtjs/i18n',
+    '@nuxt/fonts',
+    'nuxt-security'
   ],
 
+  security: {
+    headers: {
+      contentSecurityPolicy: {
+        'img-src': ["'self'", 'data:', 'https://*.supabase.co'],
+        'connect-src': ["'self'", 'https://*.supabase.co', 'wss://*.supabase.co']
+      }
+    }
+  },
+
   supabase: {
+    types: '@@/shared/types/database.types.ts',
     redirect: true,
     redirectOptions: {
       login: '/auth/login',

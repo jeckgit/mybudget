@@ -1,4 +1,4 @@
-import type { AppState, Transaction, BudgetConfig } from '~/types';
+import type { AppState, Transaction, BudgetConfig } from '~/../shared/types';
 
 export const useBudget = () => {
   const getDaysInMonth = (date: Date) => {
