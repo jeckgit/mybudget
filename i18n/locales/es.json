@@ -100,7 +100,8 @@
     "danger_zone": "Zona de Peligro",
     "delete_account": "Eliminar Cuenta",
     "delete_account_desc": "Elimina permanentemente tus datos y cuenta.",
-    "delete_confirmation": "¿Estás seguro? Esto no se puede deshacer."
+    "delete_confirmation": "¿Estás seguro? Esto no se puede deshacer.",
+    "type_delete_to_confirm": "Escribe {word} para confirmar"
   },
   "legal": {
     "title": "Legal",

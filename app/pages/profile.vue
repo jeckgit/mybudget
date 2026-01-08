@@ -23,7 +23,7 @@ const errorMsg = ref('');
 const successMsg = ref('');
 const newEmail = ref('');
 const showDeleteConfirm = ref(false);
-const deleteEmailInput = ref('');
+const deleteConfirmationInput = ref('');
 const isDeleting = ref(false);
 
 // --- Settings Logic ---
@@ -137,18 +137,27 @@ const handleLogout = async () => {
 };
 
 const handleDeleteAccount = async () => {
-    if (deleteEmailInput.value !== user.value?.email) return;
+    if (deleteConfirmationInput.value.toUpperCase() !== 'DELETE') return;
 
     isDeleting.value = true;
+    const userId = user.value?.id || user.value?.sub;
+
     try {
         // 1. Delete all user data via RLS (client side)
-        // Note: RLS policies must allow deletion for this to work
-        await Promise.all([
-            client.from('transactions').delete().eq('user_id', user.value.id),
-            client.from('categories').delete().eq('user_id', user.value.id),
-            client.from('profiles').delete().eq('id', user.value.id) // If profiles exists
-        ]);
+        if (userId) {
+            const results = await Promise.all([
+                client.from('transactions').delete().eq('user_id', userId),
+                client.from('categories').delete().eq('user_id', userId),
+                client.from('profiles').delete().eq('id', userId)
+            ]);
 
+            // Check for errors in any of the results
+            const errors = results.map(r => r.error).filter(Boolean);
+            if (errors.length > 0) {
+                console.error("Deletion errors:", errors);
+                throw new Error("Failed to delete some data");
+            }
+        }
         // 2. Sign out
         await client.auth.signOut();
 
@@ -186,7 +195,7 @@ const handleDeleteAccount = async () => {
                                 <Tag class="w-5 h-5" />
                             </div>
                             <span class="font-bold text-slate-700 dark:text-slate-200">{{ t('common.manage_categories')
-                                }}</span>
+                            }}</span>
                             <ChevronRight
                                 class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors group-active:translate-x-1" />
                         </div>
@@ -205,7 +214,7 @@ const handleDeleteAccount = async () => {
                                 <Globe class="w-5 h-5" />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
-                            }}</span>
+                                }}</span>
                         </div>
                         <select v-model="localLanguage"
                             class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -226,7 +235,7 @@ const handleDeleteAccount = async () => {
                                 <Monitor class="w-5 h-5" v-else />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex bg-slate-100 dark:bg-white/10 rounded-lg p-1 w-32">
                             <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
@@ -249,7 +258,7 @@ const handleDeleteAccount = async () => {
                                 <span class="text-lg font-bold">{{ state.config.currencySymbol }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex gap-2">
                             <select v-model="localCurrency"
@@ -349,8 +358,6 @@ const handleDeleteAccount = async () => {
                             <span class="font-bold text-slate-700 dark:text-slate-200">{{ t('legal.imprint') }} / {{
                                 t('legal.privacy') }}</span>
                         </div>
-                        <ChevronRight
-                            class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors group-active:translate-x-1" />
                     </GlassCard>
                 </NuxtLink>
             </section>
@@ -379,7 +386,7 @@ const handleDeleteAccount = async () => {
                             <p class="text-xs text-slate-400 dark:text-slate-500 px-1">{{
                                 t('profile.delete_account_desc') }}</p>
                             <button @click="showDeleteConfirm = true"
-                                class="w-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30 dark:hover:bg-red-900/20 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                                class="w-full bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 dark:bg-red-900/10 dark:text-red-400 dark:border-red-900/30 dark:hover:bg-red-900/20 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer">
                                 <AlertCircle class="w-5 h-5" />
                                 {{ t('profile.delete_account') }}
                             </button>
@@ -418,13 +425,17 @@ const handleDeleteAccount = async () => {
 
             <div class="space-y-4">
                 <div class="space-y-2 text-center">
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <label class="block text-xs text-slate-400 tracking-widest">
 
-                        {{ t('profile.type_email_to_confirm', { email: user?.email }) }}
+                        <i18n-t keypath="profile.type_delete_to_confirm" tag="span">
+                            <template #word>
+                                <span class="font-black text-slate-900 dark:text-white text-base">DELETE</span>
+                            </template>
+                        </i18n-t>
                     </label>
-                    <input v-model="deleteEmailInput" type="email"
+                    <input v-model="deleteConfirmationInput" type="text"
                         class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500 transition-all text-center font-medium text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white placeholder:text-slate-300 dark:placeholder:text-slate-600"
-                        :placeholder="user?.email" />
+                        placeholder="DELETE" />
                 </div>
             </div>
 
@@ -433,7 +444,7 @@ const handleDeleteAccount = async () => {
                     class="flex-1 py-3.5 font-bold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors dark:text-slate-300 dark:bg-white/10 dark:hover:bg-white/20">
                     {{ t('common.cancel') }}
                 </button>
-                <button @click="handleDeleteAccount" :disabled="deleteEmailInput !== user?.email || isDeleting"
+                <button @click="handleDeleteAccount" :disabled="deleteConfirmationInput !== 'DELETE' || isDeleting"
                     class="flex-1 py-3.5 text-sm text-white bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-[0.98] flex items-center justify-center gap-2">
                     <span v-if="isDeleting"
                         class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

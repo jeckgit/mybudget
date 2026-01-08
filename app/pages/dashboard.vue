@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Bell, ArrowUpRight, Wallet } from 'lucide-vue-next';
+import { ArrowUpRight } from 'lucide-vue-next';
 
 
 // Inject state directly from storage
@@ -23,10 +23,6 @@ await useAsyncData('dashboard-state', async () => {
 const { formatCurrency, calculateBudgetData } = useBudget();
 
 const budgetData = computed(() => calculateBudgetData(state.value));
-
-const formatTime = (date: string) => {
-    return new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-};
 
 // Generate weekly spending data for the chart
 const weeklySpendingData = computed(() => {
@@ -89,7 +85,7 @@ const navigateToDetail = () => {
                     <div :class="['w-2 h-2 rounded-full', budgetData.isOverBudget ? 'bg-red-400' : 'bg-green-400']" />
                     <span class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ budgetData.isOverBudget ?
                         t('dashboard.over_budget') : t('dashboard.on_track')
-                    }}</span>
+                        }}</span>
                 </div>
             </div>
 

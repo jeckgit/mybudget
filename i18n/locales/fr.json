@@ -100,7 +100,8 @@
     "danger_zone": "Zone de Danger",
     "delete_account": "Supprimer le compte",
     "delete_account_desc": "Supprimez définitivement vos données et votre compte.",
-    "delete_confirmation": "Êtes-vous sûr ? Cela ne peut pas être annulé."
+    "delete_confirmation": "Êtes-vous sûr ? Cela ne peut pas être annulé.",
+    "type_delete_to_confirm": "Tapez {word} pour confirmer"
   },
   "legal": {
     "title": "Mentions Légales",

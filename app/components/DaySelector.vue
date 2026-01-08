@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { CalendarDays } from 'lucide-vue-next';
+import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
 const { state, loadState } = useStorage();
 const { t, locale } = useI18n();
@@ -10,8 +10,44 @@ const currentMonthDate = ref(new Date());
 
 onMounted(async () => {
     await loadState();
-    scrollToToday();
+    await loadState();
+    // Default to today if needed, or just let it stay. 
+    // If we want to ensure we see today on load:
+    if (isToday(new Date())) {
+        scrollToToday();
+    }
 });
+
+// Month Picker State
+const showMonthPicker = ref(false);
+const pickerYear = ref(new Date().getFullYear());
+
+const months = computed(() => {
+    const formatter = new Intl.DateTimeFormat(locale.value, { month: 'short' });
+    return Array.from({ length: 12 }, (_, i) => {
+        const date = new Date(2000, i, 1);
+        return {
+            index: i,
+            name: formatter.format(date)
+        };
+    });
+});
+
+const toggleMonthPicker = () => {
+    if (!showMonthPicker.value) {
+        pickerYear.value = currentMonthDate.value.getFullYear();
+    }
+    showMonthPicker.value = !showMonthPicker.value;
+};
+
+const changePickerYear = (delta: number) => {
+    pickerYear.value += delta;
+};
+
+const selectMonth = (monthIndex: number) => {
+    currentMonthDate.value = new Date(pickerYear.value, monthIndex, 1);
+    showMonthPicker.value = false;
+};
 
 // Calculate daily spending from transactions
 const dayMoneyMap = computed(() => {
@@ -27,14 +63,6 @@ const dayMoneyMap = computed(() => {
     });
     return map;
 });
-
-const getMoneyForDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const key = `${year}-${month}-${day}`;
-    return dayMoneyMap.value.get(key) || 0;
-};
 
 // Generate all days for the current month
 const visibleDays = computed(() => {
@@ -115,10 +143,6 @@ const scrollToToday = () => {
     }
 };
 
-const jumpToToday = () => {
-    scrollToToday();
-};
-
 const handleDayClick = (date: Date) => {
     // Navigate instantly to detail page
     const year = date.getFullYear();
@@ -151,12 +175,63 @@ const formatMonthYear = (date: Date) => {
                 <h3 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-[0.15em]">
                     {{ formatMonthYear(currentMonthDate) }}
                 </h3>
-                <button @click="jumpToToday"
-                    class="h-8 px-4 rounded-xl text-[10px] font-bold uppercase tracking-widest bg-white/60 border border-white/80 text-slate-600 flex items-center gap-1.5 active:scale-95 transition-all dark:bg-white/10 dark:border-white/10 dark:text-slate-300">
+                <button @click="toggleMonthPicker" :class="['h-8 px-4 rounded-xl text-[10px] font-bold uppercase tracking-widest border flex items-center gap-1.5 active:scale-95 transition-all',
+                    showMonthPicker
+                        ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900'
+                        : 'bg-white/60 border-white/80 text-slate-600 dark:bg-white/10 dark:border-white/10 dark:text-slate-300'
+                ]">
                     <CalendarDays :size="12" />
-                    {{ t('day_selector.today') }}
+                    {{ showMonthPicker ? t('common.cancel') : t('day_selector.selected_date') }}
                 </button>
             </div>
+
+            <!-- Month Picker Modal -->
+            <Teleport to="body">
+                <Transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 scale-95"
+                    enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-150"
+                    leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+                    <div v-if="showMonthPicker"
+                        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
+                        @click="showMonthPicker = false">
+                        <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 w-full max-w-sm shadow-2xl border border-slate-100 dark:border-white/10"
+                            @click.stop>
+                            <!-- Modal Header -->
+                            <div class="flex items-center justify-between mb-8">
+                                <button @click="changePickerYear(-1)"
+                                    class="p-3 hover:bg-slate-50 rounded-full dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 transition-colors">
+                                    <ChevronLeft class="w-6 h-6" />
+                                </button>
+                                <span class="text-2xl font-black text-slate-800 dark:text-white tracking-tight">{{
+                                    pickerYear }}</span>
+                                <button @click="changePickerYear(1)"
+                                    class="p-3 hover:bg-slate-50 rounded-full dark:hover:bg-white/5 text-slate-600 dark:text-slate-300 transition-colors">
+                                    <ChevronRight class="w-6 h-6" />
+                                </button>
+                            </div>
+
+                            <!-- Months Grid -->
+                            <div class="grid grid-cols-3 gap-3">
+                                <button v-for="month in months" :key="month.index" @click="selectMonth(month.index)"
+                                    :class="[
+                                        'py-4 rounded-2xl text-sm font-bold transition-all duration-200',
+                                        (month.index === currentMonthDate.getMonth() && pickerYear === currentMonthDate.getFullYear())
+                                            ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20 dark:bg-white dark:text-slate-900 dark:shadow-white/10 scale-105'
+                                            : 'bg-slate-50 text-slate-600 hover:bg-slate-100 dark:bg-white/5 dark:text-slate-400 dark:hover:bg-white/10'
+                                    ]">
+                                    {{ month.name }}
+                                </button>
+                            </div>
+
+                            <div class="mt-8 pt-6 border-t border-slate-100 dark:border-white/5">
+                                <button @click="showMonthPicker = false"
+                                    class="w-full py-3 text-sm font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white transition-colors">
+                                    {{ t('common.cancel') }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </Transition>
+            </Teleport>
 
             <!-- Scrollable Day List - Viewport fits ~5 items -->
             <div ref="scrollRef"

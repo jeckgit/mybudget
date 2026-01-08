@@ -100,7 +100,8 @@
     "danger_zone": "Gefahrenzone",
     "delete_account": "Konto löschen",
     "delete_account_desc": "Löschen Sie dauerhaft Ihre Daten und Ihr Konto.",
-    "delete_confirmation": "Sind Sie sicher? Dies kann nicht rückgängig gemacht werden."
+    "delete_confirmation": "Sind Sie sicher? Dies kann nicht rückgängig gemacht werden.",
+    "type_delete_to_confirm": "Geben Sie {word} zur Bestätigung ein"
   },
   "legal": {
     "title": "Rechtliches",

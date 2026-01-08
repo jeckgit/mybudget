@@ -100,7 +100,8 @@
     "danger_zone": "Danger Zone",
     "delete_account": "Delete Account",
     "delete_account_desc": "Permanently delete your data and account.",
-    "delete_confirmation": "Are you sure? This cannot be undone."
+    "delete_confirmation": "Are you sure? This cannot be undone.",
+    "type_delete_to_confirm": "Type {word} to confirm"
   },
   "legal": {
     "title": "Legal",
