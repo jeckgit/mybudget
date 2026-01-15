@@ -22,7 +22,13 @@ const deleteConfirmationInput = ref('');
 const isDeleting = ref(false);
 
 // --- Settings Logic ---
-const currencies = ['€', '$', '£', '¥', 'CHF'];
+const currencies = [
+    { code: 'EUR', label: 'Euro (€)' },
+    { code: 'USD', label: 'US Dollar ($)' },
+    { code: 'GBP', label: 'British Pound (£)' },
+    { code: 'CHF', label: 'Swiss Franc (CHF)' },
+    { code: 'JPY', label: 'Japanese Yen (¥)' }
+];
 const languages = [
     { code: 'en', name: 'English' },
     { code: 'de', name: 'Deutsch' },
@@ -32,12 +38,12 @@ const languages = [
 
 // Local state for settings to allow manual save
 const localLanguage = ref(locale.value as string);
-const localCurrency = ref(state.value.config.currencySymbol);
+const localCurrency = ref(state.value.config.currency);
 const localBudget = ref(state.value.config.monthlyLimit);
 
 const hasChanges = computed(() => {
     return localLanguage.value !== locale.value ||
-        localCurrency.value !== state.value.config.currencySymbol ||
+        localCurrency.value !== state.value.config.currency ||
         localBudget.value !== state.value.config.monthlyLimit;
 });
 
@@ -54,7 +60,7 @@ const handleSaveSettings = async () => {
         // Update global storage config
         await updateConfig({
             language: localLanguage.value,
-            currencySymbol: localCurrency.value,
+            currency: localCurrency.value,
             monthlyLimit: localBudget.value
         });
 
@@ -77,8 +83,8 @@ watchEffect(() => {
     if (state.value.config) {
         // We only want to sync these if the local value isn't already set or if we want to force refresh
         // For simplicity, we sync them once when the state is loaded
-        if (state.value.config.currencySymbol) {
-            localCurrency.value = state.value.config.currencySymbol;
+        if (state.value.config.currency) {
+            localCurrency.value = state.value.config.currency;
         }
         if (state.value.config.monthlyLimit) {
             localBudget.value = state.value.config.monthlyLimit;
@@ -258,7 +264,7 @@ const handleDeleteAccount = async () => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
-                                <span class="text-lg font-bold">{{ state.config.currencySymbol }}</span>
+                                <span class="text-sm font-bold">{{ state.config.currency }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
                                 }}</span>
@@ -266,9 +272,9 @@ const handleDeleteAccount = async () => {
                         <div class="flex gap-2">
                             <select v-model="localCurrency"
                                 class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                <option v-for="c in currencies" :key="c" :value="c"
+                                <option v-for="c in currencies" :key="c.code" :value="c.code"
                                     class="text-slate-800 bg-white dark:bg-slate-900">
-                                    {{ c }}
+                                    {{ c.label }}
                                 </option>
                             </select>
                         </div>
@@ -278,10 +284,10 @@ const handleDeleteAccount = async () => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-600 dark:text-pink-400">
-                                <span class="text-xs font-bold">{{ state.config.currencySymbol }}</span>
+                                <span class="text-xs font-bold">{{ state.config.currency }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{
-                                t('settings.monthly_budget') }}</span>
+                                t('settings.monthly_budget_default') }}</span>
                         </div>
                         <div class="relative w-32">
                             <span

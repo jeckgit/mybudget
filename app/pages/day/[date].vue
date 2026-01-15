@@ -26,7 +26,7 @@ const dayTransactions = computed(() => {
     });
 });
 
-const { formatCurrency } = useBudget();
+const { formatCurrency } = useCurrency();
 
 const totalForDay = computed(() => {
     return dayTransactions.value.reduce((sum, tx) => sum + tx.amount, 0);
@@ -91,7 +91,7 @@ const handleModalClose = () => {
                         {{ t('day_selector.daily_spending') }}
                     </p>
                     <h2 class="text-5xl font-bold text-slate-800 dark:text-white tracking-tighter">
-                        {{ formatCurrency(totalForDay, state.config.currencySymbol) }}
+                        {{ formatCurrency(totalForDay, state.config.currency) }}
                     </h2>
                 </div>
             </GlassCard>
@@ -120,7 +120,7 @@ const handleModalClose = () => {
                             </div>
                         </div>
                         <span class="font-bold text-slate-800 dark:text-white">
-                            {{ formatCurrency(tx.amount, state.config.currencySymbol) }}
+                            {{ formatCurrency(tx.amount, state.config.currency) }}
                         </span>
                     </GlassCard>
 

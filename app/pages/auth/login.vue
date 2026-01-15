@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { t } = useI18n();
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const isOAuth = ref(false);
@@ -35,7 +36,7 @@ const handleAuth = async () => {
             if (data.session) {
                 navigateTo('/dashboard');
             } else {
-                alert('Check your email for the login link!');
+                alert(t('auth.check_email'));
             }
         } else {
             const { error } = await supabase.auth.signInWithPassword({
@@ -76,21 +77,21 @@ const handleOAuth = async (provider: 'google' | 'github') => {
         <GlassCard variant="white"
             class="w-full max-w-md p-8 relative z-10 !bg-white/80 dark:!bg-white/5 dark:!border dark:!border-white/10 dark:shadow-black/20">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-slate-800 mb-2 dark:text-white">Welcome</h1>
-                <p class="text-slate-500 dark:text-slate-400">{{ isSignUp ? 'Create an account' : 'Sign in to continue'
-                    }}</p>
+                <h1 class="text-3xl font-bold text-slate-800 mb-2 dark:text-white">{{ t('auth.welcome') }}</h1>
+                <p class="text-slate-500 dark:text-slate-400">{{ isSignUp ? t('auth.create_account') :
+                    t('auth.sign_in_desc') }}</p>
             </div>
             <template v-if="isOAuth">
                 <div class="space-y-3 mb-6">
                     <button @click="handleOAuth('google')"
                         class="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 transition-colors text-slate-700 font-bold text-sm dark:bg-white/10 dark:border-white/20 dark:text-white dark:hover:bg-white/20">
                         <img src="~/assets/icons/google.svg" class="w-5 h-5" alt="Google" />
-                        Continue with Google
+                        {{ t('auth.continue_google') }}
                     </button>
                     <button @click="handleOAuth('github')"
                         class="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-[#24292F] hover:bg-[#24292F]/90 transition-colors text-white font-bold text-sm">
                         <img src="~/assets/icons/github.svg" class="w-5 h-5 invert" alt="GitHub" />
-                        Continue with GitHub
+                        {{ t('auth.continue_github') }}
                     </button>
                 </div>
 
@@ -100,8 +101,9 @@ const handleOAuth = async (provider: 'google' | 'github') => {
                     </div>
                     <div class="relative flex justify-center text-xs uppercase">
                         <span
-                            class="bg-white/80 px-2 text-slate-400 font-bold tracking-wider dark:bg-transparent dark:text-slate-500">Or
-                            with email</span>
+                            class="bg-white/80 px-2 text-slate-400 font-bold tracking-wider dark:bg-transparent dark:text-slate-500">
+                            {{ t('auth.or_email') }}
+                        </span>
                     </div>
                 </div>
             </template>
@@ -109,23 +111,25 @@ const handleOAuth = async (provider: 'google' | 'github') => {
             <form @submit.prevent="handleAuth" class="space-y-4">
                 <div>
                     <label for="email"
-                        class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">Email</label>
+                        class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">{{
+                        t('auth.email') }}</label>
                     <input id="email" v-model="email" type="email" name="email" autocomplete="username" required
                         class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
-                        placeholder="hello@example.com" />
+                        :placeholder="t('auth.email_placeholder')" />
                 </div>
 
                 <div>
                     <label for="password"
-                        class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">Password</label>
+                        class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">{{
+                            t('auth.password') }}</label>
                     <input id="password" v-model="password" type="password" name="password"
                         :autocomplete="isSignUp ? 'new-password' : 'current-password'" required
                         class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
-                        placeholder="••••••••" />
+                        :placeholder="t('auth.password_placeholder')" />
                     <div class="flex justify-end mt-1">
                         <NuxtLink to="/auth/forgot-password"
                             class="text-xs text-slate-500 hover:text-accent transition-colors dark:text-slate-400 dark:hover:text-white">
-                            Forgot Password?
+                            {{ t('auth.forgot_password') }}
                         </NuxtLink>
                     </div>
                 </div>
@@ -136,14 +140,14 @@ const handleOAuth = async (provider: 'google' | 'github') => {
 
                 <GlassButton type="submit" :full-width="true" :disabled="loading"
                     class="bg-slate-900! text-white! hover:bg-slate-800! dark:bg-white! dark:text-black! dark:hover:bg-slate-200!">
-                    {{ loading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In') }}
+                    {{ loading ? t('auth.loading') : (isSignUp ? t('auth.sign_up') : t('auth.sign_in')) }}
                 </GlassButton>
             </form>
 
             <div class="mt-6 text-center">
                 <button @click="toggleSignup" type="button"
                     class="cursor-pointer text-sm text-slate-500 hover:text-accent font-medium transition-colors dark:text-slate-400 dark:hover:text-white">
-                    {{ isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up" }}
+                    {{ isSignUp ? t('auth.have_account') : t('auth.no_account') }}
                 </button>
             </div>
         </GlassCard>

@@ -1,12 +1,13 @@
-import type { AppState, Transaction } from '~/../shared/types';
+import type { AppState, Transaction, MonthData } from '~/../shared/types';
 import type { Database } from '~/../shared/types/database.types';
 
 const DEFAULT_STATE: AppState = {
   transactions: [],
   categories: [],
+  months: {},
   config: {
     monthlyLimit: 0,
-    currencySymbol: '€',
+    currency: 'EUR',
     onboardingComplete: false
   }
 };
@@ -58,18 +59,24 @@ export const useStorage = () => {
         const [
           { data: profile, error: profileError },
           { data: transactions, error: txError },
-          { data: categories, error: catError }
+          { data: categories, error: catError },
+          { data: monthsData, error }
         ] = await Promise.all([
           client.from('profiles').select('*').eq('user_id', user.value!.sub).maybeSingle(),
           client.from('transactions').select('*').eq('user_id', user.value!.sub).order('date', { ascending: false }),
-          client.from('categories').select('*').eq('user_id', user.value!.sub)
+          client.from('transactions').select('*').eq('user_id', user.value!.sub).order('date', { ascending: false }),
+          client.from('categories').select('*').eq('user_id', user.value!.sub),
+          client.from('months').select('*').eq('user_id', user.value!.sub)
         ]);
 
         if (profileError) console.error('Error loading profile:', profileError);
         if (txError) console.error('Error loading transactions:', txError);
         if (catError) console.error('Error loading categories:', catError);
 
-        let finalProfile = profile;
+        // Cast as `any` first because TS might not know about `months` error yet if types aren't fully propagated in local check
+        if (error as any) console.error('Error loading months:', error as any);
+
+        let finalProfile: any = profile; // Cast to any because types thinks it has currency_symbol
         let finalCategories = categories || [];
 
         // INITIALIZATION FOR NEW USERS
@@ -80,11 +87,11 @@ export const useStorage = () => {
             .upsert(
               {
                 user_id: user.value!.sub,
-                currency_symbol: '€',
+                currency: 'EUR', // New column
                 onboarding_complete: false,
                 language: 'en',
                 theme: 'system'
-              },
+              } as any, // Cast to any for renamed column
               { onConflict: 'user_id' }
             )
             .select()
@@ -103,10 +110,14 @@ export const useStorage = () => {
           if (refreshedCats) finalCategories = refreshedCats;
         }
 
+        // Map legacy symbols to codes if strictly necessary, but SQL migration should have handled it.
+        // We trust the DB to have valid codes now.
+        const dbCurrency = finalProfile?.currency || 'EUR';
+
         state.value = {
           config: {
             monthlyLimit: Number(finalProfile?.monthly_limit || 0),
-            currencySymbol: finalProfile?.currency_symbol || '€',
+            currency: dbCurrency,
             onboardingComplete: finalProfile?.onboarding_complete || false,
             language: finalProfile?.language || 'en',
             theme: finalProfile?.theme || 'system'
@@ -124,7 +135,15 @@ export const useStorage = () => {
             date: t.date || new Date().toISOString(),
             note: t.note || '',
             category: t.category || ''
-          }))
+          })),
+          months: (monthsData || []).reduce((acc: Record<string, MonthData>, m) => {
+            acc[m.key] = {
+              budget: m.budget,
+              income: m.income,
+              data: m.data
+            };
+            return acc;
+          }, {})
         };
       } catch (e) {
         console.error('Failed to load state from Supabase', e);
@@ -154,11 +173,11 @@ export const useStorage = () => {
       const { error } = await client.from('profiles').upsert({
         user_id: user.value.sub,
         monthly_limit: newState.config.monthlyLimit,
-        currency_symbol: newState.config.currencySymbol,
+        currency: newState.config.currency,
         onboarding_complete: newState.config.onboardingComplete,
         language: newState.config.language,
         theme: newState.config.theme
-      });
+      } as any);
 
       if (error) throw error;
     } catch (e) {
@@ -276,16 +295,63 @@ export const useStorage = () => {
       const { error } = await client.from('profiles').upsert({
         user_id: user.value.sub,
         monthly_limit: state.value.config.monthlyLimit,
-        currency_symbol: state.value.config.currencySymbol,
+        currency: state.value.config.currency,
         onboarding_complete: state.value.config.onboardingComplete,
         language: state.value.config.language,
         theme: state.value.config.theme
-      });
+      } as any);
 
       if (error) throw error;
     } catch (e) {
       console.error('Failed to update config', e);
       // Ideally revert state here if critical
+    }
+  };
+
+  const getMonthConfig = (date: string) => {
+    const key = getMonthKey(date);
+    const monthData = state.value.months?.[key];
+
+    // If specific month budget exists, use it. Otherwise default to global monthlyLimit.
+    const budget =
+      monthData?.budget !== null && monthData?.budget !== undefined
+        ? monthData.budget
+        : state.value.config.monthlyLimit;
+
+    return {
+      budget,
+      income: monthData?.income || 0,
+      meta: monthData?.data || {}
+    };
+  };
+
+  const upsertMonth = async (key: string, data: Partial<MonthData>) => {
+    if (!user.value?.sub) return;
+
+    // Optimistic Update
+    if (!state.value.months) state.value.months = {};
+    const existing = state.value.months[key] || {};
+
+    state.value.months[key] = {
+      ...existing,
+      ...data
+    };
+
+    try {
+      const { error } = await client.from('months').upsert(
+        {
+          user_id: user.value.sub,
+          key,
+          budget: data.budget,
+          income: data.income,
+          data: data.data || existing.data || {}
+        } as any,
+        { onConflict: 'user_id,key' }
+      );
+
+      if (error) throw error;
+    } catch (e) {
+      console.error('Failed to upsert month', e);
     }
   };
 
@@ -297,6 +363,16 @@ export const useStorage = () => {
     updateTransaction,
     removeTransaction,
     addTransaction,
-    clearState
+    clearState,
+    getMonthConfig,
+    upsertMonth
   };
 };
+
+// Helper: Get Month Key (YYYY-MM)
+function getMonthKey(date: string | Date = new Date()) {
+  const d = new Date(date);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}`;
+}

@@ -27,10 +27,13 @@ const handleAction = () => {
     <div class="relative flex justify-between items-center px-6 py-4">
       <template v-for="item in navItems" :key="item.label">
         <!-- Action Button (Add) -->
-        <button v-if="item.isAction" @click="handleAction"
-          class="w-14 h-14 bg-black dark:bg-white rounded-full flex items-center justify-center text-white dark:text-black shadow-xl shadow-accent/20 dark:shadow-accent/40 active:scale-90 transition-transform -mt-8 border-4 border-[#F6F8FC] dark:border-[#121212]">
-          <component :is="item.icon" :size="28" :stroke-width="2" />
-        </button>
+        <div v-if="item.isAction" class="relative">
+          <button @click="handleAction"
+            class="w-14 h-14 bg-black dark:bg-white rounded-full flex items-center justify-center text-white dark:text-black shadow-xl shadow-accent/20 dark:shadow-accent/40 active:scale-90 transition-transform -mt-8 border-4 border-[#F6F8FC] dark:border-[#121212] relative z-20">
+            <component :is="item.icon" :size="28" :stroke-width="2" />
+          </button>
+          <FloatingDollar />
+        </div>
 
         <!-- Navigation Link -->
         <NuxtLink v-else :to="item.to"

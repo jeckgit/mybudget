@@ -6,7 +6,8 @@ import { onClickOutside } from '@vueuse/core';
 const { state, loadState } = useStorage();
 const { t, locale } = useI18n();
 const { categories, getCategoryName } = useCategories();
-const { formatCurrency, calculateBudgetData } = useBudget();
+const { calculateBudgetData } = useBudget();
+const { formatCurrency } = useCurrency();
 
 // Month Navigation State
 const currentDate = ref(new Date());
@@ -186,7 +187,7 @@ const exportAsJSON = () => {
                     <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">{{
                         t('analytics.total_spent') }}</p>
                     <h3 class="text-3xl font-bold text-slate-800 dark:text-white">
-                        {{ formatCurrency(budgetData.totalSpentMonth, state.config.currencySymbol) }}
+                        {{ formatCurrency(budgetData.totalSpentMonth, state.config.currency) }}
                     </h3>
                 </div>
                 <!-- Mini Halo for target progress -->
@@ -210,7 +211,7 @@ const exportAsJSON = () => {
 
             <GlassCard variant="glass" class="p-6 mb-6 dark:bg-white/5 dark:border-white/10">
                 <CategoryDonutChart :data="categoryStats" :total="totalSpent"
-                    :currency-symbol="state.config.currencySymbol" />
+                    :currency-symbol="state.config.currency" />
             </GlassCard>
 
             <div class="space-y-3">
@@ -235,7 +236,7 @@ const exportAsJSON = () => {
                     </div>
                     <div class="ml-4 text-right">
                         <span class="font-bold text-slate-800 dark:text-white tabular-nums">
-                            {{ formatCurrency(cat.amount, state.config.currencySymbol) }}
+                            {{ formatCurrency(cat.amount, state.config.currency) }}
                         </span>
                     </div>
                 </GlassCard>

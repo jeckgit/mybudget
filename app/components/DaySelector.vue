@@ -2,8 +2,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
-const { state } = useStorage();
+const { state, getMonthConfig, upsertMonth } = useStorage();
 const { t, locale } = useI18n();
+const { formatCurrency } = useCurrency();
+const { updateTheme } = useTheme(); // Assuming used elsewhere or safe to ignore if unused, but just in case
 
 const scrollRef = ref<HTMLElement | null>(null);
 const currentMonthDate = ref(new Date());
@@ -19,6 +21,10 @@ onMounted(async () => {
 // Month Picker State
 const showMonthPicker = ref(false);
 const pickerYear = ref(new Date().getFullYear());
+// Budget Edit State
+const showBudgetEdit = ref(false);
+const editingBudget = ref<number | null>(null);
+const isSavingBudget = ref(false);
 
 const months = computed(() => {
     const formatter = new Intl.DateTimeFormat(locale.value, { month: 'short' });
@@ -45,6 +51,27 @@ const changePickerYear = (delta: number) => {
 const selectMonth = (monthIndex: number) => {
     currentMonthDate.value = new Date(pickerYear.value, monthIndex, 1);
     showMonthPicker.value = false;
+};
+
+// Open Budget Editor
+const openBudgetEdit = () => {
+    const config = getMonthConfig(currentMonthDate.value.toISOString());
+    // Load current effective budget as starting point
+    editingBudget.value = config.budget;
+    showBudgetEdit.value = true;
+};
+
+const saveMonthlyBudget = async () => {
+    isSavingBudget.value = true;
+    try {
+        const key = `${currentMonthDate.value.getFullYear()}-${String(currentMonthDate.value.getMonth() + 1).padStart(2, '0')}`;
+        await upsertMonth(key, { budget: editingBudget.value });
+        showBudgetEdit.value = false;
+    } catch (e) {
+        console.error("Failed to save budget", e);
+    } finally {
+        isSavingBudget.value = false;
+    }
 };
 
 // Calculate daily spending from transactions
@@ -75,7 +102,12 @@ const visibleDays = computed(() => {
 
 const dailyBudget = computed(() => {
     const daysInMonth = visibleDays.value.length;
-    return state.value.config.monthlyLimit / (daysInMonth || 1);
+    // Use the month-specific config
+    const config = getMonthConfig(currentMonthDate.value.toISOString());
+    // If budget is null (somehow), fallback to 0 to avoid NaN
+    const limit = config.budget ?? 0;
+
+    return limit / (daysInMonth || 1);
 });
 
 // Calculate rollover budget for each day
@@ -169,18 +201,27 @@ const formatMonthYear = (date: Date) => {
             class="overflow-hidden !rounded-[2.5rem] border border-white/60 shadow-xl shadow-purple-900/5 dark:!bg-white/5 dark:!border-white/10 dark:shadow-black/40">
             <!-- Header -->
             <div
-                class="flex items-center justify-between px-6 py-5 border-b border-slate-100/50 bg-white/30 dark:border-white/5 dark:bg-white/5">
+                class="relative z-10 flex items-center justify-between px-6 py-5 border-b border-slate-200/80 bg-white/50 backdrop-blur-md shadow-[0_4px_20px_-12px_rgba(0,0,0,0.1)] dark:border-white/10 dark:bg-white/5">
                 <h3 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-[0.15em]">
                     {{ formatMonthYear(currentMonthDate) }}
                 </h3>
-                <button @click="toggleMonthPicker" :class="['h-8 px-4 rounded-xl text-[10px] font-bold uppercase tracking-widest border flex items-center gap-1.5 active:scale-95 transition-all',
-                    showMonthPicker
-                        ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900'
-                        : 'bg-white/60 border-white/80 text-slate-600 dark:bg-white/10 dark:border-white/10 dark:text-slate-300'
-                ]">
-                    <CalendarDays :size="12" />
-                    {{ showMonthPicker ? t('common.cancel') : t('day_selector.selected_date') }}
-                </button>
+
+                <div class="flex items-center gap-2">
+                    <button @click="openBudgetEdit"
+                        :class="['h-8 px-3 rounded-xl text-[10px] font-bold uppercase tracking-widest border flex items-center gap-1.5 active:scale-95 transition-all bg-white/60 border-white/80 text-emerald-600 dark:bg-white/10 dark:border-white/10 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20']">
+                        <span>{{ formatCurrency(getMonthConfig(currentMonthDate.toISOString()).budget,
+                            state.config.currency) }}</span>
+                    </button>
+
+                    <button @click="toggleMonthPicker" :class="['h-8 px-4 rounded-xl text-[10px] font-bold uppercase tracking-widest border flex items-center gap-1.5 active:scale-95 transition-all',
+                        showMonthPicker
+                            ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900'
+                            : 'bg-white/60 border-white/80 text-slate-600 dark:bg-white/10 dark:border-white/10 dark:text-slate-300'
+                    ]">
+                        <CalendarDays :size="12" />
+                        {{ showMonthPicker ? t('common.cancel') : t('day_selector.selected_date') }}
+                    </button>
+                </div>
             </div>
 
             <!-- Month Picker Modal -->
@@ -230,6 +271,46 @@ const formatMonthYear = (date: Date) => {
                     </div>
                 </Transition>
             </Teleport>
+            <!-- Budget Edit Modal -->
+            <Teleport to="body">
+                <Transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0 scale-95"
+                    enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-150"
+                    leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+                    <div v-if="showBudgetEdit"
+                        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
+                        @click="showBudgetEdit = false">
+                        <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 w-full max-w-sm shadow-2xl border border-slate-100 dark:border-white/10"
+                            @click.stop>
+                            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 text-center">
+                                {{ t('settings.monthly_budget') }} ({{ formatMonthYear(currentMonthDate) }})
+                            </h3>
+
+                            <div class="mb-6 relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">{{
+                                    state.config.currency }}</span>
+                                <input v-model="editingBudget" type="number"
+                                    class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl pl-12 pr-4 py-4 text-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-center"
+                                    placeholder="0" />
+                            </div>
+
+                            <div class="flex gap-3">
+                                <button @click="showBudgetEdit = false"
+                                    class="flex-1 py-3 text-sm font-bold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white transition-colors bg-slate-100 dark:bg-white/5 rounded-xl">
+                                    {{ t('common.cancel') }}
+                                </button>
+                                <button @click="saveMonthlyBudget" :disabled="isSavingBudget"
+                                    class="flex-1 py-3 text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 rounded-xl shadow-lg shadow-purple-500/20 transition-all active:scale-[0.98] flex items-center justify-center">
+                                    <span v-if="isSavingBudget"
+                                        class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                    <span v-else>{{ t('common.save') }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </Transition>
+            </Teleport>
+
+
 
             <!-- Scrollable Day List - Viewport fits ~5 items -->
             <div ref="scrollRef"
@@ -268,8 +349,8 @@ const formatMonthYear = (date: Date) => {
                                     ? (isToday(date) ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400')
                                     : (isToday(date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
                             ]">
-                                <span>{{ state.config.currencySymbol }}</span>
-                                {{ Math.abs(getBudgetForDate(date).available).toFixed(2) }}
+                                <span>{{ formatCurrency(Math.abs(getBudgetForDate(date).available),
+                                    state.config.currency) }}</span>
                             </div>
                         </div>
 
@@ -280,7 +361,7 @@ const formatMonthYear = (date: Date) => {
                             </span>
                             <span
                                 :class="['text-xs font-bold tracking-tight', isToday(date) ? 'text-white/80' : 'text-slate-500']">
-                                {{ getBudgetForDate(date).spent.toFixed(2) }}
+                                {{ formatCurrency(getBudgetForDate(date).spent, state.config.currency) }}
                             </span>
                         </div>
                     </button>

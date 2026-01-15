@@ -76,6 +76,7 @@
     },
     "global_settings": "Allgemeine Einstellungen",
     "monthly_budget": "Monatliches Budget",
+    "monthly_budget_default": "Standard Monatsbudget",
     "save_settings": "Einstellungen speichern"
   },
   "landing": {
@@ -151,5 +152,36 @@
     "resend": "Erneut senden",
     "sending": "Wird gesendet...",
     "sent": "Gesendet!"
+  },
+  "auth": {
+    "welcome": "Willkommen",
+    "sign_in_desc": "Anmelden um fortzufahren",
+    "create_account": "Konto erstellen",
+    "continue_google": "Weiter mit Google",
+    "continue_github": "Weiter mit GitHub",
+    "or_email": "Oder mit E-Mail",
+    "email": "E-Mail",
+    "email_placeholder": "hallo{'@'}beispiel.de",
+    "password": "Passwort",
+    "password_placeholder": "••••••••",
+    "forgot_password": "Passwort vergessen?",
+    "sign_in": "Anmelden",
+    "sign_up": "Registrieren",
+    "loading": "Laden...",
+    "have_account": "Bereits ein Konto? Anmelden",
+    "no_account": "Kein Konto? Registrieren",
+    "check_email": "Prüfen Sie Ihre E-Mails für den Login-Link!",
+    "reset_password": "Passwort zurücksetzen",
+    "reset_desc": "Geben Sie Ihre E-Mail ein, um Anweisungen zu erhalten",
+    "send_reset_link": "Link senden",
+    "sending_reset": "Wird gesendet...",
+    "check_email_reset": "Prüfen Sie Ihre E-Mails für den Reset-Link.",
+    "back_to_sign_in": "Zurück zur Anmeldung",
+    "session_expired": "Sitzung abgelaufen. Bitte fordern Sie einen neuen Link an.",
+    "update_password": "Passwort aktualisieren",
+    "new_password": "Neues Passwort",
+    "updating": "Wird aktualisiert...",
+    "verifying": "Link wird überprüft...",
+    "invalid_link": "Ungültiger oder abgelaufener Link."
   }
 }

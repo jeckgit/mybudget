@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ArrowUpRight } from 'lucide-vue-next';
+
 
 
 // Inject state directly from storage
-const { state, loadState } = useStorage();
+const { state, loadState, getMonthConfig } = useStorage();
 const user = useSupabaseUser();
 const { t } = useI18n();
 
@@ -20,9 +20,14 @@ if (state.value.config && !state.value.config.onboardingComplete) {
     navigateTo('/onboarding');
 }
 
-const { formatCurrency, calculateBudgetData } = useBudget();
+const { calculateBudgetData } = useBudget();
+const { formatCurrency } = useCurrency();
 
 const budgetData = computed(() => calculateBudgetData(state.value));
+
+const currentMonthBudget = computed(() => {
+    return getMonthConfig(new Date().toISOString()).budget;
+});
 
 // Generate weekly spending data for the chart
 const weeklySpendingData = computed(() => {
@@ -45,67 +50,33 @@ const weeklySpendingData = computed(() => {
 
     return weekData;
 });
-const navigateToDetail = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
-    navigateTo(`/day/${dateStr}`);
-};
+
 </script>
 <template>
     <div class="flex flex-col min-h-screen pb-32 px-6 pt-12">
-        <!-- Top Header -->
-        <div class="flex justify-between items-center mb-8">
-            <div class="flex items-center gap-4">
-                <UserAvatar :name="displayName" :size="48" class="rounded-[0.8rem]" />
-                <div>
-                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wide dark:text-slate-400">{{
-                        t('dashboard.good_morning') }}
-                    </p>
-                    <p class="text-xl font-bold text-slate-800 dark:text-white capitalize">{{ displayName }}</p>
-                </div>
-            </div>
-        </div>
-
         <!-- Main Budget Card -->
-        <GlassCard variant="featured"
-            class="p-8 mb-8 relative text-slate-900 min-h-[220px] flex flex-col justify-between dark:text-white">
-            <div class="flex justify-between items-start relative z-10">
+        <GlassCard variant="featured" class="p-6 mb-8 relative text-slate-900 dark:text-white overflow-hidden">
+            <div class="relative z-10 flex flex-row items-end justify-between w-full">
                 <div>
-                    <p class="text-slate-600 font-medium text-sm mb-2 dark:text-slate-300">{{
+                    <p class="text-slate-600 font-medium text-sm mb-1 dark:text-slate-300">{{
                         t('dashboard.spent_today') }}</p>
-                    <h2 class="text-5xl font-bold tracking-tighter">
-                        {{ formatCurrency(budgetData.spentToday, state.config.currencySymbol) }}
+                    <h2 class="text-4xl font-bold tracking-tighter">
+                        {{ formatCurrency(budgetData.spentToday, state.config.currency) }}
                     </h2>
                 </div>
-                <div
-                    class="bg-white/40 backdrop-blur-md pl-3 pr-4 py-1.5 rounded-full flex items-center gap-2 border border-white/50 dark:bg-white/10 dark:border-white/20">
-                    <div :class="['w-2 h-2 rounded-full', budgetData.isOverBudget ? 'bg-red-400' : 'bg-green-400']" />
-                    <span class="text-xs font-bold text-slate-700 dark:text-slate-200">{{ budgetData.isOverBudget ?
-                        t('dashboard.over_budget') : t('dashboard.on_track')
-                    }}</span>
-                </div>
-            </div>
 
-            <div class="flex items-end justify-between relative z-10 mt-6">
-                <div>
+                <div class="text-right">
                     <p class="text-xs text-slate-500 font-medium mb-1 uppercase tracking-wide dark:text-slate-400">
                         {{ t('dashboard.monthly_budget') }}</p>
-                    <p class="font-bold text-xl text-slate-800 opacity-80 dark:text-white">
-                        {{ formatCurrency(state.config.monthlyLimit, state.config.currencySymbol) }}
+                    <p class="font-bold text-lg text-slate-800 opacity-80 dark:text-white">
+                        {{ formatCurrency(currentMonthBudget, state.config.currency) }}
                     </p>
-                </div>
-                <div @click="navigateToDetail"
-                    class="w-14 h-14 rounded-full bg-white/30 backdrop-blur-xl border border-white/50 flex items-center justify-center shadow-lg shadow-accent/10 text-slate-700 active:scale-90 transition-all cursor-pointer dark:text-white dark:bg-white/10 dark:border-white/20">
-                    <ArrowUpRight :size="24" />
                 </div>
             </div>
 
             <!-- Decorative Elements -->
-            <div class="absolute -right-12 -bottom-24 opacity-30 pointer-events-none mix-blend-overlay">
-                <HaloRing :size="320" :stroke-width="60" :progress="0.65" color="white"
+            <div class="absolute -right-10 -bottom-12 opacity-40 pointer-events-none mix-blend-overlay">
+                <HaloRing :size="140" :stroke-width="30" :progress="0.65" color="white"
                     track-color="rgba(255,255,255,0.1)" />
             </div>
         </GlassCard>

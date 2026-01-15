@@ -103,6 +103,7 @@ const handleAddTransaction = (cat?: typeof categories.value[0]) => {
         addTransaction(newTx);
     }
 
+    useState('showSuccessAnimation').value = true;
     inputValue.value = "";
     emit('close');
 };

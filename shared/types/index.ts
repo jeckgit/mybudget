@@ -16,7 +16,7 @@ export interface Transaction {
 
 export interface BudgetConfig {
   monthlyLimit: number;
-  currencySymbol: string;
+  currency: string;
   onboardingComplete: boolean;
   language?: string;
   theme?: string;
@@ -29,9 +29,16 @@ export interface DailyStats {
   isUnderBudget: boolean;
 }
 
+export interface MonthData {
+  budget?: number | null;
+  income?: number | null;
+  data?: any; // JSONB data
+}
+
 export interface AppState {
   transactions: Transaction[];
   categories: Category[];
+  months?: Record<string, MonthData>;
   config: BudgetConfig;
 }
 

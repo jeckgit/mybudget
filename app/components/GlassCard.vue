@@ -28,7 +28,7 @@ const variantClasses = computed(() => {
     case 'white':
       return `${base} backdrop-blur-3xl bg-white/80 border-white/60 dark:bg-[#1e1e1e]/10 dark:border-white/5 dark:backdrop-blur-2xl`;
     case 'featured':
-      return `${base} backdrop-blur-3xl bg-gradient-to-br from-[#FFE4E6]/80 to-[#E9D5FF]/80 border border-white/50 shadow-[0_10px_40px_-10px_rgba(192,132,252,0.3)] dark:from-[#1e1b4b]/40 dark:to-[#312e81]/40 dark:border-white/10 dark:shadow-none`;
+      return `${base} backdrop-blur-3xl bg-gradient-to-br from-blue-50/80 to-cyan-50/80 border border-white/50 shadow-[0_10px_40px_-10px_rgba(56,189,248,0.2)] dark:from-blue-900/20 dark:to-cyan-900/20 dark:border-white/10 dark:shadow-none`;
     default:
       return `${base} backdrop-blur-3xl bg-gradient-to-br from-white/60 to-white/30 dark:bg-black/2`;
   }

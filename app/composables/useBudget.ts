@@ -13,10 +13,6 @@ export const useBudget = () => {
     return getMonthKey(new Date());
   };
 
-  const formatCurrency = (amount: number, symbol: string) => {
-    return `${symbol}${Math.abs(amount).toFixed(0)}`;
-  };
-
   const calculateBudgetData = (state: AppState, targetDate: Date = new Date()) => {
     const today = new Date();
     const isCurrentMonth =
@@ -68,7 +64,7 @@ export const useBudget = () => {
     getDaysInMonth,
     getMonthKey,
     getCurrentMonthKey,
-    formatCurrency,
+
     calculateBudgetData
   };
 };

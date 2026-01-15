@@ -15,7 +15,12 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <button v-for="lang in languages" :key="lang.code" @click="handleSelectLanguage(lang.code)"
-                        class="p-6 rounded-3xl bg-white/60 backdrop-blur-md border border-white/80 shadow-sm hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex flex-col items-center gap-3 dark:bg-white/5 dark:border-white/10 group">
+                        class="p-6 rounded-3xl backdrop-blur-md shadow-sm hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex flex-col items-center gap-3 group border-2"
+                        :class="[
+                            locale === lang.code
+                                ? 'bg-white/80 border-accent dark:bg-white/10 dark:border-accent'
+                                : 'bg-white/60 border-white/80 dark:bg-white/5 dark:border-white/10'
+                        ]">
                         <span class="text-3xl group-hover:scale-110 transition-transform">{{ lang.flag }}</span>
                         <span class="font-bold text-slate-700 dark:text-slate-200">{{ lang.name }}</span>
                     </button>
@@ -26,7 +31,7 @@
             <div v-else-if="currentStep === 'budget'" class="animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.welcome')
-                }}</h1>
+                    }}</h1>
                 <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.tagline') }}</p>
 
                 <GlassCard variant="glass" class="p-8 dark:bg-white/5 dark:border-white/10">
@@ -60,7 +65,7 @@
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.categories_title') }}</h1>
                 <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.categories_subtitle')
-                }}</p>
+                    }}</p>
 
                 <GlassCard variant="glass" class="p-8 dark:bg-white/5 dark:border-white/10">
                     <div class="grid grid-cols-3 gap-4 mb-8">
@@ -70,14 +75,14 @@
                                 🛍️</div>
                             <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{
                                 t('categories.shopping')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
                             <div
                                 class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-2xl dark:bg-blue-500/20">
                                 🍔</div>
                             <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ t('categories.food')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
                             <div

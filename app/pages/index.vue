@@ -16,18 +16,23 @@ watchEffect(() => {
   <div class="min-h-screen flex flex-col items-center justify-between p-6 relative overflow-hidden text-center">
     <BackgroundMesh />
 
+    <div class="absolute top-6 right-6 z-20">
+      <LanguageSelector />
+    </div>
+
     <div class="flex-grow flex flex-col items-center justify-center w-full">
       <!-- Hero Content -->
       <div class="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
 
         <!-- Main Heading -->
         <h1 class="text-6xl md:text-8xl font-bold text-slate-800 mb-8 tracking-tight leading-none dark:text-white">
-          Mindful spending,<br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent to-calm">liquid clarity.</span>
+          {{ $t('landing.hero_title') }}<br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent to-calm">{{
+            $t('landing.hero_subtitle') }}</span>
         </h1>
 
         <p class="text-xl text-slate-500 mb-12 font-medium max-w-xl mx-auto leading-relaxed dark:text-slate-400">
-          Experience a budgeting app that feels as fluid as your life. Beautifully simple, powerfully insightful.
+          {{ $t('landing.hero_desc') }}
         </p>
 
         <!-- CTA -->
@@ -35,7 +40,7 @@ watchEffect(() => {
           <NuxtLink to="/auth/login">
             <GlassButton
               class="px-10! py-5! text-xl! bg-slate-900! text-white! hover:bg-slate-800! shadow-xl shadow-accent/20 group dark:bg-white! dark:text-black! dark:hover:bg-slate-200!">
-              Get Started
+              {{ $t('landing.get_started') }}
               <ArrowRight class="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
             </GlassButton>
           </NuxtLink>

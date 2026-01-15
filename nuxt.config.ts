@@ -58,7 +58,12 @@ export default defineNuxtConfig({
       { code: 'es', file: 'es.json', name: 'Español' }
     ],
     defaultLocale: 'en',
-    strategy: 'no_prefix'
+    strategy: 'no_prefix',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root' // recommended
+    }
   },
   build: {
     transpile: ['vue-echarts', 'echarts']

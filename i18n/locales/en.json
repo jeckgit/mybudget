@@ -76,6 +76,7 @@
     },
     "global_settings": "Global Settings",
     "monthly_budget": "Monthly Budget",
+    "monthly_budget_default": "Default Monthly Budget",
     "save_settings": "Save Settings"
   },
   "landing": {
@@ -151,5 +152,36 @@
     "resend": "Resend",
     "sending": "Sending...",
     "sent": "Sent!"
+  },
+  "auth": {
+    "welcome": "Welcome",
+    "sign_in_desc": "Sign in to continue",
+    "create_account": "Create an account",
+    "continue_google": "Continue with Google",
+    "continue_github": "Continue with GitHub",
+    "or_email": "Or with email",
+    "email": "Email",
+    "email_placeholder": "hello{'@'}example.com",
+    "password": "Password",
+    "password_placeholder": "••••••••",
+    "forgot_password": "Forgot Password?",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "loading": "Loading...",
+    "have_account": "Already have an account? Sign In",
+    "no_account": "Don't have an account? Sign Up",
+    "check_email": "Check your email in the login link!",
+    "reset_password": "Reset Password",
+    "reset_desc": "Enter your email to receive instructions",
+    "send_reset_link": "Send Reset Link",
+    "sending_reset": "Sending...",
+    "check_email_reset": "Check your email for the password reset link.",
+    "back_to_sign_in": "Back to Sign In",
+    "session_expired": "Session expired. Please request a new password reset link.",
+    "update_password": "Update Password",
+    "new_password": "New Password",
+    "updating": "Updating...",
+    "verifying": "Verifying reset link...",
+    "invalid_link": "Invalid or expired password reset link."
   }
 }

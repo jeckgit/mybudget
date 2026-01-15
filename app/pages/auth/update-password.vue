@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { t } = useI18n()
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const password = ref('')
@@ -16,7 +17,7 @@ onMounted(async () => {
                     verifying.value = false;
                 } else if (event === 'SIGNED_OUT') {
                     // If we end up signed out, the link might be invalid or expired
-                    errorMsg.value = 'Invalid or expired password reset link.';
+                    errorMsg.value = t('auth.invalid_link');
                     verifying.value = false;
                 }
             });
@@ -28,7 +29,7 @@ onMounted(async () => {
 
 const handleUpdate = async () => {
     if (!user.value) {
-        errorMsg.value = 'Session expired. Please request a new password reset link.';
+        errorMsg.value = t('auth.session_expired');
         return;
     }
 
@@ -58,25 +59,25 @@ const handleUpdate = async () => {
         <GlassCard variant="white"
             class="w-full max-w-md p-8 relative z-10 !bg-white/80 dark:!bg-white/5 dark:!border dark:!border-white/10 dark:shadow-black/20">
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-slate-800 mb-2 dark:text-white">Update Password</h1>
-                <p class="text-slate-500 dark:text-slate-400">Enter your new password</p>
+                <h1 class="text-3xl font-bold text-slate-800 mb-2 dark:text-white">{{ t('auth.update_password') }}</h1>
+                <p class="text-slate-500 dark:text-slate-400">{{ t('auth.new_password') }}</p>
             </div>
 
             <div v-if="verifying" class="text-center py-8">
                 <div
                     class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900 mb-4 dark:border-white">
                 </div>
-                <p class="text-slate-500 font-medium dark:text-slate-400">Verifying reset link...</p>
+                <p class="text-slate-500 font-medium dark:text-slate-400">{{ t('auth.verifying') }}</p>
             </div>
 
             <form v-else @submit.prevent="handleUpdate" class="space-y-4">
                 <div>
                     <label
-                        class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">New
-                        Password</label>
+                        class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">{{
+                            t('auth.new_password') }}</label>
                     <input v-model="password" type="password" required minlength="6"
                         class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
-                        placeholder="••••••••" />
+                        :placeholder="t('auth.password_placeholder')" />
                 </div>
 
                 <div v-if="errorMsg" class="text-red-500 text-sm text-center font-medium">
@@ -85,7 +86,7 @@ const handleUpdate = async () => {
 
                 <GlassButton type="submit" :full-width="true" :disabled="loading"
                     class="!bg-slate-900 !text-white hover:!bg-slate-800 dark:!bg-white dark:!text-black dark:hover:!bg-slate-200">
-                    {{ loading ? 'Updating...' : 'Update Password' }}
+                    {{ loading ? t('auth.updating') : t('auth.update_password') }}
                 </GlassButton>
             </form>
         </GlassCard>
