@@ -1,15 +1,9 @@
 <script setup lang="ts">
 import { ArrowRight } from 'lucide-vue-next';
-const user = useSupabaseUser()
 definePageMeta({
   layout: 'marketing'
 })
 
-watchEffect(() => {
-  if (user.value) {
-    navigateTo('/dashboard');
-  }
-})
 </script>
 
 <template>
@@ -20,14 +14,14 @@ watchEffect(() => {
       <LanguageSelector />
     </div>
 
-    <div class="flex-grow flex flex-col items-center justify-center w-full">
+    <div class="grow flex flex-col items-center justify-center w-full">
       <!-- Hero Content -->
       <div class="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
 
         <!-- Main Heading -->
         <h1 class="text-6xl md:text-8xl font-bold text-slate-800 mb-8 tracking-tight leading-none dark:text-white">
           {{ $t('landing.hero_title') }}<br />
-          <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent to-calm">{{
+          <span class="text-transparent bg-clip-text bg-linear-to-r from-accent to-calm">{{
             $t('landing.hero_subtitle') }}</span>
         </h1>
 
@@ -64,6 +58,6 @@ watchEffect(() => {
     <div
       class="absolute top-1/4 left-0 w-96 h-96 bg-calm/20 rounded-full blur-3xl -translate-x-1/2 pointer-events-none" />
     <div
-      class="absolute bottom-0 right-0 w-[30rem] h-[30rem] bg-accent/20 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
+      class="absolute bottom-0 right-0 w-120 h-120 bg-accent/20 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
   </div>
 </template>

@@ -114,7 +114,7 @@ const rolloverData = computed(() => {
 
         map.set(key, {
             spent: daySpent,
-            available: available
+            available: available - daySpent
         });
 
         totalSpentUntilNow += daySpent;
@@ -177,7 +177,7 @@ const formatMonthYear = (date: Date) => {
 <template>
     <div class="w-full mx-auto mb-8">
         <GlassCard variant="white"
-            class="overflow-hidden !rounded-[2.5rem] border border-white/60 shadow-xl shadow-purple-900/5 dark:!bg-white/5 dark:!border-white/10 dark:shadow-black/40">
+            class="overflow-hidden rounded-[2.5rem]! border border-white/60 shadow-xl shadow-purple-900/5 dark:bg-white/5! dark:border-white/10! dark:shadow-black/40">
             <!-- Header -->
             <div
                 class="relative z-10 flex items-center justify-between px-6 py-5 border-b border-slate-200/80 bg-white/50 backdrop-blur-md shadow-[0_4px_20px_-12px_rgba(0,0,0,0.1)] dark:border-white/10 dark:bg-white/5">
@@ -205,9 +205,9 @@ const formatMonthYear = (date: Date) => {
                     enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-150"
                     leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
                     <div v-if="showMonthPicker"
-                        class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
+                        class="fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
                         @click="showMonthPicker = false">
-                        <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 w-full max-w-sm shadow-2xl border border-slate-100 dark:border-white/10"
+                        <div class="bg-white dark:bg-slate-900 rounded-4xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 dark:border-white/10"
                             @click.stop>
                             <!-- Modal Header -->
                             <div class="flex items-center justify-between mb-8">
@@ -272,7 +272,7 @@ const formatMonthYear = (date: Date) => {
 
                         <!-- Divider -->
                         <div
-                            :class="['h-10 w-[1px]', isToday(date) ? 'bg-white/20 dark:bg-white/10' : 'bg-slate-100 dark:bg-white/5']" />
+                            :class="['h-10 w-px', isToday(date) ? 'bg-white/20 dark:bg-white/10' : 'bg-slate-100 dark:bg-white/5']" />
 
                         <!-- Center: Available Budget (Dominant) -->
                         <div class="flex-1 flex flex-col items-center">

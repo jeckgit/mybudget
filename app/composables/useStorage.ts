@@ -12,7 +12,7 @@ const DEFAULT_STATE: AppState = {
   }
 };
 
-let globalLoadingPromise: Promise<any> | null = null;
+let globalLoadingPromise: Promise<void> | null = null;
 
 export const useStorage = () => {
   const { $i18n } = useNuxtApp();
@@ -27,7 +27,7 @@ export const useStorage = () => {
     () => state.value.config.language,
     (newLang) => {
       if (newLang && newLang !== locale.value) {
-        setLocale(newLang as any);
+        setLocale(newLang);
       }
     },
     { immediate: true }
@@ -64,7 +64,6 @@ export const useStorage = () => {
         ] = await Promise.all([
           client.from('profiles').select('*').eq('user_id', user.value!.sub).maybeSingle(),
           client.from('transactions').select('*').eq('user_id', user.value!.sub).order('date', { ascending: false }),
-          client.from('transactions').select('*').eq('user_id', user.value!.sub).order('date', { ascending: false }),
           client.from('categories').select('*').eq('user_id', user.value!.sub),
           client.from('months').select('*').eq('user_id', user.value!.sub)
         ]);
@@ -73,10 +72,9 @@ export const useStorage = () => {
         if (txError) console.error('Error loading transactions:', txError);
         if (catError) console.error('Error loading categories:', catError);
 
-        // Cast as `any` first because TS might not know about `months` error yet if types aren't fully propagated in local check
-        if (error as any) console.error('Error loading months:', error as any);
+        if (error) console.error('Error loading months:', error);
 
-        let finalProfile: any = profile; // Cast to any because types thinks it has currency_symbol
+        let finalProfile = profile;
         let finalCategories = categories || [];
 
         // INITIALIZATION FOR NEW USERS
@@ -87,11 +85,11 @@ export const useStorage = () => {
             .upsert(
               {
                 user_id: user.value!.sub,
-                currency: 'EUR', // New column
+                currency: 'EUR',
                 onboarding_complete: false,
                 language: 'en',
                 theme: 'system'
-              } as any, // Cast to any for renamed column
+              },
               { onConflict: 'user_id' }
             )
             .select()
@@ -177,7 +175,7 @@ export const useStorage = () => {
         onboarding_complete: newState.config.onboardingComplete,
         language: newState.config.language,
         theme: newState.config.theme
-      } as any);
+      });
 
       if (error) throw error;
     } catch (e) {
@@ -297,9 +295,9 @@ export const useStorage = () => {
         monthly_limit: state.value.config.monthlyLimit,
         currency: state.value.config.currency,
         onboarding_complete: state.value.config.onboardingComplete,
-        language: state.value.config.language,
-        theme: state.value.config.theme
-      } as any);
+        theme: state.value.config.theme,
+        language: state.value.config.language
+      });
 
       if (error) throw error;
     } catch (e) {
@@ -345,7 +343,7 @@ export const useStorage = () => {
           budget: data.budget,
           income: data.income,
           data: data.data || existing.data || {}
-        } as any,
+        },
         { onConflict: 'user_id,key' }
       );
 

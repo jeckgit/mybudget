@@ -1,7 +1,7 @@
 <template>
   <div :class="[variantClasses]">
     <div
-      class="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent dark:from-white/10 opacity-60 dark:opacity-20 pointer-events-none" />
+      class="absolute inset-0 bg-linear-to-b from-white/50 to-transparent dark:from-white/10 opacity-60 dark:opacity-20 pointer-events-none" />
     <div class="relative z-10 h-full">
       <slot />
     </div>

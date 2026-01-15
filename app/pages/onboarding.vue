@@ -3,7 +3,7 @@
         <div class="max-w-md w-full transition-all duration-500 ease-in-out">
             <!-- Icon / Logo Area -->
             <div
-                class="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-white/80 to-white/20 backdrop-blur-xl border border-white/60 flex items-center justify-center shadow-2xl shadow-accent/30 mb-8 mx-auto dark:from-white/10 dark:to-white/5 dark:border-white/10 dark:shadow-accent/20">
+                class="w-24 h-24 rounded-4xl bg-linear-to-br from-white/80 to-white/20 backdrop-blur-xl border border-white/60 flex items-center justify-center shadow-2xl shadow-accent/30 mb-8 mx-auto dark:from-white/10 dark:to-white/5 dark:border-white/10 dark:shadow-accent/20">
                 <Wallet class="w-10 h-10 text-mint" :stroke-width="1.5" />
             </div>
 
@@ -31,22 +31,40 @@
             <div v-else-if="currentStep === 'budget'" class="animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.welcome')
-                    }}</h1>
+                }}</h1>
                 <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.tagline') }}</p>
 
+
                 <GlassCard variant="glass" class="p-8 dark:bg-white/5 dark:border-white/10">
+                    <div class="mb-6">
+                        <label
+                            class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest dark:text-slate-500">
+                            {{ t('settings.currency') }}
+                        </label>
+                        <select v-model="selectedCurrency"
+                            class="w-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-xl px-4 py-3 font-medium focus:outline-none focus:ring-2 focus:ring-accent transition-all appearance-none text-center cursor-pointer">
+                            <option v-for="c in currencies" :key="c.code" :value="c.code">
+                                {{ c.label }}
+                            </option>
+                        </select>
+                    </div>
+
                     <label
                         class="block text-xs font-bold text-slate-400 mb-4 uppercase tracking-widest dark:text-slate-500">
                         {{ t('onboarding.monthly_budget') }}
                     </label>
-                    <div class="relative mb-8">
-                        <span
-                            class="absolute left-0 top-1/2 -translate-y-1/2 text-3xl font-medium text-slate-400 dark:text-slate-500">{{
-                                state.config.currencySymbol }}</span>
+                    <div
+                        class="flex items-center gap-4 mb-8 border-b-2 border-slate-200/50 dark:border-white/10 focus-within:border-accent transition-colors pb-2">
+                        <span class="text-3xl font-medium text-slate-400 dark:text-slate-500">{{
+                            selectedCurrency }}</span>
                         <input v-model="budgetInput" type="number"
-                            class="w-full bg-transparent border-b-2 border-slate-200/50 py-2 pl-8 text-5xl font-bold text-slate-800 focus:outline-none focus:border-accent transition-colors placeholder-slate-200 dark:text-white dark:border-white/10 dark:placeholder-slate-700"
+                            class="w-full bg-transparent border-none p-0 text-5xl font-bold text-slate-800 focus:ring-0 focus:outline-none placeholder-slate-200 dark:text-white dark:placeholder-slate-700 leading-none outline-none"
                             placeholder="0" />
                     </div>
+                    <p class="text-xs text-slate-400 font-medium mb-8 dark:text-slate-500">
+                        {{ t('onboarding.budget_hint') }}
+                    </p>
+
                     <div class="flex flex-col gap-3">
                         <GlassButton :full-width="true" @click="handleSetBudget" :disabled="!budgetInput">
                             {{ t('onboarding.start_journey') }}
@@ -65,7 +83,7 @@
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.categories_title') }}</h1>
                 <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.categories_subtitle')
-                    }}</p>
+                }}</p>
 
                 <GlassCard variant="glass" class="p-8 dark:bg-white/5 dark:border-white/10">
                     <div class="grid grid-cols-3 gap-4 mb-8">
@@ -75,14 +93,14 @@
                                 🛍️</div>
                             <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{
                                 t('categories.shopping')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
                             <div
                                 class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-2xl dark:bg-blue-500/20">
                                 🍔</div>
                             <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ t('categories.food')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
                             <div
@@ -140,10 +158,19 @@ import { Wallet } from 'lucide-vue-next';
 
 // Use storage
 const { state, updateConfig } = useStorage();
-const { t, setLocale } = useI18n();
+const { t, setLocale, locale } = useI18n();
 
 const budgetInput = ref('');
 const currentStep = ref<'language' | 'budget' | 'categories' | 'completing'>('language');
+const selectedCurrency = ref(state.value.config.currency || 'EUR');
+
+const currencies = [
+    { code: 'EUR', label: 'Euro (€)' },
+    { code: 'USD', label: 'US Dollar ($)' },
+    { code: 'GBP', label: 'British Pound (£)' },
+    { code: 'CHF', label: 'Swiss Franc (CHF)' },
+    { code: 'JPY', label: 'Japanese Yen (¥)' }
+];
 
 const languages = [
     { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
@@ -171,7 +198,8 @@ const handleSetBudget = async () => {
         currentStep.value = 'categories';
 
         await updateConfig({
-            monthlyLimit: amount
+            monthlyLimit: amount,
+            currency: selectedCurrency.value
         });
     }
 };

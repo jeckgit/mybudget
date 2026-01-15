@@ -128,6 +128,7 @@
     "tagline": "Dépenses conscientes, clarté liquide.",
     "monthly_budget": "Budget mensuel",
     "start_journey": "Commencer le voyage",
+    "budget_hint": "Votre revenu disponible après frais fixes (loyer, factures, etc.)",
     "setting_up": "Configuration de votre budget...",
     "categories_title": "Catégories",
     "categories_subtitle": "Vos habitudes de dépenses",

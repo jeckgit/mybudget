@@ -1,10 +1,9 @@
 <script setup lang="ts">
-
-
-
 // Inject state directly from storage
 const { state, loadState, getMonthConfig, upsertMonth } = useStorage();
 const { t, locale } = useI18n();
+const { calculateBudgetData } = useBudget();
+const { formatCurrency } = useCurrency();
 
 // Ensure state is loaded (calls loadState which has built-in dedup)
 await loadState();
@@ -14,24 +13,19 @@ if (state.value.config && !state.value.config.onboardingComplete) {
     navigateTo('/onboarding');
 }
 
-const { calculateBudgetData } = useBudget();
-const { formatCurrency } = useCurrency();
-
-const budgetData = computed(() => calculateBudgetData(state.value));
-
-const currentMonthBudget = computed(() => {
-    return getMonthConfig(new Date().toISOString()).budget;
-});
-
-const remainingPercentage = computed(() => {
-    if (currentMonthBudget.value === 0) return 0;
-    return Math.max(0, (currentMonthBudget.value - budgetData.value.totalSpentMonth) / currentMonthBudget.value);
-});
-
 // Budget Editing
 const showBudgetEdit = ref(false);
 const editingBudget = ref<number | null>(null);
 const isSavingBudget = ref(false);
+
+const budgetData = computed(() => calculateBudgetData(state.value));
+const currentMonthBudget = computed(() => {
+    return getMonthConfig(new Date().toISOString()).budget;
+});
+const remainingPercentage = computed(() => {
+    if (currentMonthBudget.value === 0) return 0;
+    return Math.max(0, (currentMonthBudget.value - budgetData.value.totalSpentMonth) / currentMonthBudget.value);
+});
 
 const formatMonthYear = (date: Date) => {
     return date.toLocaleDateString(locale.value, { month: 'long', year: 'numeric' });
@@ -58,8 +52,6 @@ const saveMonthlyBudget = async () => {
         isSavingBudget.value = false;
     }
 };
-
-
 </script>
 <template>
     <div class="flex flex-col min-h-screen pb-32 px-6 pt-12">
@@ -100,9 +92,9 @@ const saveMonthlyBudget = async () => {
                 enter-to-class="opacity-100 scale-100" leave-active-class="transition ease-in duration-150"
                 leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
                 <div v-if="showBudgetEdit"
-                    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
+                    class="fixed inset-0 z-100 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
                     @click="showBudgetEdit = false">
-                    <div class="bg-white dark:bg-slate-900 rounded-[2rem] p-6 w-full max-w-sm shadow-2xl border border-slate-100 dark:border-white/10"
+                    <div class="bg-white dark:bg-slate-900 rounded-4xl p-6 w-full max-w-sm shadow-2xl border border-slate-100 dark:border-white/10"
                         @click.stop>
                         <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4 text-center">
                             {{ t('settings.monthly_budget') }} ({{ formatMonthYear(new Date()) }})
