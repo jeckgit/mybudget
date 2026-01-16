@@ -35,12 +35,38 @@ export const useBudget = () => {
       ? monthTransactions.filter((t) => new Date(t.date).getDate() === currentDay).reduce((acc, t) => acc + t.amount, 0)
       : 0;
 
-    const budgetAvailableForTodayAndFuture = remainingMonthly + spentToday;
+    const avgDaily = state.config.monthlyLimit / daysInMonth;
+
+    // Feature: Adaptive Smart Start
+    // Rule: The budget "starts" on the day of the first transaction of the month,
+    // or "today" if no transactions exist yet. Days before this are "skipped".
+    let effectiveRemainingForDailyCalc = remainingMonthly;
+
+    if (isCurrentMonth) {
+      let startDayOfMonth = 1;
+
+      if (monthTransactions.length > 0) {
+        // Find earliest transaction date
+        const sorted = [...monthTransactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        startDayOfMonth = new Date(sorted[0].date).getDate();
+      } else {
+        // No transactions yet -> Start today
+        startDayOfMonth = currentDay;
+      }
+
+      // If we are starting late (after the 1st), deduct implied spending for skipped days
+      if (startDayOfMonth > 1) {
+        const skippedDays = startDayOfMonth - 1;
+        const assumedPastSpending = skippedDays * avgDaily;
+        // We only adjust the *calculation base* for the daily target, not the actual remaining money
+        effectiveRemainingForDailyCalc = Math.max(0, remainingMonthly - assumedPastSpending);
+      }
+    }
+
+    const budgetAvailableForTodayAndFuture = effectiveRemainingForDailyCalc + spentToday;
     const dailyTarget = budgetAvailableForTodayAndFuture / daysRemaining;
     const remainingToday = dailyTarget - spentToday;
     const isOverBudget = remainingToday < 0;
-
-    const avgDaily = state.config.monthlyLimit / daysInMonth;
 
     return {
       today,

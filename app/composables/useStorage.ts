@@ -285,9 +285,6 @@ export const useStorage = () => {
           fixed_cost_details: []
         })
         .eq('user_id', user.value.sub);
-
-      // Delete all categories
-      await client.from('categories').delete().eq('user_id', user.value.sub);
     } catch (e) {
       console.error('Failed to clear state', e);
     }

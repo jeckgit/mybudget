@@ -89,13 +89,47 @@ const dailyBudget = computed(() => {
     return limit / (daysInMonth || 1);
 });
 
-// Calculate rollover budget for each day
-// Formula: budget_for_day_i = (i * dailyBudget) - total_spent_until_day_i-1
-const rolloverData = computed(() => {
-    const map = new Map<string, { spent: number; available: number }>();
-    let totalSpentUntilNow = 0;
+// Feature: Adaptive Smart Start
+// Determine the effective start date for calculations
+const effectiveStartDate = computed(() => {
+    const year = currentMonthDate.value.getFullYear();
+    const month = currentMonthDate.value.getMonth();
+    const now = new Date();
 
-    visibleDays.value.forEach((date, index) => {
+    // Check if we are viewing the current calendar month
+    const isCurrentCalendarMonth = year === now.getFullYear() && month === now.getMonth();
+
+    // Find transactions in this month
+    const monthTransactions = state.value.transactions.filter(t => {
+        const d = new Date(t.date);
+        return d.getFullYear() === year && d.getMonth() === month;
+    });
+
+    if (monthTransactions.length > 0) {
+        // Return earliest transaction date
+        const sorted = [...monthTransactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        const firstDate = new Date(sorted[0].date);
+        // Normalize to start of day for comparison
+        return new Date(year, month, firstDate.getDate());
+    } else if (isCurrentCalendarMonth) {
+        // No transactions, current month -> Start Today
+        return new Date(year, month, now.getDate());
+    } else {
+        // Past/Future month without transactions -> Start 1st
+        return new Date(year, month, 1);
+    }
+});
+
+// Calculate rollover budget for each day
+// Formula with Adaptive Start:
+// If Day < StartDate: Available = 0 (Skipped)
+// If Day >= StartDate: Available = ((DaysActive * DailyBudget) - SpentSinceStartDate)
+const rolloverData = computed(() => {
+    const map = new Map<string, { spent: number; available: number; isSkipped: boolean }>();
+    let totalSpentSinceStart = 0;
+    const startDate = effectiveStartDate.value;
+
+    visibleDays.value.forEach((date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
@@ -103,21 +137,33 @@ const rolloverData = computed(() => {
 
         const daySpent = dayMoneyMap.value.get(key) || 0;
 
-        // Available budget for today = (Days so far * Daily Budget) - Total spent including today
-        // Wait, the user said: "Budget for Tuesday is 15 if I spend 5 on Monday (Budget 10/day)"
-        // So Available(Monday) = 10. Spent(Monday) = 5.
-        // Available(Tuesday) = 10 + (10 - 5) = 15.
-        // General: Available(Day i) = DailyBudget + (Available(Day i-1) - Spent(Day i-1))
-        // Which simplifies to: Available(Day i) = (i * DailyBudget) - (Total Spent until Day i-1)
+        // Check if skipped
+        // We compare timestamps to be safe (ignoring time component essentially as dates are 00:00)
+        if (date.getTime() < startDate.getTime()) {
+            map.set(key, {
+                spent: daySpent,
+                available: 0,
+                isSkipped: true
+            });
+        } else {
+            // Active Days Calculation
+            // Days active including this one
+            const daysActive = Math.floor((date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
-        const available = ((index + 1) * dailyBudget.value) - totalSpentUntilNow;
+            // Accumulate spending only for active period (though theoretically no spending should exist before start if based on txs)
+            // But if we stick to the rule: "Start Date IS First Tx Date", then by definition no spending before.
+            totalSpentSinceStart += daySpent;
 
-        map.set(key, {
-            spent: daySpent,
-            available: available - daySpent
-        });
+            const available = (daysActive * dailyBudget.value) - totalSpentSinceStart;
 
-        totalSpentUntilNow += daySpent;
+            map.set(key, {
+                spent: daySpent,
+                available: available, // This is the "End of Day" available or "Available to Spend"? Match previous logic.
+                // Previous: (index+1)*daily - totalSpent.
+                // Assuming "available" means "Remaining Budget"
+                isSkipped: false
+            });
+        }
     });
     return map;
 });
@@ -127,7 +173,7 @@ const getBudgetForDate = (date: Date) => {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const key = `${year}-${month}-${day}`;
-    return rolloverData.value.get(key) || { spent: 0, available: 0 };
+    return rolloverData.value.get(key) || { spent: 0, available: 0, isSkipped: false };
 };
 
 const isToday = (date: Date) => {
@@ -257,9 +303,10 @@ const formatMonthYear = (date: Date) => {
                 <div class="flex flex-col gap-3 day-list">
                     <button v-for="(date, index) in visibleDays" :key="index" @click="handleDayClick(date)" :class="[
                         'w-full p-4 flex items-center gap-4 rounded-[1.8rem] transition-all duration-300 border active:scale-[0.98] snap-center',
-                        isToday(date)
+                        getBudgetForDate(date).isSkipped ? 'opacity-40 grayscale bg-slate-50 border-slate-100 dark:bg-white/5 dark:border-white/5' : '',
+                        !getBudgetForDate(date).isSkipped && isToday(date)
                             ? 'bg-slate-800 text-white border-slate-800 shadow-xl shadow-slate-200 dark:bg-white/15 dark:text-white dark:border-white/20 dark:shadow-purple-900/20'
-                            : 'bg-white border-slate-100 text-slate-700 shadow-sm shadow-slate-200/50 hover:bg-slate-50 dark:bg-white/5 dark:border-white/5 dark:text-slate-300'
+                            : !getBudgetForDate(date).isSkipped ? 'bg-white border-slate-100 text-slate-700 shadow-sm shadow-slate-200/50 hover:bg-slate-50 dark:bg-white/5 dark:border-white/5 dark:text-slate-300' : ''
                     ]">
                         <!-- Left: Date -->
                         <div class="flex flex-col items-center min-w-[50px]">
@@ -276,20 +323,27 @@ const formatMonthYear = (date: Date) => {
 
                         <!-- Center: Available Budget (Dominant) -->
                         <div class="flex-1 flex flex-col items-center">
-                            <span
-                                :class="['text-[9px] font-black uppercase tracking-[0.2em] mb-0.5 opacity-60', isToday(date) ? 'text-white/60' : 'text-slate-400']">
-                                {{ getBudgetForDate(date).available >= 0 ? t('day_selector.available') :
-                                    t('day_selector.over') }}
-                            </span>
-                            <div :class="[
-                                'text-2xl font-black tracking-tighter transition-colors',
-                                getBudgetForDate(date).available >= 0
-                                    ? (isToday(date) ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400')
-                                    : (isToday(date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
-                            ]">
-                                <span>{{ formatCurrency(Math.abs(getBudgetForDate(date).available),
-                                    state.config.currency, true) }}</span>
-                            </div>
+                            <template v-if="!getBudgetForDate(date).isSkipped">
+                                <span
+                                    :class="['text-[9px] font-black uppercase tracking-[0.2em] mb-0.5 opacity-60', isToday(date) ? 'text-white/60' : 'text-slate-400']">
+                                    {{ getBudgetForDate(date).available >= 0 ? t('day_selector.available') :
+                                        t('day_selector.over') }}
+                                </span>
+                                <div :class="[
+                                    'text-2xl font-black tracking-tighter transition-colors',
+                                    getBudgetForDate(date).available >= 0
+                                        ? (isToday(date) ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400')
+                                        : (isToday(date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
+                                ]">
+                                    <span>{{ formatCurrency(Math.abs(getBudgetForDate(date).available),
+                                        state.config.currency, true) }}</span>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <div class="text-2xl font-black tracking-tighter text-slate-300 dark:text-slate-600">
+                                    —
+                                </div>
+                            </template>
                         </div>
 
                         <!-- Right: Spent (Secondary) -->

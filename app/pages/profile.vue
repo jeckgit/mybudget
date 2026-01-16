@@ -167,15 +167,25 @@ const handleDeleteAccount = async () => {
             // even if the auth deletion fails (e.g. if the RPC doesn't exist yet)
         }
 
-        // 3. Sign out
-        await client.auth.signOut();
+        // 3. Sign out (might fail if user is already deleted, which is fine)
+        try {
+            await client.auth.signOut();
+        } catch (signOutError) {
+            console.warn("Sign out failed (expected if user deleted):", signOutError);
+        }
 
         // 4. Redirect
         navigateTo('/');
-    } catch (e) {
-        console.error("Deletion failed", e);
-        errorMsg.value = t('common.error_occurred');
-        showDeleteConfirm.value = false;
+    } catch (e: any) {
+        console.error("Deletion process error", e);
+        // Only show error if it's NOT the "User from sub claim..." error which we expect
+        if (!e.message?.includes('user_not_found') && !e.message?.includes('JWT')) {
+            errorMsg.value = t('common.error_occurred');
+            showDeleteConfirm.value = false;
+        } else {
+             // If it was a JWT error, we consider deletion successful enough to redirect
+             navigateTo('/');
+        }
     } finally {
         isDeleting.value = false;
     }
