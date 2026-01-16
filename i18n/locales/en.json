@@ -134,7 +134,30 @@
     "categories_title": "Categories",
     "categories_subtitle": "Your Spending Habits",
     "categories_desc": "We've set up some default categories for you. You can add, edit, or remove them anytime in your Profile.",
-    "continue": "Continue"
+    "continue": "Continue",
+    "help_calculate": "Not sure? Help me calculate",
+    "income": "Monthly Income",
+    "income_hint": "Net income (what lands in your account)",
+    "fixed_costs": "Fixed Costs (Rent, etc.)",
+    "fixed_costs_hint": "Regular monthly payments (Rent, Internet, Subscriptions)",
+    "error_missing_income": "Please enter your income to calculate the budget.",
+    "error_negative_budget": "Fixed costs exceed income. Please adjust.",
+    "error_missing_budget": "Please set a monthly budget amount.",
+    "add_cost": "Add Cost",
+    "add_custom": "Custom",
+    "cost_name": "Cost Name",
+    "cost_amount": "Amount",
+    "total_fixed_costs": "Total Fixed Costs",
+    "costs": {
+      "rent": "Rent / Mortgage",
+      "electricity": "Electricity",
+      "internet": "Internet",
+      "phone": "Phone",
+      "insurance": "Insurance",
+      "streaming": "Streaming",
+      "gym": "Gym",
+      "transport": "Public Transport"
+    }
   },
   "day_selector": {
     "today": "Today",

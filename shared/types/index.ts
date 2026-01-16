@@ -5,6 +5,11 @@ export interface Category {
   key?: string; // Translation key for default categories (e.g., 'shopping', 'food')
   user_id?: string;
 }
+export interface FixedCostItem {
+  id: string;
+  label: string;
+  amount: number;
+}
 
 export interface Transaction {
   id: string;
@@ -20,6 +25,9 @@ export interface BudgetConfig {
   onboardingComplete: boolean;
   language?: string;
   theme?: string;
+  income?: number;
+  fixedCosts?: number;
+  fixedCostDetails?: FixedCostItem[];
 }
 
 export interface DailyStats {

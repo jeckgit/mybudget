@@ -133,7 +133,30 @@
     "categories_title": "Categorías",
     "categories_subtitle": "Tus hábitos de gasto",
     "categories_desc": "Hemos configurado algunas categorías por defecto. Puedes modificarlas en cualquier momento en tu perfil.",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "help_calculate": "¿Necesitas ayuda para calcular?",
+    "income": "Ingreso Mensual",
+    "income_hint": "Ingreso neto (lo que llega a tu cuenta)",
+    "fixed_costs": "Gastos fijos (alquiler, etc.)",
+    "fixed_costs_hint": "Pagos mensuales regulares (Alquiler, Internet, Suscripciones)",
+    "error_missing_income": "Por favor, introduce tus ingresos para calcular el presupuesto.",
+    "error_negative_budget": "Los gastos fijos superan a los ingresos.",
+    "error_missing_budget": "Por favor, establece un presupuesto mensual.",
+    "add_cost": "Añadir gasto",
+    "add_custom": "Otro",
+    "cost_name": "Nombre del gasto",
+    "cost_amount": "Importe",
+    "total_fixed_costs": "Total gastos fijos",
+    "costs": {
+      "rent": "Alquiler",
+      "electricity": "Electricidad",
+      "internet": "Internet",
+      "phone": "Teléfono",
+      "insurance": "Seguro",
+      "streaming": "Streaming",
+      "gym": "Gimnasio",
+      "transport": "Transporte"
+    }
   },
   "day_selector": {
     "today": "Hoy",

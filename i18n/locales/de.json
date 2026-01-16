@@ -134,7 +134,30 @@
     "categories_title": "Kategorien",
     "categories_subtitle": "Deine Ausgabegewohnheiten",
     "categories_desc": "Wir haben einige Standardkategorien für dich eingerichtet. Du kannst sie jederzeit in deinem Profil anpassen.",
-    "continue": "Weiter"
+    "continue": "Weiter",
+    "help_calculate": "Unsicher? Rechenhilfe",
+    "income": "Monatliches Einkommen",
+    "income_hint": "Nettoeinkommen (was auf dem Konto landet)",
+    "fixed_costs": "Fixkosten (Miete, Internet, etc.)",
+    "fixed_costs_hint": "Regelmäßige monatliche Zahlungen (Miete, Internet, Abos)",
+    "error_missing_income": "Bitte gib dein Einkommen an, um das Budget zu berechnen.",
+    "error_negative_budget": "Deine Fixkosten sind höher als dein Einkommen.",
+    "error_missing_budget": "Bitte lege ein monatliches Budget fest.",
+    "add_cost": "Kostenpunkt hinzufügen",
+    "add_custom": "Eigener",
+    "cost_name": "Bezeichnung",
+    "cost_amount": "Betrag",
+    "total_fixed_costs": "Fixkosten Gesamt",
+    "costs": {
+      "rent": "Miete",
+      "electricity": "Strom",
+      "internet": "Internet",
+      "phone": "Handy",
+      "insurance": "Versicherung",
+      "streaming": "Streaming",
+      "gym": "Fitnessstudio",
+      "transport": "ÖPNV"
+    }
   },
   "day_selector": {
     "today": "Heute",

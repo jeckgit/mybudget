@@ -133,7 +133,30 @@
     "categories_title": "Catégories",
     "categories_subtitle": "Vos habitudes de dépenses",
     "categories_desc": "Nous avons configuré quelques catégories par défaut. Vous pouvez les modifier à tout moment dans votre profil.",
-    "continue": "Continuer"
+    "continue": "Continuer",
+    "help_calculate": "Besoin d'aide pour calculer ?",
+    "income": "Revenu mensuel",
+    "income_hint": "Revenu net (ce qui arrive sur le compte)",
+    "fixed_costs": "Coûts fixes (loyer, etc.)",
+    "fixed_costs_hint": "Paiements mensuels réguliers (Loyer, Internet, Abonnements)",
+    "error_missing_income": "Veuillez saisir vos revenus pour calculer le budget.",
+    "error_negative_budget": "Les coûts fixes dépassent les revenus.",
+    "error_missing_budget": "Veuillez définir un budget mensuel.",
+    "add_cost": "Ajouter un coût",
+    "add_custom": "Autre",
+    "cost_name": "Nom du coût",
+    "cost_amount": "Montant",
+    "total_fixed_costs": "Total des coûts fixes",
+    "costs": {
+      "rent": "Loyer",
+      "electricity": "Électricité",
+      "internet": "Internet",
+      "phone": "Téléphone",
+      "insurance": "Assurance",
+      "streaming": "Streaming",
+      "gym": "Salle de sport",
+      "transport": "Transport"
+    }
   },
   "day_selector": {
     "today": "Aujourd'hui",

@@ -118,7 +118,10 @@ export const useStorage = () => {
             currency: dbCurrency,
             onboardingComplete: finalProfile?.onboarding_complete || false,
             language: finalProfile?.language || 'en',
-            theme: finalProfile?.theme || 'system'
+            theme: finalProfile?.theme || 'system',
+            income: Number(finalProfile?.income || 0),
+            fixedCosts: Number(finalProfile?.fixed_costs || 0),
+            fixedCostDetails: (finalProfile?.fixed_cost_details as any) || []
           },
           categories: finalCategories.map((c) => ({
             id: c.id,
@@ -174,7 +177,10 @@ export const useStorage = () => {
         currency: newState.config.currency,
         onboarding_complete: newState.config.onboardingComplete,
         language: newState.config.language,
-        theme: newState.config.theme
+        theme: newState.config.theme,
+        income: newState.config.income,
+        fixed_costs: newState.config.fixedCosts,
+        fixed_cost_details: newState.config.fixedCostDetails as any
       });
 
       if (error) throw error;
@@ -273,7 +279,10 @@ export const useStorage = () => {
         .from('profiles')
         .update({
           monthly_limit: 0,
-          onboarding_complete: false
+          onboarding_complete: false,
+          income: 0,
+          fixed_costs: 0,
+          fixed_cost_details: []
         })
         .eq('user_id', user.value.sub);
 
@@ -296,7 +305,10 @@ export const useStorage = () => {
         currency: state.value.config.currency,
         onboarding_complete: state.value.config.onboardingComplete,
         theme: state.value.config.theme,
-        language: state.value.config.language
+        language: state.value.config.language,
+        income: state.value.config.income,
+        fixed_costs: state.value.config.fixedCosts,
+        fixed_cost_details: state.value.config.fixedCostDetails as any
       });
 
       if (error) throw error;
