@@ -108,9 +108,9 @@
                                             class="flex items-center gap-2 animate-in slide-in-from-left-2 fade-in duration-300"
                                             :style="{ animationDelay: `${index * 50}ms` }">
                                             <input v-model="item.label" type="text"
-                                                class="flex-1 bg-slate-100 dark:bg-white/10 rounded-xl px-4 py-3 text-base font-medium outline-none focus:ring-2 focus:ring-accent transition-all dark:text-white"
+                                                class="flex-1 bg-slate-100 dark:bg-white/10 rounded-xl px-4 py-3 text-base font-medium outline-none focus:ring-2 focus:ring-accent transition-all dark:text-white w-38"
                                                 :placeholder="t('onboarding.cost_name')" />
-                                            <div class="relative w-32">
+                                            <div class="relative">
                                                 <input v-model.number="item.amount" type="number"
                                                     class="w-full bg-slate-100 dark:bg-white/10 rounded-xl px-4 py-3 text-base font-medium outline-none focus:ring-2 focus:ring-accent transition-all dark:text-white text-right"
                                                     placeholder="0" />
