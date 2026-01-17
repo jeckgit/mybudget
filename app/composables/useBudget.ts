@@ -48,7 +48,7 @@ export const useBudget = () => {
       if (monthTransactions.length > 0) {
         // Find earliest transaction date
         const sorted = [...monthTransactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        startDayOfMonth = new Date(sorted[0].date).getDate();
+        startDayOfMonth = sorted[0] ? new Date(sorted[0].date).getDate() : 1;
       } else {
         // No transactions yet -> Start today
         startDayOfMonth = currentDay;

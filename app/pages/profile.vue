@@ -183,8 +183,8 @@ const handleDeleteAccount = async () => {
             errorMsg.value = t('common.error_occurred');
             showDeleteConfirm.value = false;
         } else {
-             // If it was a JWT error, we consider deletion successful enough to redirect
-             navigateTo('/');
+            // If it was a JWT error, we consider deletion successful enough to redirect
+            navigateTo('/');
         }
     } finally {
         isDeleting.value = false;
@@ -207,14 +207,14 @@ const handleDeleteAccount = async () => {
 
                 <NuxtLink to="/categories" class="block mb-6">
                     <GlassCard variant="white"
-                        class="p-4 !rounded-2xl flex items-center justify-between group active:scale-[0.98] transition-all">
+                        class="p-4 rounded-2xl! flex items-center justify-between group active:scale-[0.98] transition-all">
                         <div class="flex items-center gap-4">
                             <div
                                 class="w-10 h-10 rounded-xl bg-purple-50 text-purple-500 flex items-center justify-center dark:bg-purple-900/20 dark:text-purple-300">
                                 <Tag class="w-5 h-5" />
                             </div>
                             <span class="font-bold text-slate-700 dark:text-slate-200">{{ t('common.manage_categories')
-                            }}</span>
+                                }}</span>
                             <ChevronRight
                                 class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors group-active:translate-x-1" />
                         </div>
@@ -224,7 +224,7 @@ const handleDeleteAccount = async () => {
                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 dark:text-slate-500">
                     {{ t('settings.global_settings') }}
                 </h2>
-                <GlassCard variant="white" class="p-4 !rounded-2xl space-y-4">
+                <GlassCard variant="white" class="p-4 rounded-2xl! space-y-4">
                     <!-- Language -->
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -233,7 +233,7 @@ const handleDeleteAccount = async () => {
                                 <Globe class="w-5 h-5" />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
-                                }}</span>
+                            }}</span>
                         </div>
                         <select v-model="localLanguage"
                             class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -254,7 +254,7 @@ const handleDeleteAccount = async () => {
                                 <Monitor class="w-5 h-5" v-else />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex bg-slate-100 dark:bg-white/10 rounded-lg p-1 w-32">
                             <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
@@ -277,7 +277,7 @@ const handleDeleteAccount = async () => {
                                 <span class="text-sm font-bold">{{ state.config.currency }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex gap-2">
                             <select v-model="localCurrency"
@@ -326,7 +326,7 @@ const handleDeleteAccount = async () => {
                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 dark:text-slate-500">
                     {{ t('profile.account_security') }}
                 </h2>
-                <GlassCard variant="white" class="p-6 !rounded-2xl space-y-4">
+                <GlassCard variant="white" class="p-6 rounded-2xl! space-y-4">
                     <div class="space-y-2">
                         <label class="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                             <Mail class="w-4 h-4" />
@@ -368,7 +368,7 @@ const handleDeleteAccount = async () => {
                     t('legal.title') }}</h2>
                 <NuxtLink to="/legal">
                     <GlassCard variant="white"
-                        class="p-4 !rounded-2xl flex items-center justify-between group active:scale-[0.98] transition-all">
+                        class="p-4 rounded-2xl! flex items-center justify-between group active:scale-[0.98] transition-all">
                         <div class="flex items-center gap-4">
                             <div
                                 class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center">
@@ -385,7 +385,7 @@ const handleDeleteAccount = async () => {
             <section>
                 <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 dark:text-slate-500">{{
                     t('settings.data') }}</h2>
-                <GlassCard variant="white" class="p-4 !rounded-2xl space-y-2">
+                <GlassCard variant="white" class="p-4 rounded-2xl! space-y-2">
                     <button @click="handleReset"
                         class="w-full flex items-center justify-between p-2 text-slate-600 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-white/5 rounded-xl transition-colors group">
                         <div class="flex items-center gap-3">
@@ -430,7 +430,7 @@ const handleDeleteAccount = async () => {
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             @click="showDeleteConfirm = false" />
         <GlassCard variant="white"
-            class="w-full max-w-sm p-6 relative z-10 space-y-6 animate-in fade-in zoom-in-95 duration-200 !rounded-[2rem]">
+            class="w-full max-w-sm p-6 relative z-10 space-y-6 animate-in fade-in zoom-in-95 duration-200 rounded-[2rem]!">
             <div class="text-center space-y-2">
                 <div
                     class="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4 text-red-500 shadow-sm border border-red-100 dark:border-red-900/30">
