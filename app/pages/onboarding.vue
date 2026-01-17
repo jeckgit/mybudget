@@ -31,7 +31,7 @@
             <div v-else-if="currentStep === 'budget'" class="animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.welcome')
-                    }}</h1>
+                }}</h1>
                 <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.tagline') }}</p>
 
 
@@ -108,11 +108,11 @@
                                             class="flex items-center gap-2 animate-in slide-in-from-left-2 fade-in duration-300"
                                             :style="{ animationDelay: `${index * 50}ms` }">
                                             <input v-model="item.label" type="text"
-                                                class="flex-1 bg-slate-100 dark:bg-white/10 rounded-xl px-3 py-2 text-sm font-medium outline-none focus:ring-2 focus:ring-accent transition-all dark:text-white"
+                                                class="flex-1 bg-slate-100 dark:bg-white/10 rounded-xl px-4 py-3 text-base font-medium outline-none focus:ring-2 focus:ring-accent transition-all dark:text-white"
                                                 :placeholder="t('onboarding.cost_name')" />
-                                            <div class="relative w-24">
+                                            <div class="relative w-32">
                                                 <input v-model.number="item.amount" type="number"
-                                                    class="w-full bg-slate-100 dark:bg-white/10 rounded-xl px-3 py-2 text-sm font-medium outline-none focus:ring-2 focus:ring-accent transition-all dark:text-white text-right"
+                                                    class="w-full bg-slate-100 dark:bg-white/10 rounded-xl px-4 py-3 text-base font-medium outline-none focus:ring-2 focus:ring-accent transition-all dark:text-white text-right"
                                                     placeholder="0" />
                                             </div>
                                             <button @click="removeCostItem(item.id)"
@@ -168,7 +168,7 @@
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.categories_title') }}</h1>
                 <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.categories_subtitle')
-                    }}</p>
+                }}</p>
 
                 <GlassCard variant="glass" class="p-8 dark:bg-white/5 dark:border-white/10">
                     <div class="grid grid-cols-3 gap-4 mb-8">
@@ -178,14 +178,14 @@
                                 🛍️</div>
                             <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{
                                 t('categories.shopping')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
                             <div
                                 class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-2xl dark:bg-blue-500/20">
                                 🍔</div>
                             <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ t('categories.food')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
                             <div
