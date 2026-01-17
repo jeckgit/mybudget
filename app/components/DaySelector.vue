@@ -108,7 +108,9 @@ const effectiveStartDate = computed(() => {
     if (monthTransactions.length > 0) {
         // Return earliest transaction date
         const sorted = [...monthTransactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        const firstDate = new Date(sorted[0].date);
+        const firstTx = sorted[0];
+        if (!firstTx) return new Date(year, month, 1); // Should not happen due to length check
+        const firstDate = new Date(firstTx.date);
         // Normalize to start of day for comparison
         return new Date(year, month, firstDate.getDate());
     } else if (isCurrentCalendarMonth) {
