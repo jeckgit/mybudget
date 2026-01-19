@@ -9,7 +9,7 @@ watch(user, () => {
 </script>
 
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+    <div class="min-h-dvh flex items-center justify-center bg-slate-50 dark:bg-slate-900">
         <div class="text-center">
             <div class="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4">
             </div>

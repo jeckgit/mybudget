@@ -7,7 +7,7 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-between p-6 relative overflow-hidden text-center">
+  <div class="min-h-dvh flex flex-col items-center justify-between p-6 relative overflow-hidden text-center">
     <BackgroundMesh />
 
     <div class="absolute top-6 right-6 z-20">

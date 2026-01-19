@@ -54,7 +54,7 @@ const saveMonthlyBudget = async () => {
 };
 </script>
 <template>
-    <div class="flex flex-col min-h-screen pb-32 px-6 pt-12">
+    <div class="flex flex-col min-h-dvh pb-32 px-6 pt-12">
         <!-- Main Budget Card -->
         <GlassCard variant="featured" class="p-6 mb-8 relative text-slate-900 dark:text-white overflow-hidden">
             <div class="relative z-10 flex flex-row items-end justify-between w-full">

@@ -8,7 +8,7 @@ const links = [
 </script>
 
 <template>
-    <div class="min-h-screen pt-20 pb-24 px-6 md:px-0">
+    <div class="min-h-dvh pt-20 pb-24 px-6 md:px-0">
         <GlassCard variant="white" class="max-w-xl mx-auto p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <header class="mb-8">
                 <NuxtLink to="/profile"

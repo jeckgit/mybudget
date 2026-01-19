@@ -24,4 +24,9 @@
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
+  /* background-color: #f8fafc; */
+}
+
+html.dark {
+  /* background-color: #050505; */
 }

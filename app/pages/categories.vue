@@ -66,7 +66,7 @@ const cancelEdit = () => {
 </script>
 
 <template>
-    <div class="min-h-screen pb-32">
+    <div class="min-h-dvh pb-32">
         <header class="p-6 pt-12 flex items-center justify-between relative z-20">
             <button @click="router.back()"
                 class="p-3 rounded-full bg-white/80 backdrop-blur-md shadow-sm text-slate-600 active:scale-95 transition-all dark:bg-white/10 dark:text-white dark:border dark:border-white/10">
@@ -87,7 +87,7 @@ const cancelEdit = () => {
             <div class="space-y-3">
                 <div v-for="cat in categories" :key="cat.id">
                     <GlassCard variant="white"
-                        class="p-4 !rounded-3xl border border-slate-100 dark:border-white/5 shadow-sm">
+                        class="p-4 rounded-3xl! border border-slate-100 dark:border-white/5 shadow-sm">
                         <div v-if="editingId === cat.id" class="flex items-center gap-3">
                             <input v-model="editEmoji"
                                 class="w-12 h-12 text-2xl text-center bg-slate-100 dark:bg-white/10 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none" />
@@ -127,7 +127,7 @@ const cancelEdit = () => {
                 <!-- Add Category Form -->
                 <div v-if="isAdding">
                     <GlassCard variant="white"
-                        class="p-4 !rounded-3xl border-2 border-dashed border-purple-200 dark:border-purple-500/20 shadow-none">
+                        class="p-4 rounded-3xl! border-2 border-dashed border-purple-200 dark:border-purple-500/20 shadow-none">
                         <div class="flex items-center gap-3">
                             <input v-model="newEmoji"
                                 class="w-12 h-12 text-2xl text-center bg-slate-50 dark:bg-white/10 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none" />

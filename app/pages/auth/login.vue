@@ -71,11 +71,11 @@ const handleOAuth = async (provider: 'google' | 'github') => {
 </script>
 
 <template>
-    <div class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+    <div class="min-h-dvh flex items-center justify-center p-6 relative overflow-hidden">
         <BackgroundMesh />
 
         <GlassCard variant="white"
-            class="w-full max-w-md p-8 relative z-10 !bg-white/80 dark:!bg-white/5 dark:!border dark:!border-white/10 dark:shadow-black/20">
+            class="w-full max-w-md p-8 relative z-10 bg-white/80! dark:bg-white/5! dark:border! dark:border-white/10! dark:shadow-black/20">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-slate-800 mb-2 dark:text-white">{{ t('auth.welcome') }}</h1>
                 <p class="text-slate-500 dark:text-slate-400">{{ isSignUp ? t('auth.create_account') :
@@ -112,7 +112,7 @@ const handleOAuth = async (provider: 'google' | 'github') => {
                 <div>
                     <label for="email"
                         class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 dark:text-slate-400">{{
-                        t('auth.email') }}</label>
+                            t('auth.email') }}</label>
                     <input id="email" v-model="email" type="email" name="email" autocomplete="username" required
                         class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-slate-800 dark:bg-white/5 dark:border-white/10 dark:text-white dark:placeholder-slate-600"
                         :placeholder="t('auth.email_placeholder')" />

@@ -54,10 +54,10 @@ const handleUpdate = async () => {
 </script>
 
 <template>
-    <div class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+    <div class="min-h-dvh flex items-center justify-center p-6 relative overflow-hidden">
         <BackgroundMesh />
         <GlassCard variant="white"
-            class="w-full max-w-md p-8 relative z-10 !bg-white/80 dark:!bg-white/5 dark:!border dark:!border-white/10 dark:shadow-black/20">
+            class="w-full max-w-md p-8 relative z-10 bg-white/80! dark:bg-white/5! dark:border! dark:border-white/10! dark:shadow-black/20">
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-slate-800 mb-2 dark:text-white">{{ t('auth.update_password') }}</h1>
                 <p class="text-slate-500 dark:text-slate-400">{{ t('auth.new_password') }}</p>
@@ -85,7 +85,7 @@ const handleUpdate = async () => {
                 </div>
 
                 <GlassButton type="submit" :full-width="true" :disabled="loading"
-                    class="!bg-slate-900 !text-white hover:!bg-slate-800 dark:!bg-white dark:!text-black dark:hover:!bg-slate-200">
+                    class="bg-slate-900! text-white! hover:bg-slate-800! dark:bg-white! dark:text-black! dark:hover:bg-slate-200!">
                     {{ loading ? t('auth.updating') : t('auth.update_password') }}
                 </GlassButton>
             </form>

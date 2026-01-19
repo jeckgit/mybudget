@@ -4,18 +4,18 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <div class="flex flex-col min-h-screen px-6 pt-12 pb-32">
+    <div class="flex flex-col min-h-dvh px-6 pt-12 pb-32">
         <header class="mb-8">
             <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-2">{{ t('assistant.title') }}</h1>
             <p class="text-slate-500 dark:text-slate-400">{{ t('assistant.subtitle') }}</p>
         </header>
 
         <GlassCard variant="featured"
-            class="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-6 !rounded-3xl border-dashed border-2 !bg-white/30 dark:!bg-white/5 border-slate-300 dark:border-white/10">
+            class="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-6 rounded-3xl! border-dashed border-2 bg-white/30! dark:bg-white/5! border-slate-300 dark:border-white/10">
 
             <div class="relative">
                 <div
-                    class="w-24 h-24 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-white shadow-xl shadow-purple-500/20 animate-pulse">
+                    class="w-24 h-24 rounded-full bg-linear-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-white shadow-xl shadow-purple-500/20 animate-pulse">
                     <Bot class="w-12 h-12" />
                 </div>
                 <div class="absolute -top-2 -right-2">

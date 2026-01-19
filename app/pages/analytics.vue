@@ -125,7 +125,7 @@ const exportAsJSON = () => {
 </script>
 
 <template>
-    <div class="min-h-screen pb-32 px-6 pt-12">
+    <div class="min-h-dvh pb-32 px-6 pt-12">
         <!-- Header -->
         <div class="flex items-center gap-4 mb-8">
             <NuxtLink to="/"
@@ -149,7 +149,7 @@ const exportAsJSON = () => {
                     leave-from-class="transform scale-100 opacity-100 translate-y-0"
                     leave-to-class="transform scale-95 opacity-0 -translate-y-2">
                     <div v-if="isMenuOpen"
-                        class="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white/80 backdrop-blur-xl border border-white/50 shadow-xl shadow-purple-900/5 z-[100] overflow-hidden dark:bg-slate-900/90 dark:border-white/10">
+                        class="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white/80 backdrop-blur-xl border border-white/50 shadow-xl shadow-purple-900/5 z-100 overflow-hidden dark:bg-slate-900/90 dark:border-white/10">
                         <div class="p-2 space-y-1">
                             <button @click="exportAsCSV"
                                 class="flex items-center gap-3 w-full px-4 py-3 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-white/50 dark:hover:bg-white/10 rounded-xl transition-colors">
@@ -216,7 +216,7 @@ const exportAsJSON = () => {
 
             <div class="space-y-3">
                 <GlassCard v-for="cat in categoryStats" :key="cat.id" variant="white"
-                    class="flex items-center justify-between p-4 !rounded-[1.5rem] !bg-white/50 dark:!bg-white/5 dark:!border dark:!border-white/10">
+                    class="flex items-center justify-between p-4 rounded-3xl! bg-white/50! dark:bg-white/5! dark:border! dark:border-white/10!">
                     <div class="flex items-center gap-4 flex-1">
                         <div
                             class="w-12 h-12 rounded-2xl flex items-center justify-center border border-white/60 shadow-sm dark:border-white/20 font-bold text-xl bg-slate-50 dark:bg-white/5">

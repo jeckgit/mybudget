@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col items-center justify-center min-h-screen p-6 text-center z-10 relative">
+    <div class="flex flex-col items-center justify-center min-h-dvh p-6 text-center z-10 relative">
         <div class="max-w-md w-full transition-all duration-500 ease-in-out">
             <!-- Icon / Logo Area -->
             <div
@@ -31,7 +31,7 @@
             <div v-else-if="currentStep === 'budget'" class="animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.welcome')
-                }}</h1>
+                    }}</h1>
                 <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.tagline') }}</p>
 
 
@@ -168,7 +168,7 @@
                 <h1 class="text-4xl font-bold text-slate-800 mb-2 tracking-tight dark:text-white">{{
                     t('onboarding.categories_title') }}</h1>
                 <p class="text-slate-500 mb-10 font-medium dark:text-slate-400">{{ t('onboarding.categories_subtitle')
-                }}</p>
+                    }}</p>
 
                 <GlassCard variant="glass" class="p-8 dark:bg-white/5 dark:border-white/10">
                     <div class="grid grid-cols-3 gap-4 mb-8">
@@ -178,14 +178,14 @@
                                 🛍️</div>
                             <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{
                                 t('categories.shopping')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
                             <div
                                 class="w-14 h-14 rounded-2xl bg-blue-100 flex items-center justify-center text-2xl dark:bg-blue-500/20">
                                 🍔</div>
                             <span class="text-xs font-bold text-slate-600 dark:text-slate-300">{{ t('categories.food')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex flex-col items-center gap-2">
                             <div

@@ -61,7 +61,7 @@ const handleModalClose = () => {
 </script>
 
 <template>
-    <div class="flex flex-col min-h-screen pb-32 bg-slate-50 dark:bg-[#050505]">
+    <div class="flex flex-col min-h-dvh pb-32 bg-slate-50 dark:bg-[#050505]">
         <!-- Header -->
         <div
             class="sticky top-0 z-20 px-6 pt-12 pb-6 bg-slate-50/80 backdrop-blur-xl dark:bg-[#050505]/80 border-b border-transparent transition-all duration-300">
@@ -85,7 +85,7 @@ const handleModalClose = () => {
         <div class="px-6 pt-4">
             <!-- Daily Summary Card -->
             <GlassCard variant="white"
-                class="p-8 mb-8 !bg-white/80 dark:!bg-white/5 dark:!border-white/10 shadow-2xl shadow-purple-900/5 dark:shadow-none">
+                class="p-8 mb-8 bg-white/80! dark:bg-white/5! dark:border-white/10! shadow-2xl shadow-purple-900/5 dark:shadow-none">
                 <div class="flex flex-col items-center">
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-3">
                         {{ t('day_selector.daily_spending') }}
@@ -103,7 +103,7 @@ const handleModalClose = () => {
                 <div class="space-y-3">
                     <GlassCard v-for="tx in dayTransactions" :key="tx.id" variant="white"
                         @click="handleTransactionClick(tx)"
-                        class="flex items-center justify-between p-4 !rounded-[1.5rem] !bg-white/60 dark:!bg-white/5 dark:!border dark:!border-white/10 active:scale-95 transition-all cursor-pointer hover:bg-white/80 dark:hover:bg-white/10">
+                        class="flex items-center justify-between p-4 rounded-3xl! bg-white/60! dark:bg-white/5! dark:border! dark:border-white/10! active:scale-95 transition-all cursor-pointer hover:bg-white/80 dark:hover:bg-white/10">
                         <div class="flex items-center gap-4">
                             <div
                                 class="w-12 h-12 rounded-2xl bg-white/80 flex items-center justify-center text-xl shadow-sm border border-white dark:bg-white/10 dark:border-white/5 dark:text-white">
@@ -125,7 +125,7 @@ const handleModalClose = () => {
                     </GlassCard>
 
                     <div v-if="dayTransactions.length === 0"
-                        class="text-center py-16 text-slate-400 bg-white/30 backdrop-blur-md rounded-[2rem] border border-dashed border-white/50 dark:text-slate-600 dark:bg-white/5 dark:border-white/10">
+                        class="text-center py-16 text-slate-400 bg-white/30 backdrop-blur-md rounded-4xl border border-dashed border-white/50 dark:text-slate-600 dark:bg-white/5 dark:border-white/10">
                         {{ t('dashboard.no_transactions') }}
                     </div>
                 </div>

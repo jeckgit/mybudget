@@ -1,5 +1,4 @@
 <script setup lang="ts">
-const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const route = useRoute();
 
@@ -9,10 +8,8 @@ const showAddModal = useState('showAddModal', () => false);
 </script>
 
 <template>
-    <div class="relative min-h-screen text-slate-800 font-sans selection:bg-accent/30 dark:text-white">
+    <div class="relative min-h-dvh text-slate-800 font-sans selection:bg-accent/30 dark:text-white">
         <BackgroundMesh />
-        <!-- <VerificationBanner /> -->
-
         <!-- Main Content -->
         <div class="relative z-10">
             <slot />
