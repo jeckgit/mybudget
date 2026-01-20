@@ -1,15 +1,7 @@
 <script setup lang="ts">
 const { initTheme, getEffectiveTheme } = useTheme();
 
-// Set dark mode class on server for SSR
-if (import.meta.server) {
-    const theme = getEffectiveTheme();
-    useHead({
-        htmlAttrs: {
-            class: theme === 'dark' ? 'dark' : ''
-        }
-    });
-}
+// Manual theme injection removed; handled by @nuxtjs/color-mode
 
 useHead({
     meta: [
@@ -21,9 +13,7 @@ useHead({
     ]
 });
 
-onMounted(() => {
-    initTheme();
-});
+
 </script>
 
 <template>

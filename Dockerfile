@@ -31,12 +31,15 @@ FROM node:20-slim AS runner
 WORKDIR /app
 
 # Copy the build output from the builder stage
-COPY --from=builder /app/.output ./.output
+COPY --from=builder --chown=node:node /app/.output ./.output
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
+
+# Switch to non-root user
+USER node
 
 # Expose the port
 EXPOSE 3000
