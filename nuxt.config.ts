@@ -39,6 +39,7 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxtjs/supabase',
+    '@nuxtjs/color-mode',
     '@nuxt/eslint',
     '@nuxt/hints',
     '@nuxt/icon',
@@ -108,6 +109,13 @@ export default defineNuxtConfig({
       redirectOn: 'root' // recommended
     }
   },
+
+  colorMode: {
+    classSuffix: '',
+    preference: 'system',
+    fallback: 'light'
+  },
+
   build: {
     transpile: ['vue-echarts', 'echarts']
   }
