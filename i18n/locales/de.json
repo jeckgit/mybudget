@@ -15,6 +15,8 @@
     "user": "Benutzer",
     "see_all": "Alle anzeigen",
     "add_expense_modal": "Ausgabe hinzufügen",
+    "add_income_modal": "Einnahme hinzufügen",
+    "edit_income": "Einnahme bearbeiten",
     "confirm_expense": "Ausgabe bestätigen",
     "next": "Weiter",
     "back": "Zurück",
@@ -22,10 +24,15 @@
     "manage_categories": "Kategorien bearbeiten",
     "edit_expense": "Ausgabe bearbeiten",
     "delete_confirm": "Möchten Sie diese Ausgabe wirklich löschen?",
+    "delete_confirm_desc": "Dieser Vorgang kann nicht rückgängig gemacht werden.",
     "error_occurred": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "add_category": "Kategorie hinzufügen",
     "edit_category": "Kategorie bearbeiten",
-    "delete_category": "Kategorie löschen"
+    "delete_category": "Kategorie löschen",
+    "income": "Einnahme",
+    "expense": "Ausgabe",
+    "my_income": "Meine Einnahmen",
+    "my_expenses": "Meine Ausgaben"
   },
   "dashboard": {
     "good_morning": "Guten Morgen",
@@ -57,7 +64,12 @@
     "utilities": "Nebenkosten",
     "add_new": "Neue Kategorie hinzufügen",
     "category_name": "Kategorie-Name",
-    "spending": "Ausgaben"
+
+    "spending": "Ausgaben",
+    "salary": "Gehalt",
+    "gift": "Geschenk",
+    "refund": "Rückerstattung",
+    "sale": "Verkauf"
   },
   "settings": {
     "title": "Einstellungen",

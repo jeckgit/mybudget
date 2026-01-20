@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { User, Mail, Save, AlertCircle, CheckCircle2, Trash2, Globe, Moon, Sun, Monitor, LogOut, Tag, ChevronRight, Scale } from 'lucide-vue-next';
-
 // Composables
 const user = useSupabaseUser();
 const client = useSupabaseClient();
 const { t, locale, setLocale } = useI18n();
+
+useHead({ title: t('profile.title') })
+import {
+    User, Mail, Save, AlertCircle, CheckCircle2, Trash2, Globe, Moon, Sun, Monitor, LogOut, Tag, ChevronRight,
+    Scale
+} from 'lucide-vue-next';
+
 const { colorMode, updateTheme } = useTheme();
 const { state, loadState, clearState, updateConfig } = useStorage();
 const { seedDefaultCategories } = useCategories();

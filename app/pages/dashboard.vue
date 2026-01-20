@@ -2,16 +2,15 @@
 // Inject state directly from storage
 const { state, loadState, getMonthConfig, upsertMonth } = useStorage();
 const { t, locale } = useI18n();
+
+useHead({ title: t('common.dashboard') })
 const { calculateBudgetData } = useBudget();
 const { formatCurrency } = useCurrency();
 
 // Ensure state is loaded (calls loadState which has built-in dedup)
 await loadState();
 
-// Redirect to onboarding if not completed
-if (state.value.config && !state.value.config.onboardingComplete) {
-    navigateTo('/onboarding');
-}
+
 
 // Budget Editing
 const showBudgetEdit = ref(false);
@@ -62,7 +61,10 @@ const saveMonthlyBudget = async () => {
                     <p class="text-slate-600 font-medium text-sm mb-1 dark:text-slate-300">{{
                         t('dashboard.spent_today') }}</p>
                     <h2 class="text-4xl font-bold tracking-tighter">
-                        {{ formatCurrency(budgetData.spentToday, state.config.currency) }}
+                        {{ formatCurrency(budgetData.spentToday, state.config.currency, false, {
+                            minimumFractionDigits:
+                                2
+                        }) }}
                     </h2>
                 </div>
 

@@ -15,6 +15,8 @@
     "user": "Utilisateur",
     "see_all": "Voir tout",
     "add_expense_modal": "Ajouter une dépense",
+    "add_income_modal": "Ajouter un revenu",
+    "edit_income": "Modifier le revenu",
     "confirm_expense": "Confirmer la dépense",
     "next": "Suivant",
     "back": "Retour",
@@ -22,10 +24,15 @@
     "manage_categories": "Gérer les catégories",
     "edit_expense": "Modifier la dépense",
     "delete_confirm": "Êtes-vous sûr de vouloir supprimer cette dépense ?",
+    "delete_confirm_desc": "Cette action est irréversible.",
     "error_occurred": "Une erreur est survenue. Veuillez réessayer.",
     "add_category": "Ajouter une catégorie",
     "edit_category": "Modifier la catégorie",
-    "delete_category": "Supprimer la catégorie"
+    "delete_category": "Supprimer la catégorie",
+    "income": "Revenu",
+    "expense": "Dépense",
+    "my_income": "Mes revenus",
+    "my_expenses": "Mes dépenses"
   },
   "dashboard": {
     "good_morning": "Bonjour",
@@ -57,7 +64,12 @@
     "utilities": "Utilitaires",
     "add_new": "Ajouter une nouvelle catégorie",
     "category_name": "Nom de la catégorie",
-    "spending": "Dépenses"
+
+    "spending": "Dépenses",
+    "salary": "Salaire",
+    "gift": "Cadeau",
+    "refund": "Remboursement",
+    "sale": "Vente"
   },
   "settings": {
     "title": "Paramètres",

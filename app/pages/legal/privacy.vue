@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n();
+useHead({ title: t('legal.privacy') })
 </script>
 
 <template>

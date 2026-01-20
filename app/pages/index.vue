@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ArrowRight } from 'lucide-vue-next';
+const { t } = useI18n()
+useHead({ title: t('auth.welcome') })
+
 definePageMeta({
   layout: 'marketing'
 })

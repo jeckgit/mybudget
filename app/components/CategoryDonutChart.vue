@@ -33,10 +33,11 @@ interface CategoryData {
 interface Props {
     data: CategoryData[];
     total: number;
-    currencySymbol: string;
+    currencyCode: string;
 }
 
 const props = defineProps<Props>();
+const { formatCurrency } = useCurrency();
 
 const mounted = ref(false);
 
@@ -45,7 +46,7 @@ onMounted(() => {
 });
 
 const formattedTotal = computed(() => {
-    return `${props.currencySymbol}${Math.round(props.total)}`;
+    return formatCurrency(props.total, props.currencyCode, false, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 });
 
 const chartOption = computed(() => ({
@@ -55,7 +56,7 @@ const chartOption = computed(() => ({
             return `<div class="flex items-center gap-2">
             <span>${params.data.emoji}</span>
             <span class="font-bold">${params.name}</span>
-            <span>${props.currencySymbol}${params.value}</span>
+            <span>${formatCurrency(params.value, props.currencyCode)}</span>
         </div>`;
         },
         backgroundColor: 'rgba(255, 255, 255, 0.95)',

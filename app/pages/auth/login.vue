@@ -1,5 +1,10 @@
 <script setup lang="ts">
 const { t } = useI18n();
+
+
+definePageMeta({
+    hideBottomNav: true
+});
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
 const isOAuth = ref(false);
@@ -8,6 +13,7 @@ const loading = ref(false);
 const email = ref('');
 const password = ref('');
 const isSignUp = ref(false);
+useHead({ title: computed(() => isSignUp.value ? t('auth.create_account') : t('auth.sign_in')) })
 const errorMsg = ref('');
 
 watchEffect(() => {
@@ -32,10 +38,7 @@ const handleAuth = async () => {
             });
             if (error) throw error;
 
-            // If "Confirm email" is disabled in Supabase, data.session will be present
-            if (data.session) {
-                navigateTo('/dashboard');
-            } else {
+            if (!data.session) {
                 alert(t('auth.check_email'));
             }
         } else {
@@ -65,6 +68,7 @@ const handleOAuth = async (provider: 'google' | 'github') => {
         if (error) throw error;
     } catch (error: any) {
         errorMsg.value = error.message;
+    } finally {
         loading.value = false;
     }
 };

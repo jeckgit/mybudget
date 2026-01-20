@@ -9,15 +9,25 @@ export const useCategories = () => {
   const state = useState<AppState>('app-state');
 
   const categories = computed(() => state.value.categories);
+  const expenseCategories = computed(() => categories.value.filter((c) => c.type !== 'income'));
+  const incomeCategories = computed(() => categories.value.filter((c) => c.type === 'income'));
+
   const isSeeding = useState('is-seeding', () => false);
 
   const DEFAULT_CATEGORIES = [
-    { emoji: '🛍️', key: 'shopping' },
-    { emoji: '🍔', key: 'food' },
-    { emoji: '🚗', key: 'transport' },
-    { emoji: '🎬', key: 'entertainment' },
-    { emoji: '☕', key: 'coffee' },
-    { emoji: '🏠', key: 'utilities' }
+    { emoji: '🛍️', key: 'shopping', type: 'expense' },
+    { emoji: '🍔', key: 'food', type: 'expense' },
+    { emoji: '🚗', key: 'transport', type: 'expense' },
+    { emoji: '🎬', key: 'entertainment', type: 'expense' },
+    { emoji: '☕', key: 'coffee', type: 'expense' },
+    { emoji: '🏠', key: 'utilities', type: 'expense' }
+  ];
+
+  const INCOME_CATEGORIES = [
+    { emoji: '💰', key: 'salary', type: 'income' },
+    { emoji: '🎁', key: 'gift', type: 'income' },
+    { emoji: '💸', key: 'refund', type: 'income' },
+    { emoji: '🏷️', key: 'sale', type: 'income' }
   ];
 
   const seedDefaultCategories = async (force = false) => {
@@ -35,11 +45,14 @@ export const useCategories = () => {
         if (count && count > 0) return;
       }
 
-      const defaults = DEFAULT_CATEGORIES.map((cat) => ({
+      const allDefaults = [...DEFAULT_CATEGORIES, ...INCOME_CATEGORIES];
+
+      const defaults = allDefaults.map((cat) => ({
         user_id: user.value!.sub,
         emoji: cat.emoji,
         key: cat.key,
-        name: '' // Empty for default categories - we use key for translation
+        name: '', // Empty for default categories - we use key for translation
+        type: cat.type
       }));
 
       const { data, error } = await client.from('categories').insert(defaults).select();
@@ -50,11 +63,12 @@ export const useCategories = () => {
       }
 
       if (data) {
-        state.value.categories = data.map((c) => ({
+        state.value.categories = data.map((c: any) => ({
           id: c.id,
           emoji: c.emoji,
           name: c.name || '', // Use stored name, or empty string for default categories
           key: c.key || undefined,
+          type: (c.type as 'income' | 'expense') || 'expense',
           user_id: c.user_id
         }));
       }
@@ -63,7 +77,7 @@ export const useCategories = () => {
     }
   };
 
-  const addCategory = async (emoji: string, name: string) => {
+  const addCategory = async (emoji: string, name: string, type: 'income' | 'expense' = 'expense') => {
     if (!user.value?.sub) return;
 
     const { data, error } = await client
@@ -71,7 +85,8 @@ export const useCategories = () => {
       .insert({
         user_id: user.value.sub,
         emoji,
-        name
+        name,
+        type
       })
       .select()
       .single();
@@ -87,6 +102,7 @@ export const useCategories = () => {
         emoji: data.emoji,
         name: name, // Custom categories store name directly
         key: data.key || undefined,
+        type: (data.type as 'income' | 'expense') || 'expense',
         user_id: data.user_id
       });
     }
@@ -143,12 +159,15 @@ export const useCategories = () => {
 
   return {
     categories,
+    expenseCategories,
+    incomeCategories,
     addCategory,
     updateCategory,
     deleteCategory,
     getCategoryById,
     getCategoryByEmoji,
     getCategoryName,
-    seedDefaultCategories
+    seedDefaultCategories,
+    INCOME_CATEGORIES
   };
 };

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { ChevronLeft, ChevronRight, MoreHorizontal, FileDown, FileJson } from 'lucide-vue-next';
-import { onClickOutside } from '@vueuse/core';
-
 // Use storage directly
 const { state, loadState } = useStorage();
 const { t, locale } = useI18n();
+
+useHead({ title: t('common.analytics') })
+import { ChevronLeft, ChevronRight, MoreHorizontal, FileDown, FileJson } from 'lucide-vue-next';
+import { onClickOutside } from '@vueuse/core';
+
 const { categories, getCategoryName } = useCategories();
 const { calculateBudgetData } = useBudget();
 const { formatCurrency } = useCurrency();
@@ -210,37 +212,44 @@ const exportAsJSON = () => {
             <h3 class="font-bold text-lg text-slate-800 mb-4 px-1 dark:text-white">{{ t('analytics.categories') }}</h3>
 
             <GlassCard variant="glass" class="p-6 mb-6 dark:bg-white/5 dark:border-white/10">
-                <CategoryDonutChart :data="categoryStats" :total="totalSpent"
-                    :currency-symbol="state.config.currency" />
+                <CategoryDonutChart :data="categoryStats" :total="totalSpent" :currency-code="state.config.currency" />
             </GlassCard>
 
-            <div class="space-y-3">
-                <GlassCard v-for="cat in categoryStats" :key="cat.id" variant="white"
-                    class="flex items-center justify-between p-4 rounded-3xl! bg-white/50! dark:bg-white/5! dark:border! dark:border-white/10!">
-                    <div class="flex items-center gap-4 flex-1">
-                        <div
-                            class="w-12 h-12 rounded-2xl flex items-center justify-center border border-white/60 shadow-sm dark:border-white/20 font-bold text-xl bg-slate-50 dark:bg-white/5">
-                            {{ cat.emoji }}
+            <!-- Unified Insight List -->
+            <GlassCard variant="white" class="p-0! overflow-hidden dark:bg-white/5! dark:border-white/10!">
+                <div v-for="(cat, index) in categoryStats" :key="cat.id"
+                    class="group relative p-4 flex items-center gap-4 border-b border-slate-100 dark:border-white/5 last:border-0 transition-all hover:bg-purple-50/50 dark:hover:bg-white/5">
+
+                    <!-- Rank / Icon -->
+                    <div
+                        class="w-10 h-10 rounded-2xl flex items-center justify-center bg-slate-50 dark:bg-white/5 font-bold text-lg shadow-sm border border-slate-100 dark:border-white/10 shrink-0 group-hover:scale-110 transition-transform duration-300">
+                        {{ cat.emoji }}
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-700 dark:text-white text-sm truncate">{{
+                                getCategoryName(cat) }}</span>
+                            <div class="text-right flex items-center gap-2">
+                                <span
+                                    class="text-xs font-semibold text-slate-400 bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded-md">
+                                    {{ Math.round(cat.percentage) }}%
+                                </span>
+                                <span class="font-bold text-slate-800 dark:text-white tabular-nums text-sm">
+                                    {{ formatCurrency(cat.amount, state.config.currency, false) }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="flex-1">
-                            <div class="flex items-center justify-between mb-1">
-                                <p class="font-bold text-slate-700 text-sm dark:text-white">{{ getCategoryName(cat) }}
-                                </p>
-                                <p class="text-[10px] font-bold text-slate-400">{{ Math.round(cat.percentage) }}%</p>
-                            </div>
-                            <div class="w-full h-1.5 bg-slate-200/50 rounded-full overflow-hidden dark:bg-white/10">
-                                <div class="h-full rounded-full bg-purple-500"
-                                    :style="{ width: cat.percentage + '%' }" />
-                            </div>
+
+                        <!-- Sleek Bar -->
+                        <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden dark:bg-white/10">
+                            <div class="h-full rounded-full bg-slate-800 dark:bg-white group-hover:bg-purple-500 transition-colors duration-300"
+                                :style="{ width: cat.percentage + '%', opacity: 0.8 }" />
                         </div>
                     </div>
-                    <div class="ml-4 text-right">
-                        <span class="font-bold text-slate-800 dark:text-white tabular-nums">
-                            {{ formatCurrency(cat.amount, state.config.currency) }}
-                        </span>
-                    </div>
-                </GlassCard>
-            </div>
+                </div>
+            </GlassCard>
         </div>
 
         <!-- No Data State -->

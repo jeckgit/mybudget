@@ -1,5 +1,8 @@
 <script setup lang="ts">
 const user = useSupabaseUser()
+const { t } = useI18n()
+
+useHead({ title: t('common.loading') })
 
 watch(user, () => {
     if (user.value) {

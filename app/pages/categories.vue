@@ -1,17 +1,33 @@
 <script setup lang="ts">
 import { Check, ChevronLeft, Edit2, Plus, Trash2, X } from 'lucide-vue-next';
-const { categories, addCategory, updateCategory, deleteCategory, getCategoryName } = useCategories();
-const { state, loadState } = useStorage();
+const { categories, expenseCategories, incomeCategories, addCategory, updateCategory, deleteCategory, getCategoryName } = useCategories();
+const { loadState } = useStorage();
 const { t } = useI18n();
+
+useHead({ title: t('common.manage_categories') })
 const router = useRouter();
 
 // Ensure state is loaded (calls loadState which has built-in dedup)
 await loadState();
 
+const currentTab = ref<'expense' | 'income'>('expense');
+
+const filteredCategories = computed(() => {
+    return currentTab.value === 'expense' ? expenseCategories.value : incomeCategories.value;
+});
+
 const isAdding = ref(false);
 const editingId = ref<string | null>(null);
 const newEmoji = ref('🛍️');
 const newName = ref('');
+
+// Reset adding state when switching tabs
+watch(currentTab, () => {
+    isAdding.value = false;
+    newName.value = '';
+    editingId.value = null;
+    newEmoji.value = currentTab.value === 'expense' ? '🛍️' : '💰';
+});
 
 const editEmoji = ref('');
 const editName = ref('');
@@ -19,7 +35,7 @@ const editName = ref('');
 const handleAdd = async () => {
     if (!newName.value.trim()) return;
     try {
-        await addCategory(newEmoji.value, newName.value.trim());
+        await addCategory(newEmoji.value, newName.value.trim(), currentTab.value);
         isAdding.value = false;
         newName.value = '';
     } catch (e) {
@@ -79,13 +95,28 @@ const cancelEdit = () => {
         </header>
 
         <main class="px-6 space-y-6">
-            <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider dark:text-slate-500">
-                {{ t('common.select_category') }}
+            <!-- Tabs -->
+            <div class="flex p-1 bg-slate-100 rounded-2xl dark:bg-white/5">
+                <button @click="currentTab = 'expense'"
+                    class="flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300"
+                    :class="currentTab === 'expense' ? 'bg-white shadow-sm text-slate-800 dark:bg-white/10 dark:text-white' : 'text-slate-400 dark:text-slate-500'">
+                    {{ t('common.expense') }}
+                </button>
+                <button @click="currentTab = 'income'"
+                    class="flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300"
+                    :class="currentTab === 'income' ? 'bg-white shadow-sm text-green-600 dark:bg-white/10 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'">
+                    {{ t('common.income') }}
+                </button>
+            </div>
+
+            <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider dark:text-slate-500 transition-colors"
+                :class="{ 'text-green-500! dark:text-green-400!': currentTab === 'income' }">
+                {{ currentTab === 'expense' ? t('common.my_expenses') : t('common.my_income') }}
             </h2>
 
             <!-- Categories List -->
             <div class="space-y-3">
-                <div v-for="cat in categories" :key="cat.id">
+                <div v-for="cat in filteredCategories" :key="cat.id">
                     <GlassCard variant="white"
                         class="p-4 rounded-3xl! border border-slate-100 dark:border-white/5 shadow-sm">
                         <div v-if="editingId === cat.id" class="flex items-center gap-3">
@@ -127,14 +158,18 @@ const cancelEdit = () => {
                 <!-- Add Category Form -->
                 <div v-if="isAdding">
                     <GlassCard variant="white"
-                        class="p-4 rounded-3xl! border-2 border-dashed border-purple-200 dark:border-purple-500/20 shadow-none">
+                        class="p-4 rounded-3xl! border-2 border-dashed border-purple-200 dark:border-purple-500/20 shadow-none"
+                        :class="{ 'border-green-200 dark:border-green-500/20': currentTab === 'income' }">
                         <div class="flex items-center gap-3">
                             <input v-model="newEmoji"
-                                class="w-12 h-12 text-2xl text-center bg-slate-50 dark:bg-white/10 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none" />
+                                class="w-12 h-12 text-2xl text-center bg-slate-50 dark:bg-white/10 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none"
+                                :class="{ 'focus:ring-green-500': currentTab === 'income' }" />
                             <input v-model="newName" :placeholder="t('categories.category_name')"
-                                class="flex-1 bg-slate-50 dark:bg-white/10 px-4 py-2 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none dark:text-white" />
+                                class="flex-1 bg-slate-50 dark:bg-white/10 px-4 py-2 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none dark:text-white"
+                                :class="{ 'focus:ring-green-500': currentTab === 'income' }" />
                             <button @click="handleAdd"
-                                class="p-2 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-xl transition-colors">
+                                class="p-2 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-xl transition-colors"
+                                :class="{ 'text-green-600 hover:bg-green-50 dark:hover:bg-green-500/10': currentTab === 'income' }">
                                 <Check class="w-5 h-5" />
                             </button>
                             <button @click="cancelAdd"
@@ -146,7 +181,8 @@ const cancelEdit = () => {
                 </div>
 
                 <button v-else @click="isAdding = true"
-                    class="w-full py-4 flex items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-slate-200 text-slate-400 hover:border-purple-300 hover:text-purple-500 transition-all dark:border-white/10 dark:hover:border-purple-500/30">
+                    class="w-full py-4 flex items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-slate-200 text-slate-400 hover:border-purple-300 hover:text-purple-500 transition-all dark:border-white/10 dark:hover:border-purple-500/30"
+                    :class="{ 'hover:border-green-300 hover:text-green-500 dark:hover:border-green-500/30': currentTab === 'income' }">
                     <Plus class="w-5 h-5" />
                     <span class="font-bold text-sm uppercase tracking-wider">{{ t('categories.add_new') }}</span>
                 </button>

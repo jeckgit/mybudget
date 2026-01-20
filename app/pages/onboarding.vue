@@ -245,9 +245,16 @@ import { Wallet, Calculator, Plus, X, Info } from 'lucide-vue-next';
 import type { FixedCostItem } from '~/../shared/types';
 import { v4 as uuidv4 } from 'uuid';
 
+
+
+definePageMeta({
+    hideBottomNav: true
+});
+
 // Use storage
 const { state, updateConfig } = useStorage();
 const { t, setLocale, locale } = useI18n();
+useHead({ title: t('onboarding.welcome') })
 
 const budgetInput = ref('');
 const currentStep = ref<'language' | 'budget' | 'categories' | 'completing'>('language');

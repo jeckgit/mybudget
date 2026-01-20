@@ -1,5 +1,10 @@
 <script setup lang="ts">
 const { t } = useI18n()
+useHead({ title: t('auth.forgot_password') })
+
+definePageMeta({
+    hideBottomNav: true
+});
 const supabase = useSupabaseClient()
 const email = ref('')
 const loading = ref(false)

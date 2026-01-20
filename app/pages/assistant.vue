@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Sparkles, Bot } from 'lucide-vue-next';
 const { t } = useI18n();
+useHead({ title: t('assistant.title') })
 </script>
 
 <template>

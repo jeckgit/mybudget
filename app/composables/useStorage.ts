@@ -128,6 +128,7 @@ export const useStorage = () => {
             emoji: c.emoji,
             name: c.name || '', // Handle nullable name for default categories
             key: c.key || undefined,
+            type: c.type as 'income' | 'expense', // Map the new type field
             user_id: c.user_id
           })),
           transactions: (transactions || []).map((t) => ({

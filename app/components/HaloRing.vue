@@ -1,33 +1,18 @@
 <template>
   <div class="relative flex items-center justify-center" :style="{ width: size + 'px', height: size + 'px' }">
-    <svg :width="size" :height="size" class="relative z-10 rotate-[-90deg]">
+    <svg :width="size" :height="size" class="relative z-10 -rotate-90">
       <!-- Track -->
-      <circle
-        :stroke="trackColor"
-        :stroke-width="strokeWidth"
-        stroke-linecap="round"
-        fill="transparent"
-        :r="radius"
-        :cx="size / 2"
-        :cy="size / 2"
-      />
+      <circle :stroke="trackColor" :stroke-width="strokeWidth" stroke-linecap="round" fill="transparent" :r="radius"
+        :cx="size / 2" :cy="size / 2" />
       <!-- Progress -->
-      <circle
-        :stroke="color"
-        :stroke-width="strokeWidth"
-        stroke-linecap="round"
-        fill="transparent"
-        :r="radius"
-        :cx="size / 2"
-        :cy="size / 2"
-        :style="{
+      <circle :stroke="color" :stroke-width="strokeWidth" stroke-linecap="round" fill="transparent" :r="radius"
+        :cx="size / 2" :cy="size / 2" :style="{
           strokeDasharray: circumference,
           strokeDashoffset: strokeDashoffset,
           transition: 'stroke-dashoffset 1.5s ease-out, stroke 1.5s ease-out'
-        }"
-      />
+        }" />
     </svg>
-    
+
     <!-- Inner Content -->
     <div class="absolute inset-0 flex items-center justify-center">
       <slot />

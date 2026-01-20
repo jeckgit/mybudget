@@ -14,8 +14,7 @@ const showAddModal = useState('showAddModal', () => false);
         <div class="relative z-10">
             <slot />
 
-            <BottomNav
-                v-if="user && route.path !== '/onboarding' && route.path !== '/auth/login' && route.path !== '/auth/update-password'" />
+            <BottomNav v-if="user && !route.meta.hideBottomNav" />
         </div>
 
         <AddExpenseModal :is-open="showAddModal" @close="showAddModal = false" />

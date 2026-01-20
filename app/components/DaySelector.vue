@@ -5,24 +5,18 @@ import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 const { state, getMonthConfig } = useStorage();
 const { t, locale } = useI18n();
 const { formatCurrency } = useCurrency();
-const { updateTheme } = useTheme(); // Assuming used elsewhere or safe to ignore if unused, but just in case
 
 const scrollRef = ref<HTMLElement | null>(null);
 const currentMonthDate = ref(new Date());
 
 onMounted(async () => {
-    // State is loaded by parent page/app.vue - no need to call loadState here
-    // Just scroll to today if needed
     if (isToday(new Date())) {
         scrollToToday();
     }
 });
 
-// Month Picker State
 const showMonthPicker = ref(false);
 const pickerYear = ref(new Date().getFullYear());
-// Budget Edit State is removed
-
 
 const months = computed(() => {
     const formatter = new Intl.DateTimeFormat(locale.value, { month: 'short' });
@@ -220,6 +214,20 @@ const formatDate = (date: Date) => {
 const formatMonthYear = (date: Date) => {
     return date.toLocaleDateString(locale.value, { month: 'long', year: 'numeric' });
 };
+
+const formatBudgetDisplay = (amount: number) => {
+    const absAmount = Math.abs(amount);
+
+    if (absAmount >= 1 || absAmount === 0) {
+        return formatCurrency(Math.floor(absAmount), state.value.config.currency, true);
+    }
+
+    return new Intl.NumberFormat(locale.value, {
+        style: 'decimal',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(absAmount);
+};
 </script>
 
 <template>
@@ -300,7 +308,7 @@ const formatMonthYear = (date: Date) => {
 
             <!-- Scrollable Day List - Viewport fits ~5 items -->
             <div ref="scrollRef"
-                class="h-[380px] overflow-y-auto overflow-x-hidden pt-4 pb-6 px-4 scrollbar-hide snap-y snap-mandatory"
+                class="h-95 overflow-y-auto overflow-x-hidden pt-4 pb-6 px-4 scrollbar-hide snap-y snap-mandatory"
                 style="-webkit-overflow-scrolling: touch;">
                 <div class="flex flex-col gap-3 day-list">
                     <button v-for="(date, index) in visibleDays" :key="index" @click="handleDayClick(date)" :class="[
@@ -311,7 +319,7 @@ const formatMonthYear = (date: Date) => {
                             : !getBudgetForDate(date).isSkipped ? 'bg-white border-slate-100 text-slate-700 shadow-sm shadow-slate-200/50 hover:bg-slate-50 dark:bg-white/5 dark:border-white/5 dark:text-slate-300' : ''
                     ]">
                         <!-- Left: Date -->
-                        <div class="flex flex-col items-center min-w-[50px]">
+                        <div class="flex flex-col items-center min-w-12.5">
                             <span
                                 :class="['text-[10px] font-bold uppercase tracking-widest leading-none mb-1 opacity-60', isToday(date) ? 'text-white/70 dark:text-white/60' : 'text-slate-400']">
                                 {{ formatDay(date) }}
@@ -337,8 +345,7 @@ const formatMonthYear = (date: Date) => {
                                         ? (isToday(date) ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400')
                                         : (isToday(date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
                                 ]">
-                                    <span>{{ formatCurrency(Math.abs(getBudgetForDate(date).available),
-                                        state.config.currency, true) }}</span>
+                                    <span>{{ formatBudgetDisplay(getBudgetForDate(date).available) }}</span>
                                 </div>
                             </template>
                             <template v-else>
@@ -349,13 +356,13 @@ const formatMonthYear = (date: Date) => {
                         </div>
 
                         <!-- Right: Spent (Secondary) -->
-                        <div class="flex flex-col items-end min-w-[60px]">
+                        <div class="flex flex-col items-end min-w-15">
                             <span class="text-[9px] font-bold uppercase tracking-widest opacity-40 mb-0.5">
                                 {{ t('dashboard.spending') }}
                             </span>
                             <span
                                 :class="['text-xs font-bold tracking-tight', isToday(date) ? 'text-white/80' : 'text-slate-500']">
-                                {{ formatCurrency(getBudgetForDate(date).spent, state.config.currency, true) }}
+                                {{ formatBudgetDisplay(getBudgetForDate(date).spent) }}
                             </span>
                         </div>
                     </button>

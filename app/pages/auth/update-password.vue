@@ -1,5 +1,10 @@
 <script setup lang="ts">
 const { t } = useI18n()
+useHead({ title: t('auth.update_password') })
+
+definePageMeta({
+    hideBottomNav: true
+});
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 const password = ref('')
