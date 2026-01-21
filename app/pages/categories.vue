@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { Check, ChevronLeft, Edit2, Plus, Trash2, X } from 'lucide-vue-next';
-const { categories, expenseCategories, incomeCategories, addCategory, updateCategory, deleteCategory, getCategoryName } = useCategories();
-const { loadState } = useStorage();
+const catStore = useCategoriesStore();
+const { categories, expenseCategories, incomeCategories, getCategoryName } = catStore;
+const appSync = useAppSync();
+const profileStore = useProfileStore();
 const { t } = useI18n();
 
 useHead({ title: t('common.manage_categories') })
 const router = useRouter();
 
-// Ensure state is loaded (calls loadState which has built-in dedup)
-await loadState();
+// Ensure state is loaded
+await appSync.initApp();
 
 const currentTab = ref<'expense' | 'income'>('expense');
 
@@ -35,7 +37,7 @@ const editName = ref('');
 const handleAdd = async () => {
     if (!newName.value.trim()) return;
     try {
-        await addCategory(newEmoji.value, newName.value.trim(), currentTab.value);
+        await catStore.addCategory(newEmoji.value, newName.value.trim(), currentTab.value);
         isAdding.value = false;
         newName.value = '';
     } catch (e) {
@@ -53,7 +55,7 @@ const startEdit = (cat: any) => {
 const handleUpdate = async () => {
     if (!editingId.value || !editName.value.trim()) return;
     try {
-        await updateCategory(editingId.value, editEmoji.value, editName.value.trim());
+        await catStore.updateCategory(editingId.value, editEmoji.value, editName.value.trim());
         editingId.value = null;
     } catch (e) {
         console.error('Failed to update category:', e);
@@ -64,7 +66,7 @@ const handleUpdate = async () => {
 const handleDelete = async (id: string) => {
     if (confirm(t('common.delete_confirm'))) {
         try {
-            await deleteCategory(id);
+            await catStore.deleteCategory(id);
         } catch (e) {
             console.error('Failed to delete category:', e);
         }

@@ -1,25 +1,25 @@
 <script setup lang="ts">
 // Inject state directly from storage
-const { state, loadState, getMonthConfig, upsertMonth } = useStorage();
+const profileStore = useProfileStore();
+const monthStore = useMonthsStore();
+const { initApp } = useAppSync();
 const { t, locale } = useI18n();
 
 useHead({ title: t('common.dashboard') })
 const { calculateBudgetData } = useBudget();
 const { formatCurrency } = useCurrency();
 
-// Ensure state is loaded (calls loadState which has built-in dedup)
-await loadState();
-
-
+// Ensure state is loaded
+await initApp();
 
 // Budget Editing
 const showBudgetEdit = ref(false);
 const editingBudget = ref<number | null>(null);
 const isSavingBudget = ref(false);
 
-const budgetData = computed(() => calculateBudgetData(state.value));
+const budgetData = computed(() => calculateBudgetData());
 const currentMonthBudget = computed(() => {
-    return getMonthConfig(new Date().toISOString()).budget;
+    return monthStore.getMonthConfig(new Date()).budget;
 });
 const remainingPercentage = computed(() => {
     if (currentMonthBudget.value === 0) return 0;
@@ -32,8 +32,7 @@ const formatMonthYear = (date: Date) => {
 
 const openBudgetEdit = () => {
     // Edit the budget for the current real month, as displayed in the dashboard
-    const now = new Date();
-    const config = getMonthConfig(now.toISOString());
+    const config = monthStore.getMonthConfig(new Date());
     editingBudget.value = config.budget;
     showBudgetEdit.value = true;
 };
@@ -43,7 +42,7 @@ const saveMonthlyBudget = async () => {
     try {
         const now = new Date();
         const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        await upsertMonth(key, { budget: editingBudget.value });
+        await monthStore.upsertMonth(key, { budget: editingBudget.value });
         showBudgetEdit.value = false;
     } catch (e) {
         console.error("Failed to save budget", e);
@@ -61,7 +60,7 @@ const saveMonthlyBudget = async () => {
                     <p class="text-slate-600 font-medium text-sm mb-1 dark:text-slate-300">{{
                         t('dashboard.spent_today') }}</p>
                     <h2 class="text-4xl font-bold tracking-tighter">
-                        {{ formatCurrency(budgetData.spentToday, state.config.currency, false, {
+                        {{ formatCurrency(budgetData.spentToday, profileStore.config.value.currency, false, {
                             minimumFractionDigits:
                                 2
                         }) }}
@@ -73,7 +72,7 @@ const saveMonthlyBudget = async () => {
                         {{ t('dashboard.monthly_budget') }}</p>
                     <button @click="openBudgetEdit"
                         class="font-bold text-lg text-slate-800 opacity-80 dark:text-white hover:opacity-100 border-b border-transparent hover:border-slate-800 dark:hover:border-white transition-all active:scale-95">
-                        {{ formatCurrency(currentMonthBudget, state.config.currency) }}
+                        {{ formatCurrency(currentMonthBudget, profileStore.config.value.currency) }}
                     </button>
                 </div>
             </div>
@@ -104,7 +103,7 @@ const saveMonthlyBudget = async () => {
 
                         <div class="mb-6 relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">{{
-                                state.config.currency }}</span>
+                                profileStore.config.value.currency }}</span>
                             <input v-model="editingBudget" type="number"
                                 class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl pl-12 pr-4 py-4 text-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-center"
                                 placeholder="0" />

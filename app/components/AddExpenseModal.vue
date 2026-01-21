@@ -8,8 +8,9 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
-const { state, addTransaction, updateTransaction, removeTransaction } = useStorage();
-const { categories, expenseCategories, incomeCategories, getCategoryByEmoji, getCategoryName, addCategory } = useCategories();
+const txStore = useTransactionsStore();
+const catStore = useCategoriesStore();
+const { categories, expenseCategories, incomeCategories, getCategoryByEmoji, getCategoryName } = catStore;
 const { t, locale } = useI18n();
 const emit = defineEmits(['close']);
 
@@ -139,7 +140,7 @@ const handleAddTransaction = async (cat?: typeof categories.value[0]) => {
             date: finalDate,
             category: finalCategory.id,
         };
-        updateTransaction(updatedTx);
+        txStore.updateTransaction(updatedTx);
     } else {
         const newTx: Transaction = {
             id: Date.now().toString(),
@@ -147,7 +148,7 @@ const handleAddTransaction = async (cat?: typeof categories.value[0]) => {
             date: finalDate,
             category: finalCategory.id,
         };
-        addTransaction(newTx);
+        txStore.addTransaction(newTx);
     }
 
     useState('showSuccessAnimation').value = true;
@@ -166,7 +167,7 @@ const handleDeleteTransaction = async () => {
         confirmText: t('common.delete'),
         isDestructive: true
     })) {
-        removeTransaction(props.editingTransaction.id);
+        txStore.removeTransaction(props.editingTransaction.id);
         emit('close');
     }
 }

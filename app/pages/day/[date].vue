@@ -3,8 +3,10 @@ import { ChevronLeft } from 'lucide-vue-next';
 import type { Transaction } from '~/../shared/types';
 
 const route = useRoute();
-const { state, loadState } = useStorage();
-const { getCategoryById, getCategoryName } = useCategories();
+const txStore = useTransactionsStore();
+const profileStore = useProfileStore();
+const catStore = useCategoriesStore();
+const { getCategoryById, getCategoryName } = catStore;
 const { t, locale } = useI18n();
 const dateStr = route.params.date as string;
 
@@ -21,11 +23,8 @@ useHead({ title: computed(() => formatDayTitle(dateStr)) })
 const isModalOpen = ref(false);
 const selectedTransaction = ref<Transaction | null>(null);
 
-// Ensure state is loaded (calls loadState which has built-in dedup)
-await loadState();
-
 const dayTransactions = computed(() => {
-    return state.value.transactions.filter(tx => {
+    return txStore.transactions.value.filter(tx => {
         if (!tx.date) return false;
         const localDate = new Date(tx.date);
         const year = localDate.getFullYear();
@@ -97,7 +96,7 @@ const openNewExpenseModal = () => {
                         {{ t('day_selector.daily_spending') }}
                     </p>
                     <h2 class="text-5xl font-bold text-slate-800 dark:text-white tracking-tighter">
-                        {{ formatCurrency(totalForDay, state.config.currency, false, { minimumFractionDigits: 2 }) }}
+                        {{ formatCurrency(totalForDay, profileStore.config.value.currency, false, { minimumFractionDigits: 2 }) }}
                     </h2>
                 </button>
             </GlassCard>
@@ -128,7 +127,7 @@ const openNewExpenseModal = () => {
                         </div>
                         <span class="font-bold whitespace-nowrap"
                             :class="{ 'text-green-600 dark:text-green-400': tx.amount < 0, 'text-slate-800 dark:text-white': tx.amount >= 0 }">
-                            {{ tx.amount < 0 ? '+' : '' }} {{ formatCurrency(Math.abs(tx.amount), state.config.currency,
+                            {{ tx.amount < 0 ? '+' : '' }} {{ formatCurrency(Math.abs(tx.amount), profileStore.config.value.currency,
                                 false, { minimumFractionDigits: 2 }) }} </span>
                     </GlassCard>
 

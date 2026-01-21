@@ -1,13 +1,15 @@
 <script setup lang="ts">
 // Use storage directly
-const { state, loadState } = useStorage();
+const profileStore = useProfileStore();
+const txStore = useTransactionsStore();
+const catStore = useCategoriesStore();
 const { t, locale } = useI18n();
 
 useHead({ title: t('common.analytics') })
 import { ChevronLeft, ChevronRight, MoreHorizontal, FileDown, FileJson } from 'lucide-vue-next';
 import { onClickOutside } from '@vueuse/core';
 
-const { categories, getCategoryName } = useCategories();
+const { getCategoryName, categories } = catStore;
 const { calculateBudgetData } = useBudget();
 const { formatCurrency } = useCurrency();
 
@@ -32,10 +34,7 @@ const nextMonth = () => {
     currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1);
 };
 
-// Ensure state is loaded (calls loadState which has built-in dedup)
-await loadState();
-
-const budgetData = computed(() => calculateBudgetData(state.value, currentDate.value));
+const budgetData = computed(() => calculateBudgetData(currentDate.value));
 
 // Generate daily data for the selected month
 const dailyData = computed(() => {
@@ -189,17 +188,17 @@ const exportAsJSON = () => {
                     <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">{{
                         t('analytics.total_spent') }}</p>
                     <h3 class="text-3xl font-bold text-slate-800 dark:text-white">
-                        {{ formatCurrency(budgetData.totalSpentMonth, state.config.currency) }}
+                        {{ formatCurrency(budgetData.totalSpentMonth, profileStore.config.value.currency) }}
                     </h3>
                 </div>
                 <!-- Mini Halo for target progress -->
-                <div v-if="state.config.monthlyLimit > 0" class="h-12 w-12 relative">
+                <div v-if="profileStore.config.value.monthlyLimit > 0" class="h-12 w-12 relative">
                     <HaloRing :size="48" :stroke-width="5"
-                        :progress="budgetData.totalSpentMonth / state.config.monthlyLimit" color="#C084FC"
+                        :progress="budgetData.totalSpentMonth / profileStore.config.value.monthlyLimit" color="#C084FC"
                         track-color="rgba(0,0,0,0.05)" />
                     <span
                         class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300">
-                        {{ Math.round((budgetData.totalSpentMonth / state.config.monthlyLimit) * 100) }}%
+                        {{ Math.round((budgetData.totalSpentMonth / profileStore.config.value.monthlyLimit) * 100) }}%
                     </span>
                 </div>
             </div>
@@ -212,7 +211,7 @@ const exportAsJSON = () => {
             <h3 class="font-bold text-lg text-slate-800 mb-4 px-1 dark:text-white">{{ t('analytics.categories') }}</h3>
 
             <GlassCard variant="glass" class="p-6 mb-6 dark:bg-white/5 dark:border-white/10">
-                <CategoryDonutChart :data="categoryStats" :total="totalSpent" :currency-code="state.config.currency" />
+                <CategoryDonutChart :data="categoryStats" :total="totalSpent" :currency-code="profileStore.config.value.currency" />
             </GlassCard>
 
             <!-- Unified Insight List -->
@@ -237,7 +236,7 @@ const exportAsJSON = () => {
                                     {{ Math.round(cat.percentage) }}%
                                 </span>
                                 <span class="font-bold text-slate-800 dark:text-white tabular-nums text-sm">
-                                    {{ formatCurrency(cat.amount, state.config.currency, false) }}
+                                    {{ formatCurrency(cat.amount, profileStore.config.value.currency, false) }}
                                 </span>
                             </div>
                         </div>

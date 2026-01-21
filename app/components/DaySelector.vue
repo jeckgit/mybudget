@@ -2,9 +2,12 @@
 import { ref, computed, onMounted } from 'vue';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
-const { state, getMonthConfig } = useStorage();
+const profileStore = useProfileStore();
+const txStore = useTransactionsStore();
+const monthStore = useMonthsStore();
 const { t, locale } = useI18n();
 const { formatCurrency } = useCurrency();
+const { calculateBudgetData } = useBudget();
 
 const scrollRef = ref<HTMLElement | null>(null);
 const currentMonthDate = ref(new Date());
@@ -45,12 +48,10 @@ const selectMonth = (monthIndex: number) => {
     showMonthPicker.value = false;
 };
 
-
-
 // Calculate daily spending from transactions
 const dayMoneyMap = computed(() => {
     const map = new Map<string, number>();
-    state.value.transactions.forEach(tx => {
+    txStore.transactions.value.forEach(tx => {
         if (!tx.date) return;
         const localDate = new Date(tx.date);
         const year = localDate.getFullYear();
@@ -73,102 +74,65 @@ const visibleDays = computed(() => {
     });
 });
 
-const dailyBudget = computed(() => {
-    const daysInMonth = visibleDays.value.length;
-    // Use the month-specific config
-    const config = getMonthConfig(currentMonthDate.value.toISOString());
-    // If budget is null (somehow), fallback to 0 to avoid NaN
-    const limit = config.budget ?? 0;
-
-    return limit / (daysInMonth || 1);
+// Use useBudget for unified calculation logic
+const budgetStats = computed(() => {
+    return calculateBudgetData(currentMonthDate.value);
 });
 
-// Feature: Adaptive Smart Start
-// Determine the effective start date for calculations
-const effectiveStartDate = computed(() => {
-    const year = currentMonthDate.value.getFullYear();
-    const month = currentMonthDate.value.getMonth();
-    const now = new Date();
-
-    // Check if we are viewing the current calendar month
-    const isCurrentCalendarMonth = year === now.getFullYear() && month === now.getMonth();
-
-    // Find transactions in this month
-    const monthTransactions = state.value.transactions.filter(t => {
-        const d = new Date(t.date);
-        return d.getFullYear() === year && d.getMonth() === month;
-    });
-
-    if (monthTransactions.length > 0) {
-        // Return earliest transaction date
-        const sorted = [...monthTransactions].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        const firstTx = sorted[0];
-        if (!firstTx) return new Date(year, month, 1); // Should not happen due to length check
-        const firstDate = new Date(firstTx.date);
-        // Normalize to start of day for comparison
-        return new Date(year, month, firstDate.getDate());
-    } else if (isCurrentCalendarMonth) {
-        // No transactions, current month -> Start Today
-        return new Date(year, month, now.getDate());
-    } else {
-        // Past/Future month without transactions -> Start 1st
-        return new Date(year, month, 1);
-    }
-});
-
-// Calculate rollover budget for each day
-// Formula with Adaptive Start:
-// If Day < StartDate: Available = 0 (Skipped)
-// If Day >= StartDate: Available = ((DaysActive * DailyBudget) - SpentSinceStartDate)
+// Calculate rollover budget for each day using same logic as useBudget
 const rolloverData = computed(() => {
     const map = new Map<string, { spent: number; available: number; isSkipped: boolean }>();
     let totalSpentSinceStart = 0;
-    const startDate = effectiveStartDate.value;
+    
+    // Extract pieces from budgetStats
+    const { dailyTarget, targetDate } = budgetStats.value;
+    const year = targetDate.getFullYear();
+    const month = targetDate.getMonth();
+    
+    // Find the effective start date (earliest tx or today if current month)
+    const monthTx = txStore.transactions.value.filter(t => {
+         const d = new Date(t.date);
+         return d.getFullYear() === year && d.getMonth() === month;
+    });
+
+    let startDate: Date;
+    const now = new Date();
+    const isCurrentCalendarMonth = year === now.getFullYear() && month === now.getMonth();
+
+    if (monthTx.length > 0) {
+        const sorted = [...monthTx].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        startDate = new Date(year, month, new Date(sorted[0]!.date).getDate());
+    } else if (isCurrentCalendarMonth) {
+        startDate = new Date(year, month, now.getDate());
+    } else {
+        startDate = new Date(year, month, 1);
+    }
 
     visibleDays.value.forEach((date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const key = `${year}-${month}-${day}`;
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const key = `${y}-${m}-${d}`;
 
         const daySpent = dayMoneyMap.value.get(key) || 0;
 
-        // Check if skipped
-        // We compare timestamps to be safe (ignoring time component essentially as dates are 00:00)
         if (date.getTime() < startDate.getTime()) {
-            map.set(key, {
-                spent: daySpent,
-                available: 0,
-                isSkipped: true
-            });
+            map.set(key, { spent: daySpent, available: 0, isSkipped: true });
         } else {
-            // Active Days Calculation
-            // Days active including this one
             const daysActive = Math.floor((date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-
-            // Accumulate spending only for active period (though theoretically no spending should exist before start if based on txs)
-            // But if we stick to the rule: "Start Date IS First Tx Date", then by definition no spending before.
             totalSpentSinceStart += daySpent;
-
-            const available = (daysActive * dailyBudget.value) - totalSpentSinceStart;
-
-            map.set(key, {
-                spent: daySpent,
-                available: available, // This is the "End of Day" available or "Available to Spend"? Match previous logic.
-                // Previous: (index+1)*daily - totalSpent.
-                // Assuming "available" means "Remaining Budget"
-                isSkipped: false
-            });
+            const available = (daysActive * dailyTarget) - totalSpentSinceStart;
+            map.set(key, { spent: daySpent, available, isSkipped: false });
         }
     });
     return map;
 });
 
 const getBudgetForDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const key = `${year}-${month}-${day}`;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const key = `${y}-${m}-${d}`;
     return rolloverData.value.get(key) || { spent: 0, available: 0, isSkipped: false };
 };
 
@@ -195,11 +159,10 @@ const scrollToToday = () => {
 };
 
 const handleDayClick = (date: Date) => {
-    // Navigate instantly to detail page
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
     navigateTo(`/day/${dateStr}`);
 };
 
@@ -219,7 +182,7 @@ const formatBudgetDisplay = (amount: number) => {
     const absAmount = Math.abs(amount);
 
     if (absAmount >= 1 || absAmount === 0) {
-        return formatCurrency(Math.floor(absAmount), state.value.config.currency, true);
+        return formatCurrency(Math.floor(absAmount), profileStore.config.value.currency, true);
     }
 
     return new Intl.NumberFormat(locale.value, {

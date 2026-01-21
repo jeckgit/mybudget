@@ -11,11 +11,13 @@ import {
 } from 'lucide-vue-next';
 
 const { colorMode, updateTheme } = useTheme();
-const { state, loadState, clearState, updateConfig } = useStorage();
-const { seedDefaultCategories } = useCategories();
+const profileStore = useProfileStore();
+const txStore = useTransactionsStore();
+const catStore = useCategoriesStore();
+const appSync = useAppSync();
 
-// Ensure state is loaded (calls loadState which has built-in dedup)
-await loadState();
+// Ensure state is loaded
+await appSync.initApp();
 
 // --- Profile/Email Logic ---
 const loading = ref(false);
@@ -43,13 +45,13 @@ const languages = [
 
 // Local state for settings to allow manual save
 const localLanguage = ref(locale.value as string);
-const localCurrency = ref(state.value.config.currency);
-const localBudget = ref(state.value.config.monthlyLimit);
+const localCurrency = ref(profileStore.config.value.currency);
+const localBudget = ref(profileStore.config.value.monthlyLimit);
 
 const hasChanges = computed(() => {
     return localLanguage.value !== locale.value ||
-        localCurrency.value !== state.value.config.currency ||
-        localBudget.value !== state.value.config.monthlyLimit;
+        localCurrency.value !== profileStore.config.value.currency ||
+        localBudget.value !== profileStore.config.value.monthlyLimit;
 });
 
 const isSaving = ref(false);
@@ -63,7 +65,7 @@ const handleSaveSettings = async () => {
         }
 
         // Update global storage config
-        await updateConfig({
+        await profileStore.updateConfig({
             language: localLanguage.value,
             currency: localCurrency.value,
             monthlyLimit: localBudget.value
@@ -85,17 +87,15 @@ watchEffect(() => {
     }
 
     // Sync local state if global state changes (e.g. on initial load)
-    if (state.value.config) {
-        // We only want to sync these if the local value isn't already set or if we want to force refresh
-        // For simplicity, we sync them once when the state is loaded
-        if (state.value.config.currency) {
-            localCurrency.value = state.value.config.currency;
+    if (profileStore.config.value) {
+        if (profileStore.config.value.currency) {
+            localCurrency.value = profileStore.config.value.currency;
         }
-        if (state.value.config.monthlyLimit) {
-            localBudget.value = state.value.config.monthlyLimit;
+        if (profileStore.config.value.monthlyLimit) {
+            localBudget.value = profileStore.config.value.monthlyLimit;
         }
-        if (state.value.config.language) {
-            localLanguage.value = state.value.config.language;
+        if (profileStore.config.value.language) {
+            localLanguage.value = profileStore.config.value.language;
         }
     }
 });
@@ -129,9 +129,8 @@ const displayName = computed(() => {
 
 const handleReset = async () => {
     if (confirm(t('settings.reset_confirm'))) {
-        await clearState();
-        await seedDefaultCategories();
-        await loadState();
+        await appSync.clearAllData();
+        await appSync.initApp(true);
         navigateTo('/onboarding');
     }
 };
@@ -279,7 +278,7 @@ const handleDeleteAccount = async () => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
-                                <span class="text-sm font-bold">{{ state.config.currency }}</span>
+                                <span class="text-sm font-bold">{{ profileStore.config.value.currency }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
                                 }}</span>
@@ -299,7 +298,7 @@ const handleDeleteAccount = async () => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-600 dark:text-pink-400">
-                                <span class="text-xs font-bold">{{ state.config.currency }}</span>
+                                <span class="text-xs font-bold">{{ profileStore.config.value.currency }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{
                                 t('settings.monthly_budget_default') }}</span>

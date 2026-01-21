@@ -251,14 +251,14 @@ definePageMeta({
     hideBottomNav: true
 });
 
-// Use storage
-const { state, updateConfig } = useStorage();
+// Use profile store
+const profileStore = useProfileStore();
 const { t, setLocale, locale } = useI18n();
 useHead({ title: t('onboarding.welcome') })
 
 const budgetInput = ref('');
 const currentStep = ref<'language' | 'budget' | 'categories' | 'completing'>('language');
-const selectedCurrency = ref(state.value.config.currency || 'EUR');
+const selectedCurrency = ref(profileStore.config.value.currency || 'EUR');
 
 // Calculator State
 const showCalculator = ref(false);
@@ -352,14 +352,14 @@ const addSuggestion = (suggestion: { key: string, icon: string }) => {
 
 // Redirect if already complete - but not if we're in completing state
 watchEffect(() => {
-    if (state.value.config?.onboardingComplete && currentStep.value !== 'completing') {
+    if (profileStore.config.value?.onboardingComplete && currentStep.value !== 'completing') {
         navigateTo('/dashboard');
     }
 });
 
 const handleSelectLanguage = async (code: string) => {
     await setLocale(code as any);
-    await updateConfig({ language: code });
+    await profileStore.updateConfig({ language: code });
     currentStep.value = 'budget';
 };
 
@@ -377,7 +377,7 @@ const handleSetBudget = async () => {
     if (amount > 0) {
         currentStep.value = 'categories';
 
-        await updateConfig({
+        await profileStore.updateConfig({
             monthlyLimit: amount,
             currency: selectedCurrency.value,
             income: showCalculator.value ? Number(incomeInput.value) : undefined,
@@ -391,7 +391,7 @@ const handleFinish = async () => {
     // Immediately switch to completing state to prevent flash
     currentStep.value = 'completing';
 
-    await updateConfig({
+    await profileStore.updateConfig({
         onboardingComplete: true
     });
 

@@ -3,7 +3,7 @@ import { Globe, Check } from 'lucide-vue-next';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 
 const { locale, setLocale } = useI18n();
-const { state, updateConfig } = useStorage();
+const profileStore = useProfileStore();
 
 const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -18,10 +18,8 @@ const currentLanguage = computed(() =>
 
 const handleLanguageChange = async (code: string) => {
     await setLocale(code as any);
-    // Also update global config for persistence if user is logged in or for onboarding
-    if (state.value) {
-        await updateConfig({ language: code });
-    }
+    // Also update global config for persistence if user is logged in
+    await profileStore.updateConfig({ language: code });
 };
 </script>
 

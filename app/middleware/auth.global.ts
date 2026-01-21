@@ -1,6 +1,7 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const user = useSupabaseUser();
-  const { state, loadState } = useStorage();
+  const { initApp } = useAppSync();
+  const profileStore = useProfileStore();
 
   // 1. Block guests from protected routes
   const publicRoutes = ['/auth/login', '/auth/forgot-password', '/auth/update-password', '/'];
@@ -13,10 +14,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   // 2. If user is logged in, ensure state is valid
   if (user.value) {
-    // Ensure state is loaded. loadState() handles deduplication and checks if data is already present.
-    await loadState();
+    // Ensure state is loaded. initApp() handles deduplication and checks if data is already present.
+    await initApp();
 
-    const isOnboardingComplete = state.value.config.onboardingComplete;
+    const isOnboardingComplete = profileStore.config.value.onboardingComplete;
 
     // A. User needs onboarding but is somewhere else -> Send to onboarding
     if (!isOnboardingComplete && to.path !== '/onboarding') {
