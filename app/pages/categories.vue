@@ -84,7 +84,7 @@ const cancelEdit = () => {
 </script>
 
 <template>
-    <div class="min-h-dvh">
+    <div class="min-h-dvh pb-32">
         <header class="p-6 pt-12 flex items-center justify-between relative z-20">
             <button @click="router.back()"
                 class="p-3 rounded-full bg-white/80 backdrop-blur-md shadow-sm text-slate-600 active:scale-95 transition-all dark:bg-white/10 dark:text-white dark:border dark:border-white/10">

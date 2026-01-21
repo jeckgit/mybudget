@@ -33,7 +33,7 @@ const acceptEssential = () => {
 <template>
     <div v-if="isVisible" class="fixed bottom-4 left-4 right-4 z-50 flex justify-center pointer-events-none">
         <GlassCard variant="white"
-            class="w-full max-w-4xl p-4 md:p-6 pointer-events-auto shadow-2xl animate-in slide-in-from-bottom-10 fade-in duration-700 !bg-white/90 dark:!bg-slate-900/95 !backdrop-blur-xl border-slate-200/50 dark:border-white/10">
+            class="w-full max-w-4xl p-4 md:p-6 pointer-events-auto shadow-2xl animate-in slide-in-from-bottom-10 fade-in duration-700 bg-white/90! dark:bg-slate-900/95! backdrop-blur-xl! border-slate-200/50 dark:border-white/10">
             <div class="flex flex-col md:flex-row items-center gap-6">
                 <!-- Icon & Text -->
                 <div class="flex items-start gap-4 flex-1">

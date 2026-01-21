@@ -30,7 +30,7 @@ const variantClasses = computed(() => {
 </script>
 <template>
   <button :class="[
-    'cursor-pointer relative px-6 py-4 rounded-[1.5rem] font-semibold transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 overflow-hidden backdrop-blur-xl',
+    'cursor-pointer relative px-6 py-4 rounded-3xl font-semibold transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 overflow-hidden backdrop-blur-xl',
     variantClasses,
     fullWidth ? 'w-full' : '',
     props.class

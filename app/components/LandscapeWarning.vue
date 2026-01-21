@@ -4,7 +4,7 @@ const { t } = useI18n();
 </script>
 
 <template>
-    <div class="landscape-warning fixed inset-0 z-[9999] bg-slate-900/95 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center"
+    <div class="landscape-warning fixed inset-0 z-9999 bg-slate-900/95 backdrop-blur-xl flex flex-col items-center justify-center p-8 text-center"
         aria-hidden="true">
         <div class="relative mb-8 animate-pulse">
             <Smartphone class="w-24 h-24 text-white rotate-90" stroke-width="1.5" />

@@ -16,7 +16,7 @@ defineProps<{
                 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md 
                 border border-red-200 dark:border-red-900/50 
                 shadow-lg shadow-red-500/10 rounded-2xl
-                min-w-[300px] max-w-md">
+                min-w-75 max-w-md">
             <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-full shrink-0">
                 <AlertCircle class="w-5 h-5 text-red-500" />
             </div>

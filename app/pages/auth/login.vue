@@ -82,7 +82,7 @@ const handleOAuth = async (provider: 'google' | 'github') => {
 
         <div class="absolute top-6 left-6 z-20">
             <NuxtLink to="/">
-                <GlassButton variant="ghost" class="!px-3 !py-3 !rounded-full">
+                <GlassButton variant="ghost" class="px-3! py-3! rounded-full!">
                     <ChevronLeft class="w-5 h-5" />
                     <span class="sr-only">{{ t('common.back') }}</span>
                 </GlassButton>

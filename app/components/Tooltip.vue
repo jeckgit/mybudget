@@ -39,7 +39,7 @@ onUnmounted(() => {
             enter-to-class="translate-y-0 opacity-100" leave-active-class="transition duration-150 ease-in"
             leave-from-class="translate-y-0 opacity-100" leave-to-class="translate-y-1 opacity-0">
             <div v-if="isOpen" class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-3 
-                  min-w-[200px] text-center
+                  min-w-50 text-center
                   bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl
                   border border-white/60 dark:border-white/10
                   text-slate-600 dark:text-slate-300 text-xs font-medium rounded-2xl

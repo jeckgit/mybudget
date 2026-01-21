@@ -7,10 +7,16 @@ const txStore = useTransactionsStore();
 const monthStore = useMonthsStore();
 const { t, locale } = useI18n();
 const { formatCurrency } = useCurrency();
-const { calculateBudgetData } = useBudget();
+const { calculateMonthlyBreakdown } = useBudget();
 
 const scrollRef = ref<HTMLElement | null>(null);
 const currentMonthDate = ref(new Date());
+
+const monthBreakdown = computed(() => {
+    return calculateMonthlyBreakdown(currentMonthDate.value);
+});
+
+const visibleDays = computed(() => monthBreakdown.value.dailyBreakdown);
 
 onMounted(async () => {
     if (isToday(new Date())) {
@@ -48,92 +54,9 @@ const selectMonth = (monthIndex: number) => {
     showMonthPicker.value = false;
 };
 
-// Calculate daily spending from transactions
-const dayMoneyMap = computed(() => {
-    const map = new Map<string, number>();
-    txStore.transactions.value.forEach(tx => {
-        if (!tx.date) return;
-        const localDate = new Date(tx.date);
-        const year = localDate.getFullYear();
-        const month = String(localDate.getMonth() + 1).padStart(2, '0');
-        const day = String(localDate.getDate()).padStart(2, '0');
-        const key = `${year}-${month}-${day}`;
-        map.set(key, (map.get(key) || 0) + tx.amount);
-    });
-    return map;
-});
-
-// Generate all days for the current month
-const visibleDays = computed(() => {
-    const year = currentMonthDate.value.getFullYear();
-    const month = currentMonthDate.value.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    return Array.from({ length: daysInMonth }, (_, i) => {
-        return new Date(year, month, i + 1);
-    });
-});
-
-// Use useBudget for unified calculation logic
-const budgetStats = computed(() => {
-    return calculateBudgetData(currentMonthDate.value);
-});
-
-// Calculate rollover budget for each day using same logic as useBudget
-const rolloverData = computed(() => {
-    const map = new Map<string, { spent: number; available: number; isSkipped: boolean }>();
-    let totalSpentSinceStart = 0;
-    
-    // Extract pieces from budgetStats
-    const { dailyTarget, targetDate } = budgetStats.value;
-    const year = targetDate.getFullYear();
-    const month = targetDate.getMonth();
-    
-    // Find the effective start date (earliest tx or today if current month)
-    const monthTx = txStore.transactions.value.filter(t => {
-         const d = new Date(t.date);
-         return d.getFullYear() === year && d.getMonth() === month;
-    });
-
-    let startDate: Date;
-    const now = new Date();
-    const isCurrentCalendarMonth = year === now.getFullYear() && month === now.getMonth();
-
-    if (monthTx.length > 0) {
-        const sorted = [...monthTx].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        startDate = new Date(year, month, new Date(sorted[0]!.date).getDate());
-    } else if (isCurrentCalendarMonth) {
-        startDate = new Date(year, month, now.getDate());
-    } else {
-        startDate = new Date(year, month, 1);
-    }
-
-    visibleDays.value.forEach((date) => {
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0');
-        const d = String(date.getDate()).padStart(2, '0');
-        const key = `${y}-${m}-${d}`;
-
-        const daySpent = dayMoneyMap.value.get(key) || 0;
-
-        if (date.getTime() < startDate.getTime()) {
-            map.set(key, { spent: daySpent, available: 0, isSkipped: true });
-        } else {
-            const daysActive = Math.floor((date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-            totalSpentSinceStart += daySpent;
-            const available = (daysActive * dailyTarget) - totalSpentSinceStart;
-            map.set(key, { spent: daySpent, available, isSkipped: false });
-        }
-    });
-    return map;
-});
-
 const getBudgetForDate = (date: Date) => {
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    const key = `${y}-${m}-${d}`;
-    return rolloverData.value.get(key) || { spent: 0, available: 0, isSkipped: false };
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    return visibleDays.value.find(d => d.key === key) || { spent: 0, available: 0, isSkipped: false };
 };
 
 const isToday = (date: Date) => {
@@ -147,7 +70,7 @@ const isToday = (date: Date) => {
 
 const scrollToToday = () => {
     if (scrollRef.value) {
-        const todayIndex = visibleDays.value.findIndex(d => isToday(d));
+        const todayIndex = visibleDays.value.findIndex(d => isToday(d.date));
         if (todayIndex !== -1) {
             const list = scrollRef.value.querySelector('.day-list');
             const element = list?.children[todayIndex] as HTMLElement;
@@ -274,41 +197,42 @@ const formatBudgetDisplay = (amount: number) => {
                 class="h-95 overflow-y-auto overflow-x-hidden pt-4 pb-6 px-4 scrollbar-hide snap-y snap-mandatory"
                 style="-webkit-overflow-scrolling: touch;">
                 <div class="flex flex-col gap-3 day-list">
-                    <button v-for="(date, index) in visibleDays" :key="index" @click="handleDayClick(date)" :class="[
+                    <button v-for="(day, index) in visibleDays" :key="index" @click="handleDayClick(day.date)" :class="[
                         'w-full p-4 flex items-center gap-4 rounded-[1.8rem] transition-all duration-300 border active:scale-[0.98] snap-center',
-                        getBudgetForDate(date).isSkipped ? 'opacity-40 grayscale bg-slate-50 border-slate-100 dark:bg-white/5 dark:border-white/5' : '',
-                        !getBudgetForDate(date).isSkipped && isToday(date)
+                        day.isSkipped ? 'opacity-40 grayscale bg-slate-50 border-slate-100 dark:bg-white/5 dark:border-white/5' : '',
+                        !day.isSkipped && isToday(day.date)
                             ? 'bg-slate-800 text-white border-slate-800 shadow-xl shadow-slate-200 dark:bg-white/15 dark:text-white dark:border-white/20 dark:shadow-purple-900/20'
-                            : !getBudgetForDate(date).isSkipped ? 'bg-white border-slate-100 text-slate-700 shadow-sm shadow-slate-200/50 hover:bg-slate-50 dark:bg-white/5 dark:border-white/5 dark:text-slate-300' : ''
+                            : !day.isSkipped ? 'bg-white border-slate-100 text-slate-700 shadow-sm shadow-slate-200/50 hover:bg-slate-50 dark:bg-white/5 dark:border-white/5 dark:text-slate-300' : ''
                     ]">
                         <!-- Left: Date -->
                         <div class="flex flex-col items-center min-w-12.5">
                             <span
-                                :class="['text-[10px] font-bold uppercase tracking-widest leading-none mb-1 opacity-60', isToday(date) ? 'text-white/70 dark:text-white/60' : 'text-slate-400']">
-                                {{ formatDay(date) }}
+                                :class="['text-[10px] font-bold uppercase tracking-widest leading-none mb-1 opacity-60', isToday(day.date) ? 'text-white/70 dark:text-white/60' : 'text-slate-400']">
+                                {{ formatDay(day.date) }}
                             </span>
-                            <span class="text-xl font-bold leading-none tracking-tighter">{{ formatDate(date) }}</span>
+                            <span class="text-xl font-bold leading-none tracking-tighter">{{ formatDate(day.date)
+                                }}</span>
                         </div>
 
                         <!-- Divider -->
                         <div
-                            :class="['h-10 w-px', isToday(date) ? 'bg-white/20 dark:bg-white/10' : 'bg-slate-100 dark:bg-white/5']" />
+                            :class="['h-10 w-px', isToday(day.date) ? 'bg-white/20 dark:bg-white/10' : 'bg-slate-100 dark:bg-white/5']" />
 
                         <!-- Center: Available Budget (Dominant) -->
                         <div class="flex-1 flex flex-col items-center">
-                            <template v-if="!getBudgetForDate(date).isSkipped">
+                            <template v-if="!day.isSkipped">
                                 <span
-                                    :class="['text-[9px] font-black uppercase tracking-[0.2em] mb-0.5 opacity-60', isToday(date) ? 'text-white/60' : 'text-slate-400']">
-                                    {{ getBudgetForDate(date).available >= 0 ? t('day_selector.available') :
+                                    :class="['text-[9px] font-black uppercase tracking-[0.2em] mb-0.5 opacity-60', isToday(day.date) ? 'text-white/60' : 'text-slate-400']">
+                                    {{ day.available >= 0 ? t('day_selector.available') :
                                         t('day_selector.over') }}
                                 </span>
                                 <div :class="[
                                     'text-2xl font-black tracking-tighter transition-colors',
-                                    getBudgetForDate(date).available >= 0
-                                        ? (isToday(date) ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400')
-                                        : (isToday(date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
+                                    day.available >= 0
+                                        ? (isToday(day.date) ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400')
+                                        : (isToday(day.date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
                                 ]">
-                                    <span>{{ formatBudgetDisplay(getBudgetForDate(date).available) }}</span>
+                                    <span>{{ formatBudgetDisplay(day.available) }}</span>
                                 </div>
                             </template>
                             <template v-else>
@@ -324,8 +248,8 @@ const formatBudgetDisplay = (amount: number) => {
                                 {{ t('dashboard.spending') }}
                             </span>
                             <span
-                                :class="['text-xs font-bold tracking-tight', isToday(date) ? 'text-white/80' : 'text-slate-500']">
-                                {{ formatBudgetDisplay(getBudgetForDate(date).spent) }}
+                                :class="['text-xs font-bold tracking-tight', isToday(day.date) ? 'text-white/80' : 'text-slate-500']">
+                                {{ formatBudgetDisplay(day.spent) }}
                             </span>
                         </div>
                     </button>

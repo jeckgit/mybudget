@@ -234,46 +234,10 @@ const { lengthY, isSwiping } = useSwipe(modalCard, {
                             </div>
 
                             <template v-if="currentStep === 1">
-                                <div class="text-center mb-6">
-                                    <!-- Income Toggle Switch -->
-                                    <div class="flex justify-center mb-4">
-                                        <div
-                                            class="flex bg-slate-100 p-1 rounded-full dark:bg-white/5 border border-slate-200 dark:border-white/10 relative">
-                                            <!-- Sliding Background -->
-                                            <div class="absolute inset-y-1 rounded-full bg-white shadow-sm dark:bg-white/10 transition-all duration-300 ease-out w-[calc(50%-4px)]"
-                                                :class="{ 'translate-x-full left-0': isIncome, 'translate-x-0 left-1': !isIncome }">
-                                            </div>
+                                <IncomeToggle v-model="isIncome" />
 
-                                            <button @click="isIncome = false"
-                                                class="relative z-10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full transition-colors duration-300"
-                                                :class="{ 'text-slate-800 dark:text-white': !isIncome, 'text-slate-400 dark:text-slate-500 hover:text-slate-600': isIncome }">
-                                                {{ t('common.expense') }}
-                                            </button>
-                                            <button @click="isIncome = true"
-                                                class="relative z-10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full transition-colors duration-300"
-                                                :class="{ 'text-green-600 dark:text-green-400': isIncome, 'text-slate-400 dark:text-slate-500 hover:text-slate-600': !isIncome }">
-                                                {{ t('common.income') }}
-                                            </button>
-                                        </div>
-                                    </div>
-
-
-                                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2 dark:text-slate-400 transition-colors"
-                                        :class="{ 'text-green-500! dark:text-green-400!': isIncome }">
-                                        {{ isIncome ? (editingTransaction ? t('common.edit_income') :
-                                            t('common.add_income_modal')) :
-                                            (editingTransaction ? t('common.edit_expense') : t('common.add_expense_modal'))
-                                        }}
-                                    </p>
-                                    <div class="flex items-center justify-center gap-1 transition-colors duration-300"
-                                        :class="{ 'text-green-500': isIncome }">
-                                        <!-- Removed Currency Symbol as requested -->
-                                        <span class="text-7xl font-bold text-slate-800 tracking-tighter dark:text-white"
-                                            :class="{ 'text-green-600! dark:text-green-400!': isIncome }">
-                                            {{ inputValue || "0" }}
-                                        </span>
-                                    </div>
-                                </div>
+                                <AmountDisplay :value="inputValue" :is-income="isIncome"
+                                    :is-editing="!!editingTransaction" />
 
                                 <NumberPad :value="inputValue" @input="handleInput" @delete="handleDelete"
                                     @submit="handleAddTransaction" :submit-label="t('common.next')" />
@@ -303,32 +267,12 @@ const { lengthY, isSwiping } = useSwipe(modalCard, {
                                     <div class="w-12 h-12" /> <!-- Spacer for centering -->
                                 </div>
 
-                                <!-- Date Picker Badge -->
-                                <div class="flex justify-center mb-6">
-                                    <label class="relative cursor-pointer group">
-                                        <input type="datetime-local" v-model="selectedDate"
-                                            class="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer" />
-                                        <div class="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-full text-sm font-bold border border-purple-100 group-hover:bg-purple-100 transition-colors dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-500/30 dark:group-hover:bg-purple-900/40"
-                                            :class="{ 'bg-green-50! text-green-600! border-green-100! group-hover:bg-green-100! dark:bg-green-900/20! dark:text-green-300! dark:border-green-500/30!': isIncome }">
-                                            <span>📅</span>
-                                            <span>{{ formattedDateDisplay }}</span>
-                                        </div>
-                                    </label>
-                                </div>
+                                <DatePickerBadge v-model="selectedDate" :is-income="isIncome"
+                                    :formatted-date="formattedDateDisplay" />
 
-                                <div class="grid grid-cols-2 gap-3 mb-4">
-                                    <button v-for="cat in displayedCategories" :key="cat.id"
-                                        @click="handleAddTransaction(cat)"
-                                        class="flex flex-col items-center justify-center p-6 rounded-3xl bg-slate-50 border border-slate-100 text-slate-600 active:scale-95 transition-all duration-300 dark:bg-white/5 dark:border-white/5 dark:text-slate-300"
-                                        :class="{
-                                            'bg-purple-50! border-purple-200! text-purple-600! dark:bg-purple-900/20! dark:border-purple-500/30!': selectedCategory.id === cat.id && !isIncome,
-                                            'bg-green-50! border-green-200! text-green-600! dark:bg-green-900/20! dark:border-green-500/30!': selectedCategory.id === cat.id && isIncome
-                                        }">
-                                        <span class="text-4xl mb-2">{{ cat.emoji }}</span>
-                                        <span class="text-xs font-bold uppercase tracking-wider opacity-80">{{
-                                            getCategoryName(cat) }}</span>
-                                    </button>
-                                </div>
+                                <CategoryPicker :categories="displayedCategories" :selected-id="selectedCategory.id"
+                                    :is-income="isIncome" :get-category-name="getCategoryName"
+                                    @select="handleAddTransaction" />
                             </template>
                         </GlassCard>
                     </div>

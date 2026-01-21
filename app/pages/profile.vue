@@ -6,14 +6,22 @@ const { t, locale, setLocale } = useI18n();
 
 useHead({ title: t('profile.title') })
 import {
-    User, Mail, Save, AlertCircle, CheckCircle2, Trash2, Globe, Moon, Sun, Monitor, LogOut, Tag, ChevronRight,
-    Scale
+    AlertCircle, CheckCircle2,
+    ChevronRight,
+    Globe,
+    LogOut,
+    Mail,
+    Monitor,
+    Moon,
+    Save,
+    Scale,
+    Sun,
+    Tag,
+    Trash2
 } from 'lucide-vue-next';
 
 const { colorMode, updateTheme } = useTheme();
 const profileStore = useProfileStore();
-const txStore = useTransactionsStore();
-const catStore = useCategoriesStore();
 const appSync = useAppSync();
 
 // Ensure state is loaded
@@ -218,7 +226,7 @@ const handleDeleteAccount = async () => {
                                 <Tag class="w-5 h-5" />
                             </div>
                             <span class="font-bold text-slate-700 dark:text-slate-200">{{ t('common.manage_categories')
-                            }}</span>
+                                }}</span>
                             <ChevronRight
                                 class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors group-active:translate-x-1" />
                         </div>
@@ -237,7 +245,7 @@ const handleDeleteAccount = async () => {
                                 <Globe class="w-5 h-5" />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
-                                }}</span>
+                            }}</span>
                         </div>
                         <select v-model="localLanguage"
                             class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -258,7 +266,7 @@ const handleDeleteAccount = async () => {
                                 <Monitor class="w-5 h-5" v-else />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex bg-slate-100 dark:bg-white/10 rounded-lg p-1 w-32">
                             <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
@@ -281,7 +289,7 @@ const handleDeleteAccount = async () => {
                                 <span class="text-sm font-bold">{{ profileStore.config.value.currency }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
-                                }}</span>
+                            }}</span>
                         </div>
                         <div class="flex gap-2">
                             <select v-model="localCurrency"

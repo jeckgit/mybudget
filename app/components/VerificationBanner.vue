@@ -43,7 +43,7 @@ const dismiss = () => {
 
 <template>
     <Transition name="slide-down">
-        <div v-if="user && !isConfirmed && isVisible" class="fixed top-0 left-0 right-0 z-[100] p-4">
+        <div v-if="user && !isConfirmed && isVisible" class="fixed top-0 left-0 right-0 z-100 p-4">
             <div class="max-w-xl mx-auto">
                 <div
                     class="bg-white/80 backdrop-blur-2xl border border-white/60 shadow-2xl rounded-2xl p-4 flex items-center justify-between gap-4 dark:bg-purple-900/20 dark:border-white/10">
@@ -73,7 +73,7 @@ const dismiss = () => {
                                 {{ t('verification_banner.sending') }}
                             </span>
                             <span v-else>{{ success ? t('verification_banner.sent') : t('verification_banner.resend')
-                                }}</span>
+                            }}</span>
                         </button>
 
                         <button @click="dismiss"

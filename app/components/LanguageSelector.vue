@@ -28,7 +28,7 @@ const handleLanguageChange = async (code: string) => {
         <MenuButton
             class="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 text-slate-600 dark:text-slate-300 transition-all active:scale-95">
             <Globe class="w-4 h-4" />
-            <span class="text-sm font-medium">{{ currentLanguage.name }}</span>
+            <span class="text-sm font-medium">{{ currentLanguage?.name }}</span>
         </MenuButton>
 
         <transition enter-active-class="transition duration-100 ease-out"
