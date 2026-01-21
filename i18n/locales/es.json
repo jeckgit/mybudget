@@ -32,7 +32,9 @@
     "income": "Ingreso",
     "expense": "Gasto",
     "my_income": "Mis Ingresos",
-    "my_expenses": "Mis Gastos"
+    "my_expenses": "Mis Gastos",
+    "rotate_device_title": "Por favor gire el dispositivo",
+    "rotate_device_desc": "Esta aplicación está optimizada para modo retrato. Por favor gire su dispositivo."
   },
   "dashboard": {
     "good_morning": "Buenos días",

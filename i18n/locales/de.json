@@ -32,7 +32,9 @@
     "income": "Einnahme",
     "expense": "Ausgabe",
     "my_income": "Meine Einnahmen",
-    "my_expenses": "Meine Ausgaben"
+    "my_expenses": "Meine Ausgaben",
+    "rotate_device_title": "Bitte Gerät drehen",
+    "rotate_device_desc": "Diese App ist für den Hochformat-Modus optimiert. Bitte drehen Sie Ihr Gerät."
   },
   "dashboard": {
     "good_morning": "Guten Morgen",

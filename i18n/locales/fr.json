@@ -32,7 +32,9 @@
     "income": "Revenu",
     "expense": "Dépense",
     "my_income": "Mes revenus",
-    "my_expenses": "Mes dépenses"
+    "my_expenses": "Mes dépenses",
+    "rotate_device_title": "Veuillez tourner l'appareil",
+    "rotate_device_desc": "Cette application est optimisée pour le mode portrait. Veuillez tourner votre appareil."
   },
   "dashboard": {
     "good_morning": "Bonjour",

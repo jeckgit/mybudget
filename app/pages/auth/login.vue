@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ChevronLeft } from 'lucide-vue-next';
 const { t } = useI18n();
 
 
@@ -13,8 +14,9 @@ const loading = ref(false);
 const email = ref('');
 const password = ref('');
 const isSignUp = ref(false);
-useHead({ title: computed(() => isSignUp.value ? t('auth.create_account') : t('auth.sign_in')) })
 const errorMsg = ref('');
+
+useHead({ title: computed(() => isSignUp.value ? t('auth.create_account') : t('auth.sign_in')) })
 
 watchEffect(() => {
     if (user.value) {
@@ -77,6 +79,15 @@ const handleOAuth = async (provider: 'google' | 'github') => {
 <template>
     <div class="min-h-dvh flex items-center justify-center p-6 relative overflow-hidden">
         <BackgroundMesh />
+
+        <div class="absolute top-6 left-6 z-20">
+            <NuxtLink to="/">
+                <GlassButton variant="ghost" class="!px-3 !py-3 !rounded-full">
+                    <ChevronLeft class="w-5 h-5" />
+                    <span class="sr-only">{{ t('common.back') }}</span>
+                </GlassButton>
+            </NuxtLink>
+        </div>
 
         <GlassCard variant="white"
             class="w-full max-w-md p-8 relative z-10 bg-white/80! dark:bg-white/5! dark:border! dark:border-white/10! dark:shadow-black/20">

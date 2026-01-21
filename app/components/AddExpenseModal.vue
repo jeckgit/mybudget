@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Transaction } from '~/../shared/types';
-import { Trash2, ArrowRightLeft } from 'lucide-vue-next'; // Added Icon
+import { Trash2 } from 'lucide-vue-next'; // Added Icon
 
 const props = defineProps<{
     editingTransaction?: Transaction | null;
