@@ -127,7 +127,7 @@ const exportAsJSON = () => {
 </script>
 
 <template>
-    <div class="min-h-dvh pb-32 px-6 pt-12">
+    <div class="min-h-dvh px-6 pt-12">
         <!-- Header -->
         <div class="flex items-center gap-4 mb-8">
             <NuxtLink to="/"

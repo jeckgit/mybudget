@@ -27,6 +27,16 @@ html {
   /* background-color: #f8fafc; */
 }
 
+body,
+html {
+  height: 100%; /* Fallback */
+  height: 100dvh; /* Adapts to address bar status */
+}
+
+html {
+  background-color: #f8fafc;
+}
+
 html.dark {
-  /* background-color: #050505; */
+  background-color: #152026;
 }

@@ -21,7 +21,7 @@ const handleAction = () => {
 </script>
 
 <template>
-  <div class="fixed bottom-6 left-6 right-6 z-30">
+  <div class="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] left-6 right-6 z-30">
     <div
       class="absolute inset-0 bg-white/40 dark:bg-[#1e1e1e]/30 backdrop-blur-2xl rounded-[2.5rem] border border-white/50 dark:border-white/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]" />
     <div class="relative flex justify-between items-center px-6 py-4">

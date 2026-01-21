@@ -5,7 +5,7 @@ useHead({ title: t('assistant.title') })
 </script>
 
 <template>
-    <div class="flex flex-col min-h-dvh px-6 pt-12 pb-32">
+    <div class="flex flex-col px-6 pt-12">
         <header class="mb-8">
             <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-2">{{ t('assistant.title') }}</h1>
             <p class="text-slate-500 dark:text-slate-400">{{ t('assistant.subtitle') }}</p>

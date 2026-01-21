@@ -8,7 +8,7 @@ const showAddModal = useState('showAddModal', () => false);
 </script>
 
 <template>
-    <div class="relative min-h-dvh text-slate-800 font-sans selection:bg-accent/30 dark:text-white">
+    <div class="relative text-slate-800 font-sans selection:bg-accent/30 dark:text-white">
         <BackgroundMesh />
         <!-- Main Content -->
         <div class="relative z-10">

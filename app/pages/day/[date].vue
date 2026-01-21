@@ -66,10 +66,10 @@ const openNewExpenseModal = () => {
 </script>
 
 <template>
-    <div class="flex flex-col min-h-dvh pb-32 bg-slate-50 dark:bg-[#050505]">
+    <div class="flex flex-col min-h-dvh bg-slate-50 dark:bg-[#050505]">
         <!-- Header -->
         <div
-            class="sticky top-0 z-20 px-6 pt-12 pb-6 bg-slate-50/80 backdrop-blur-xl dark:bg-[#050505]/80 border-b border-transparent transition-all duration-300">
+            class="sticky top-[env(safe-area-inset-top)] z-20 px-6 pt-12 pb-6 bg-slate-50/80 backdrop-blur-xl dark:bg-[#050505]/80 border-b border-transparent transition-all duration-300">
             <div class="flex items-center gap-4">
                 <button @click="goBack"
                     class="w-12 h-12 rounded-full bg-white/40 backdrop-blur-md border border-white/50 flex items-center justify-center shadow-sm text-slate-600 active:scale-95 transition-transform dark:text-white dark:bg-white/5 dark:border-white/10">
