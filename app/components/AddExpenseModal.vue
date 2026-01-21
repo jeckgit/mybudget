@@ -176,13 +176,7 @@ const handleBack = () => {
     currentStep.value = 1;
 };
 
-const handleInput = (n: string | number) => {
-    inputValue.value += n.toString();
-};
 
-const handleDelete = () => {
-    inputValue.value = inputValue.value.slice(0, -1);
-}
 
 
 
@@ -234,13 +228,9 @@ const { lengthY, isSwiping } = useSwipe(modalCard, {
                             </div>
 
                             <template v-if="currentStep === 1">
-                                <IncomeToggle v-model="isIncome" />
-
-                                <AmountDisplay :value="inputValue" :is-income="isIncome"
-                                    :is-editing="!!editingTransaction" />
-
-                                <NumberPad :value="inputValue" @input="handleInput" @delete="handleDelete"
-                                    @submit="handleAddTransaction" :submit-label="t('common.next')" />
+                                <ExpenseAmountInput v-model:amount="inputValue" v-model:is-income="isIncome"
+                                    :is-editing="!!editingTransaction" :submit-label="t('common.next')"
+                                    @submit="handleAddTransaction" />
                             </template>
 
                             <template v-else>
@@ -267,7 +257,7 @@ const { lengthY, isSwiping } = useSwipe(modalCard, {
                                     <div class="w-12 h-12" /> <!-- Spacer for centering -->
                                 </div>
 
-                                <DatePickerBadge v-model="selectedDate" :is-income="isIncome"
+                                <DateBadge v-model="selectedDate" :is-income="isIncome"
                                     :formatted-date="formattedDateDisplay" />
 
                                 <CategoryPicker :categories="displayedCategories" :selected-id="selectedCategory.id"
