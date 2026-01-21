@@ -65,6 +65,17 @@ const saveMonthlyBudget = async () => {
                                 2
                         }) }}
                     </h2>
+                    <div class="mt-2 flex items-center gap-1.5">
+                        <span
+                            class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/40">{{
+                                t('dashboard.saved_total') }}</span>
+                        <span
+                            :class="['text-sm font-bold', budgetData.totalSaved >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400']">
+                            {{ formatCurrency(budgetData.totalSaved, profileStore.config.value.currency, false, {
+                                minimumFractionDigits: 0
+                            }) }}
+                        </span>
+                    </div>
                 </div>
 
                 <div class="text-right flex flex-col items-end">

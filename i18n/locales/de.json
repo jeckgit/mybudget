@@ -47,7 +47,9 @@
     "budget_health": "Budget-Gesundheit",
     "recent": "Aktuell",
     "default_note": "Einkauf",
-    "no_transactions": "Noch keine Transaktionen"
+    "no_transactions": "Noch keine Transaktionen",
+    "saved_total": "Gespart",
+    "savings": "Ersparnisse"
   },
   "analytics": {
     "title": "Statistiken",

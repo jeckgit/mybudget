@@ -47,7 +47,9 @@
     "budget_health": "Budget Health",
     "recent": "Recent",
     "default_note": "Purchase",
-    "no_transactions": "No transactions yet"
+    "no_transactions": "No transactions yet",
+    "saved_total": "Saved",
+    "savings": "Savings"
   },
   "analytics": {
     "title": "Statistics",

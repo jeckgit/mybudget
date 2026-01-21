@@ -65,7 +65,7 @@ const openNewExpenseModal = () => {
 </script>
 
 <template>
-    <div class="flex flex-col min-h-dvh bg-slate-50 dark:bg-[#050505]">
+    <div class="flex flex-col min-h-dvh bg-slate-50 dark:bg-[#050505] pb-32">
         <!-- Header -->
         <div
             class="sticky top-[env(safe-area-inset-top)] z-20 px-6 pt-12 pb-6 bg-slate-50/80 backdrop-blur-xl dark:bg-[#050505]/80 border-b border-transparent transition-all duration-300">
@@ -96,7 +96,9 @@ const openNewExpenseModal = () => {
                         {{ t('day_selector.daily_spending') }}
                     </p>
                     <h2 class="text-5xl font-bold text-slate-800 dark:text-white tracking-tighter">
-                        {{ formatCurrency(totalForDay, profileStore.config.value.currency, false, { minimumFractionDigits: 2 }) }}
+                        {{ formatCurrency(totalForDay, profileStore.config.value.currency, false, {
+                            minimumFractionDigits: 2
+                        }) }}
                     </h2>
                 </button>
             </GlassCard>
@@ -106,34 +108,46 @@ const openNewExpenseModal = () => {
                 <h3 class="font-bold text-lg text-slate-800 px-1 dark:text-white">{{ t('dashboard.recent') }}</h3>
 
                 <div class="space-y-3">
-                    <GlassCard v-for="tx in dayTransactions" :key="tx.id" variant="white"
-                        @click="handleTransactionClick(tx)"
-                        class="flex items-center justify-between p-3 rounded-2xl! bg-white/60! dark:bg-white/5! dark:border! dark:border-white/10! active:scale-95 transition-all cursor-pointer hover:bg-white/80 dark:hover:bg-white/10">
-                        <div class="flex items-center gap-3 min-w-0 flex-1 mr-4">
+                    <div v-for="tx in dayTransactions" :key="tx.id" @click="handleTransactionClick(tx)"
+                        class="group relative flex items-center justify-between p-4 rounded-4xl bg-white/60 dark:bg-white/5 border border-white/40 dark:border-white/10 active:scale-95 transition-all duration-300 cursor-pointer hover:bg-white/80 dark:hover:bg-white/10 hover:shadow-xl hover:shadow-purple-900/5 dark:hover:shadow-none">
+
+                        <!-- Transaction Details -->
+                        <div class="flex items-center gap-4 min-w-0 flex-1">
                             <div
-                                class="w-10 h-10 shrink-0 rounded-xl bg-white/80 flex items-center justify-center text-lg shadow-sm border border-white dark:bg-white/10 dark:border-white/5 dark:text-white">
+                                class="w-12 h-12 shrink-0 rounded-2xl bg-white/80 dark:bg-white/10 flex items-center justify-center text-xl shadow-sm border border-white dark:border-white/5 group-hover:scale-110 transition-transform duration-300">
                                 {{ getCategoryById(tx.category)?.emoji || '💸' }}
                             </div>
                             <div class="min-w-0">
-                                <p class="font-bold text-slate-800 text-sm dark:text-white truncate">
+                                <p class="font-bold text-slate-800 text-sm dark:text-white truncate tracking-tight">
                                     {{ getCategoryName(getCategoryById(tx.category)) || tx.note ||
                                         t('dashboard.default_note') }}
                                 </p>
                                 <p
-                                    class="text-[10px] text-slate-400 font-bold uppercase tracking-wide dark:text-slate-500">
+                                    class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 dark:text-slate-500">
                                     {{ formatTime(tx.date) }}
                                 </p>
                             </div>
                         </div>
-                        <span class="font-bold whitespace-nowrap"
-                            :class="{ 'text-green-600 dark:text-green-400': tx.amount < 0, 'text-slate-800 dark:text-white': tx.amount >= 0 }">
-                            {{ tx.amount < 0 ? '+' : '' }} {{ formatCurrency(Math.abs(tx.amount), profileStore.config.value.currency,
-                                false, { minimumFractionDigits: 2 }) }} </span>
-                    </GlassCard>
+
+                        <!-- Amount -->
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="font-black text-base tracking-tighter whitespace-nowrap transition-colors"
+                                :class="{ 'text-emerald-500 dark:text-emerald-400': tx.amount < 0, 'text-slate-800 dark:text-white': tx.amount >= 0 }">
+                                {{ tx.amount < 0 ? '+' : '' }} {{ formatCurrency(Math.abs(tx.amount),
+                                    profileStore.config.value.currency, false, { minimumFractionDigits: 2 }) }} </span>
+                        </div>
+                    </div>
 
                     <div v-if="dayTransactions.length === 0"
-                        class="text-center py-16 text-slate-400 bg-white/30 backdrop-blur-md rounded-4xl border border-dashed border-white/50 dark:text-slate-600 dark:bg-white/5 dark:border-white/10">
-                        {{ t('dashboard.no_transactions') }}
+                        class="flex flex-col items-center justify-center py-20 text-slate-400 bg-white/30 dark:bg-white/5 backdrop-blur-md rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10">
+                        <div
+                            class="w-16 h-16 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center mb-4 text-2xl">
+                            ☁️
+                        </div>
+                        <p
+                            class="text-sm font-bold uppercase tracking-widest bg-linear-to-b from-slate-400 to-slate-500 bg-clip-text text-transparent">
+                            {{ t('dashboard.no_transactions') }}
+                        </p>
                     </div>
                 </div>
             </div>

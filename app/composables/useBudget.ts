@@ -59,6 +59,7 @@ export const useBudget = () => {
       key: string;
       spent: number;
       available: number;
+      dailyBalance: number;
       isSkipped: boolean;
     }> = [];
 
@@ -75,6 +76,7 @@ export const useBudget = () => {
           key,
           spent: daySpent,
           available: 0,
+          dailyBalance: 0,
           isSkipped: true
         });
       } else {
@@ -86,6 +88,7 @@ export const useBudget = () => {
           key,
           spent: daySpent,
           available,
+          dailyBalance: avgDaily - daySpent,
           isSkipped: false
         });
       }
@@ -146,6 +149,21 @@ export const useBudget = () => {
     const remainingToday = dailyTarget - spentToday;
     const isOverBudget = remainingToday < 0;
 
+    // Calculate total saved from previous days in the budget period
+    let totalSaved = 0;
+    if (isCurrentMonth) {
+      const startDate = getEffectiveStartDate(targetDate);
+      const startDay = startDate.getDate();
+      const currentDayNum = today.getDate();
+
+      if (currentDayNum > startDay) {
+        const daysPassed = currentDayNum - startDay;
+        const transactionsUntilYesterday = monthTransactions.filter((t) => new Date(t.date).getDate() < currentDayNum);
+        const spentUntilYesterday = transactionsUntilYesterday.reduce((acc, t) => acc + t.amount, 0);
+        totalSaved = daysPassed * avgDaily - spentUntilYesterday;
+      }
+    }
+
     return {
       today,
       targetDate,
@@ -160,7 +178,8 @@ export const useBudget = () => {
       dailyTarget,
       remainingToday,
       isOverBudget,
-      avgDaily
+      avgDaily,
+      totalSaved
     };
   };
 

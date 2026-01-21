@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-vue-next';
 
 const profileStore = useProfileStore();
@@ -81,6 +81,12 @@ const scrollToToday = () => {
     }
 };
 
+const handleTodayClick = async () => {
+    currentMonthDate.value = new Date();
+    await nextTick();
+    scrollToToday();
+};
+
 const handleDayClick = (date: Date) => {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -128,15 +134,18 @@ const formatBudgetDisplay = (amount: number) => {
                 </h3>
 
                 <div class="flex items-center gap-2">
+                    <button @click="handleTodayClick"
+                        class="h-8 px-4 rounded-xl text-[10px] font-bold uppercase tracking-widest bg-white/60 border border-white/80 text-slate-600 dark:bg-white/10 dark:border-white/10 dark:text-slate-300 active:scale-95 transition-all">
+                        {{ t('day_selector.today') }}
+                    </button>
 
-
-                    <button @click="toggleMonthPicker" :class="['h-8 px-4 rounded-xl text-[10px] font-bold uppercase tracking-widest border flex items-center gap-1.5 active:scale-95 transition-all',
+                    <button @click="toggleMonthPicker" :class="['h-8 rounded-xl text-[10px] font-bold uppercase tracking-widest border flex items-center gap-1.5 active:scale-95 transition-all',
                         showMonthPicker
-                            ? 'bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900'
-                            : 'bg-white/60 border-white/80 text-slate-600 dark:bg-white/10 dark:border-white/10 dark:text-slate-300'
+                            ? 'px-4 bg-slate-800 text-white border-slate-800 dark:bg-white dark:text-slate-900'
+                            : 'w-8 justify-center bg-white/60 border-white/80 text-slate-600 dark:bg-white/10 dark:border-white/10 dark:text-slate-300'
                     ]">
                         <CalendarDays :size="12" />
-                        {{ showMonthPicker ? t('common.cancel') : t('day_selector.selected_date') }}
+                        <span v-if="showMonthPicker">{{ t('common.cancel') }}</span>
                     </button>
                 </div>
             </div>
@@ -189,9 +198,6 @@ const formatBudgetDisplay = (amount: number) => {
                 </Transition>
             </Teleport>
 
-
-
-
             <!-- Scrollable Day List - Viewport fits ~5 items -->
             <div ref="scrollRef"
                 class="h-95 overflow-y-auto overflow-x-hidden pt-4 pb-6 px-4 scrollbar-hide snap-y snap-mandatory"
@@ -211,7 +217,7 @@ const formatBudgetDisplay = (amount: number) => {
                                 {{ formatDay(day.date) }}
                             </span>
                             <span class="text-xl font-bold leading-none tracking-tighter">{{ formatDate(day.date)
-                                }}</span>
+                            }}</span>
                         </div>
 
                         <!-- Divider -->
@@ -232,7 +238,7 @@ const formatBudgetDisplay = (amount: number) => {
                                         ? (isToday(day.date) ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400')
                                         : (isToday(day.date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
                                 ]">
-                                    <span>{{ formatBudgetDisplay(day.available) }}</span>
+                                    <span>{{ formatBudgetDisplay(day.dailyBalance) }}</span>
                                 </div>
                             </template>
                             <template v-else>
