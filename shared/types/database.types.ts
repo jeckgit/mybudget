@@ -44,6 +44,68 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string | null
+          created_at: string
+          id: string
+          meta_data: Json | null
+          role: Database["public"]["Enums"]["chat_role"]
+          user_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          meta_data?: Json | null
+          role: Database["public"]["Enums"]["chat_role"]
+          user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          meta_data?: Json | null
+          role?: Database["public"]["Enums"]["chat_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       months: {
         Row: {
           budget: number | null
@@ -119,7 +181,7 @@ export type Database = {
       transactions: {
         Row: {
           amount: number
-          category: string | null
+          category_id: string | null
           created_at: string | null
           date: string | null
           id: string
@@ -128,7 +190,7 @@ export type Database = {
         }
         Insert: {
           amount: number
-          category?: string | null
+          category_id?: string | null
           created_at?: string | null
           date?: string | null
           id?: string
@@ -137,14 +199,22 @@ export type Database = {
         }
         Update: {
           amount?: number
-          category?: string | null
+          category_id?: string | null
           created_at?: string | null
           date?: string | null
           id?: string
           note?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_transactions_category"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -154,7 +224,7 @@ export type Database = {
       delete_user_account: { Args: never; Returns: undefined }
     }
     Enums: {
-      [_ in never]: never
+      chat_role: "user" | "model"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -281,6 +351,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      chat_role: ["user", "model"],
+    },
   },
 } as const

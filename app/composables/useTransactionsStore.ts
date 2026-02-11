@@ -25,7 +25,7 @@ export const useTransactionsStore = () => {
         amount: Number(t.amount),
         date: t.date || new Date().toISOString(),
         note: t.note || '',
-        category: t.category || ''
+        category: t.category_id || ''
       }));
       isLoaded.value = true;
     } catch (e) {
@@ -48,7 +48,7 @@ export const useTransactionsStore = () => {
           amount: transaction.amount,
           date: transaction.date,
           note: transaction.note,
-          category: transaction.category
+          category_id: transaction.category
         })
         .select()
         .single();
@@ -86,7 +86,7 @@ export const useTransactionsStore = () => {
           amount: updatedTx.amount,
           date: updatedTx.date,
           note: updatedTx.note,
-          category: updatedTx.category
+          category_id: updatedTx.category
         })
         .eq('id', updatedTx.id);
 
