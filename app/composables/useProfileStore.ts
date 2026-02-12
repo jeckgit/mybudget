@@ -6,7 +6,8 @@ const DEFAULT_CONFIG: BudgetConfig = {
   currency: 'EUR',
   onboardingComplete: false,
   language: 'en',
-  theme: 'system'
+  theme: 'system',
+  showRollover: false
 };
 
 export const useProfileStore = () => {
@@ -51,7 +52,8 @@ export const useProfileStore = () => {
               currency: 'EUR',
               onboarding_complete: false,
               language: 'en',
-              theme: 'system'
+              theme: 'system',
+              show_rollover: false
             },
             { onConflict: 'user_id' }
           )
@@ -78,12 +80,13 @@ export const useProfileStore = () => {
       theme: dbProfile.theme || 'system',
       income: Number(dbProfile.income || 0),
       fixedCosts: Number(dbProfile.fixed_costs || 0),
-      fixedCostDetails: (dbProfile.fixed_cost_details as any) || []
+      fixedCostDetails: (dbProfile.fixed_cost_details as any) || [],
+      showRollover: dbProfile.show_rollover || false
     };
   };
 
   const updateConfig = async (partialConfig: Partial<BudgetConfig>) => {
-    if (!user.value?.sub) return;
+    if (!user.value?.sub) return false;
 
     // Optimistically update local state
     const previousConfig = { ...config.value };
@@ -99,14 +102,17 @@ export const useProfileStore = () => {
         language: config.value.language,
         income: config.value.income,
         fixed_costs: config.value.fixedCosts,
-        fixed_cost_details: config.value.fixedCostDetails as any
+        fixed_cost_details: config.value.fixedCostDetails as any,
+        show_rollover: config.value.showRollover
       });
 
       if (error) throw error;
+      return true;
     } catch (e) {
       console.error('[useProfileStore] Failed to update config:', e);
       // Rollback on error
       config.value = previousConfig;
+      return false;
     }
   };
 

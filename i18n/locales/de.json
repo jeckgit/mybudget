@@ -93,6 +93,8 @@
     "global_settings": "Allgemeine Einstellungen",
     "monthly_budget": "Monatliches Budget",
     "monthly_budget_default": "Standard Monatsbudget",
+    "show_rollover": "Budget übertragen",
+    "show_rollover_desc": "Ungenutztes Tagesbudget in die folgenden Tage mitnehmen",
     "save_settings": "Einstellungen speichern"
   },
   "landing": {
@@ -180,6 +182,8 @@
     "selected_date": "Ausgewähltes Datum",
     "daily_spending": "Tagesausgaben",
     "available": "Verfügbar",
+    "daily_balance": "Tages-Saldo",
+    "rollover": "Rollover",
     "details_title": "Tagesdetails",
     "back": "Zurück",
     "over": "Drüber um"

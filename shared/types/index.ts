@@ -29,6 +29,7 @@ export interface BudgetConfig {
   income?: number;
   fixedCosts?: number;
   fixedCostDetails?: FixedCostItem[];
+  showRollover?: boolean;
 }
 
 export interface DailyStats {

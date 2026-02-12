@@ -149,6 +149,7 @@ export type Database = {
           language: string | null
           monthly_limit: number | null
           onboarding_complete: boolean | null
+          show_rollover: boolean | null
           theme: string | null
           user_id: string
         }
@@ -161,6 +162,7 @@ export type Database = {
           language?: string | null
           monthly_limit?: number | null
           onboarding_complete?: boolean | null
+          show_rollover?: boolean | null
           theme?: string | null
           user_id: string
         }
@@ -173,6 +175,7 @@ export type Database = {
           language?: string | null
           monthly_limit?: number | null
           onboarding_complete?: boolean | null
+          show_rollover?: boolean | null
           theme?: string | null
           user_id?: string
         }

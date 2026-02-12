@@ -6,18 +6,20 @@ const { t, locale, setLocale } = useI18n();
 
 useHead({ title: t('profile.title') })
 import {
-    AlertCircle, CheckCircle2,
+    AlertCircle,
     ChevronRight,
     Globe,
     LogOut,
     Mail,
     Monitor,
     Moon,
+    Info,
     Save,
     Scale,
     Sun,
     Tag,
-    Trash2
+    Trash2,
+    ArrowRightLeft
 } from 'lucide-vue-next';
 
 const { colorMode, updateTheme } = useTheme();
@@ -32,9 +34,33 @@ const loading = ref(false);
 const errorMsg = ref('');
 const successMsg = ref('');
 const newEmail = ref('');
+const showToast = ref(false);
+const toastType = ref<'success' | 'error'>('success');
+let toastTimeout: ReturnType<typeof setTimeout> | null = null;
 const showDeleteConfirm = ref(false);
 const deleteConfirmationInput = ref('');
 const isDeleting = ref(false);
+
+const triggerToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+
+    successMsg.value = type === 'success' ? msg : '';
+    errorMsg.value = type === 'error' ? msg : '';
+    toastType.value = type;
+    showToast.value = true;
+
+    toastTimeout = setTimeout(() => {
+        showToast.value = false;
+    }, 3000);
+};
+
+onBeforeUnmount(() => {
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+});
 
 // --- Settings Logic ---
 const currencies = [
@@ -55,11 +81,13 @@ const languages = [
 const localLanguage = ref(locale.value as string);
 const localCurrency = ref(profileStore.config.value.currency);
 const localBudget = ref(profileStore.config.value.monthlyLimit);
+const localShowRollover = ref(profileStore.config.value.showRollover);
 
 const hasChanges = computed(() => {
     return localLanguage.value !== locale.value ||
         localCurrency.value !== profileStore.config.value.currency ||
-        localBudget.value !== profileStore.config.value.monthlyLimit;
+        localBudget.value !== profileStore.config.value.monthlyLimit ||
+        localShowRollover.value !== profileStore.config.value.showRollover;
 });
 
 const isSaving = ref(false);
@@ -73,19 +101,24 @@ const handleSaveSettings = async () => {
         }
 
         // Update global storage config
-        await profileStore.updateConfig({
+        const success = await profileStore.updateConfig({
             language: localLanguage.value,
             currency: localCurrency.value,
-            monthlyLimit: localBudget.value
+            monthlyLimit: localBudget.value,
+            showRollover: localShowRollover.value
         });
 
-        successMsg.value = t('profile.settings_saved');
-        setTimeout(() => { successMsg.value = ''; }, 3000);
+        if (!success) throw new Error(t('common.error_occurred'));
+        triggerToast(t('profile.settings_saved'), 'success');
     } catch (e: any) {
-        errorMsg.value = e.message;
+        triggerToast(e.message || t('common.error_occurred'), 'error');
     } finally {
         isSaving.value = false;
     }
+};
+
+const handleToggleRollover = () => {
+    localShowRollover.value = !localShowRollover.value;
 };
 
 // Initialize newEmail and local state from global config
@@ -96,15 +129,10 @@ watchEffect(() => {
 
     // Sync local state if global state changes (e.g. on initial load)
     if (profileStore.config.value) {
-        if (profileStore.config.value.currency) {
-            localCurrency.value = profileStore.config.value.currency;
-        }
-        if (profileStore.config.value.monthlyLimit) {
-            localBudget.value = profileStore.config.value.monthlyLimit;
-        }
-        if (profileStore.config.value.language) {
-            localLanguage.value = profileStore.config.value.language;
-        }
+        localCurrency.value = profileStore.config.value.currency;
+        localBudget.value = profileStore.config.value.monthlyLimit;
+        localLanguage.value = profileStore.config.value.language || 'en';
+        localShowRollover.value = profileStore.config.value.showRollover ?? false;
     }
 });
 
@@ -112,8 +140,6 @@ const handleUpdateEmail = async () => {
     if (!newEmail.value || newEmail.value === user.value?.email) return;
 
     loading.value = true;
-    errorMsg.value = '';
-    successMsg.value = '';
 
     try {
         const { error } = await client.auth.updateUser({
@@ -122,9 +148,9 @@ const handleUpdateEmail = async () => {
 
         if (error) throw error;
 
-        successMsg.value = t('profile.confirmation_sent');
+        triggerToast(t('profile.confirmation_sent'), 'success');
     } catch (e: any) {
-        errorMsg.value = e.message;
+        triggerToast(e.message || t('common.error_occurred'), 'error');
     } finally {
         loading.value = false;
     }
@@ -137,9 +163,13 @@ const displayName = computed(() => {
 
 const handleReset = async () => {
     if (confirm(t('settings.reset_confirm'))) {
-        await appSync.clearAllData();
-        await appSync.initApp(true);
-        navigateTo('/onboarding');
+        try {
+            await appSync.clearAllData();
+            await appSync.initApp(true);
+            navigateTo('/onboarding');
+        } catch (e: any) {
+            triggerToast(e.message || t('common.error_occurred'), 'error');
+        }
     }
 };
 
@@ -226,7 +256,7 @@ const handleDeleteAccount = async () => {
                                 <Tag class="w-5 h-5" />
                             </div>
                             <span class="font-bold text-slate-700 dark:text-slate-200">{{ t('common.manage_categories')
-                                }}</span>
+                            }}</span>
                             <ChevronRight
                                 class="w-5 h-5 text-slate-300 group-hover:text-purple-500 transition-colors group-active:translate-x-1" />
                         </div>
@@ -245,7 +275,7 @@ const handleDeleteAccount = async () => {
                                 <Globe class="w-5 h-5" />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
-                            }}</span>
+                                }}</span>
                         </div>
                         <select v-model="localLanguage"
                             class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -266,7 +296,7 @@ const handleDeleteAccount = async () => {
                                 <Monitor class="w-5 h-5" v-else />
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex bg-slate-100 dark:bg-white/10 rounded-lg p-1 w-32">
                             <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
@@ -289,7 +319,7 @@ const handleDeleteAccount = async () => {
                                 <span class="text-sm font-bold">{{ profileStore.config.value.currency }}</span>
                             </div>
                             <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
-                            }}</span>
+                                }}</span>
                         </div>
                         <div class="flex gap-2">
                             <select v-model="localCurrency"
@@ -318,6 +348,32 @@ const handleDeleteAccount = async () => {
                             <input v-model="localBudget" type="number"
                                 class="w-full bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-white rounded-lg pl-8 pr-3 py-2 text-right text-sm font-bold focus:outline-none focus:ring-2 focus:ring-purple-500" />
                         </div>
+                    </div>
+
+                    <!-- Show Rollover -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-col gap-0.5">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                                    <ArrowRightLeft class="w-5 h-5" />
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-medium text-slate-700 dark:text-slate-200">{{
+                                        t('settings.show_rollover') }}</span>
+                                    <Tooltip :text="t('settings.show_rollover_desc')">
+                                        <Info
+                                            class="w-3.5 h-3.5 text-slate-400 hover:text-purple-500 transition-colors" />
+                                    </Tooltip>
+                                </div>
+                            </div>
+                        </div>
+                        <button @click="handleToggleRollover"
+                            class="w-12 h-6 rounded-full relative transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                            :class="localShowRollover ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-white/10'">
+                            <div class="absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-300"
+                                :class="{ 'translate-x-6': localShowRollover }"></div>
+                        </button>
                     </div>
 
                     <!-- Save Settings Button -->
@@ -350,18 +406,6 @@ const handleDeleteAccount = async () => {
                         <p class="text-xs text-slate-400 dark:text-slate-500 px-1">
                             {{ t('profile.email_hint') }}
                         </p>
-                    </div>
-
-                    <div v-if="errorMsg"
-                        class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm flex items-center gap-2">
-                        <AlertCircle class="w-4 h-4 shrink-0" />
-                        {{ errorMsg }}
-                    </div>
-
-                    <div v-if="successMsg"
-                        class="bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 p-3 rounded-lg text-sm flex items-center gap-2">
-                        <CheckCircle2 class="w-4 h-4 shrink-0" />
-                        {{ successMsg }}
                     </div>
 
                     <button @click="handleUpdateEmail" :disabled="loading || newEmail === user?.email"
@@ -484,4 +528,8 @@ const handleDeleteAccount = async () => {
             </div>
         </GlassCard>
     </div>
+
+    <Teleport to="body">
+        <StatusToast :message="successMsg || errorMsg" :visible="showToast" :type="toastType" />
+    </Teleport>
 </template>

@@ -107,6 +107,9 @@ const formatMonthYear = (date: Date) => {
     return date.toLocaleDateString(locale.value, { month: 'long', year: 'numeric' });
 };
 
+const isRolloverMode = computed(() => profileStore.config.value.showRollover);
+const displayModeKey = computed(() => isRolloverMode.value ? 'rollover' : 'daily-balance');
+
 const formatBudgetDisplay = (amount: number) => {
     const absAmount = Math.abs(amount);
 
@@ -202,7 +205,7 @@ const formatBudgetDisplay = (amount: number) => {
             <div ref="scrollRef"
                 class="h-95 overflow-y-auto overflow-x-hidden pt-4 pb-6 px-4 scrollbar-hide snap-y snap-mandatory"
                 style="-webkit-overflow-scrolling: touch;">
-                <div class="flex flex-col gap-3 day-list">
+                <div :key="displayModeKey" class="flex flex-col gap-3 day-list">
                     <button v-for="(day, index) in visibleDays" :key="index" @click="handleDayClick(day.date)" :class="[
                         'w-full p-4 flex items-center gap-4 rounded-[1.8rem] transition-all duration-300 border active:scale-[0.98] snap-center',
                         day.isSkipped ? 'opacity-40 grayscale bg-slate-50 border-slate-100 dark:bg-white/5 dark:border-white/5' : '',
@@ -229,16 +232,20 @@ const formatBudgetDisplay = (amount: number) => {
                             <template v-if="!day.isSkipped">
                                 <span
                                     :class="['text-[9px] font-black uppercase tracking-[0.2em] mb-0.5 opacity-60', isToday(day.date) ? 'text-white/60' : 'text-slate-400']">
-                                    {{ day.available >= 0 ? t('day_selector.available') :
+                                    {{ (isRolloverMode ? day.available : day.dailyBalance) >= 0
+                                        ? (isRolloverMode ? t('day_selector.rollover') :
+                                            t('day_selector.daily_balance')) :
                                         t('day_selector.over') }}
                                 </span>
                                 <div :class="[
                                     'text-2xl font-black tracking-tighter transition-colors',
-                                    day.available >= 0
+                                    (isRolloverMode ? day.available : day.dailyBalance) >= 0
                                         ? (isToday(day.date) ? 'text-emerald-400' : 'text-emerald-600 dark:text-emerald-400')
                                         : (isToday(day.date) ? 'text-rose-400' : 'text-rose-600 dark:text-rose-400')
                                 ]">
-                                    <span>{{ formatBudgetDisplay(day.dailyBalance) }}</span>
+                                    <span>{{ formatBudgetDisplay(isRolloverMode ? day.available
+                                        :
+                                        day.dailyBalance) }}</span>
                                 </div>
                             </template>
                             <template v-else>

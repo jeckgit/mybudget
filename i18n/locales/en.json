@@ -93,6 +93,8 @@
     "global_settings": "Global Settings",
     "monthly_budget": "Monthly Budget",
     "monthly_budget_default": "Default Monthly Budget",
+    "show_rollover": "Carry Over Balance",
+    "show_rollover_desc": "Carry unused daily budget into the following days",
     "save_settings": "Save Settings"
   },
   "landing": {
@@ -180,6 +182,8 @@
     "selected_date": "Selected Date",
     "daily_spending": "Daily Spending",
     "available": "Available",
+    "daily_balance": "Daily Balance",
+    "rollover": "Rollover",
     "details_title": "Daily Details",
     "back": "Back",
     "over": "Over by"

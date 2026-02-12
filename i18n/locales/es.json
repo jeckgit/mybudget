@@ -92,6 +92,8 @@
     },
     "global_settings": "Ajustes Globales",
     "monthly_budget": "Presupuesto Mensual",
+    "show_rollover": "Transferir saldo",
+    "show_rollover_desc": "Pasa el presupuesto diario no usado a los dias siguientes",
     "save_settings": "Guardar Ajustes"
   },
   "landing": {
@@ -179,6 +181,8 @@
     "selected_date": "Fecha seleccionada",
     "daily_spending": "Gasto diario",
     "available": "Disponible",
+    "daily_balance": "Saldo diario",
+    "rollover": "Acumulado",
     "details_title": "Detalles diarios",
     "back": "Volver",
     "over": "Excedido por"

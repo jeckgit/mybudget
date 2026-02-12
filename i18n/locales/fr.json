@@ -92,6 +92,8 @@
     },
     "global_settings": "Paramètres globaux",
     "monthly_budget": "Budget mensuel",
+    "show_rollover": "Reporter le solde",
+    "show_rollover_desc": "Reporter le budget quotidien non utilise aux jours suivants",
     "save_settings": "Enregistrer les paramètres"
   },
   "landing": {
@@ -179,6 +181,8 @@
     "selected_date": "Date sélectionnée",
     "daily_spending": "Dépense quotidienne",
     "available": "Disponible",
+    "daily_balance": "Solde quotidien",
+    "rollover": "Cumulé",
     "details_title": "Détails quotidiens",
     "back": "Retour",
     "over": "Dépassé de"
