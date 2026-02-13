@@ -24,6 +24,7 @@ export interface BudgetConfig {
   monthlyLimit: number;
   currency: string;
   onboardingComplete: boolean;
+  emailVerifiedAt?: string | null;
   language?: string;
   theme?: string;
   income?: number;

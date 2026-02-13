@@ -192,6 +192,12 @@ export const useCategoriesStore = () => {
     }
   };
 
+  const resetCategoriesState = () => {
+    categories.value = [];
+    isLoaded.value = false;
+    isSeeding.value = false;
+  };
+
   return {
     categories,
     isLoaded,
@@ -206,6 +212,7 @@ export const useCategoriesStore = () => {
     getCategoryName,
     seedDefaultCategories,
     clearCategories,
+    resetCategoriesState,
     INCOME_CATEGORIES
   };
 };

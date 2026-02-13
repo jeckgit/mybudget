@@ -224,6 +224,7 @@
     "loading": "Loading...",
     "have_account": "Already have an account? Sign In",
     "no_account": "Don't have an account? Sign Up",
+    "account_created_optional_verify": "Account created. We sent a verification email. You can still use the app without verifying.",
     "check_email": "Check your email in the login link!",
     "reset_password": "Reset Password",
     "reset_desc": "Enter your email to receive instructions",

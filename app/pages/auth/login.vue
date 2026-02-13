@@ -34,15 +34,11 @@ const handleAuth = async () => {
 
     try {
         if (isSignUp.value) {
-            const { data, error } = await supabase.auth.signUp({
+            const { error } = await supabase.auth.signUp({
                 email: email.value,
                 password: password.value,
             });
             if (error) throw error;
-
-            if (!data.session) {
-                alert(t('auth.check_email'));
-            }
         } else {
             const { error } = await supabase.auth.signInWithPassword({
                 email: email.value,

@@ -224,6 +224,7 @@
     "loading": "Laden...",
     "have_account": "Bereits ein Konto? Anmelden",
     "no_account": "Kein Konto? Registrieren",
+    "account_created_optional_verify": "Konto erstellt. Wir haben eine Verifizierungs-E-Mail gesendet. Sie können die App auch ohne Verifizierung nutzen.",
     "check_email": "Prüfen Sie Ihre E-Mails für den Login-Link!",
     "reset_password": "Passwort zurücksetzen",
     "reset_desc": "Geben Sie Ihre E-Mail ein, um Anweisungen zu erhalten",

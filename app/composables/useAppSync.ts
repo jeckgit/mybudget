@@ -62,9 +62,19 @@ export const useAppSync = () => {
     }
   };
 
+  const resetLocalState = () => {
+    profileStore.resetProfileState();
+    txStore.resetTransactionsState();
+    catStore.resetCategoriesState();
+    monthStore.resetMonthsState();
+    isInitialLoading.value = false;
+    loadingPromise.value = null;
+  };
+
   return {
     isInitialLoading,
     initApp,
-    clearAllData
+    clearAllData,
+    resetLocalState
   };
 };

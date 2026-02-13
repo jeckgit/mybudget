@@ -1,15 +1,19 @@
 export default defineNuxtPlugin((nuxtApp) => {
   // Wrap in runWithContext to ensure composables like useI18n work correctly in plugin
   return nuxtApp.runWithContext(() => {
-    const { initApp } = useAppSync();
+    const { initApp, resetLocalState } = useAppSync();
     const user = useSupabaseUser();
 
-    // Globally load state when user is authenticated
+    // Reset stale state whenever the auth user changes, then load fresh data.
     watch(
-      user,
-      async (newUser) => {
-        if (newUser) {
-          await initApp();
+      () => user.value?.sub,
+      async (newUserId, oldUserId) => {
+        if (newUserId !== oldUserId) {
+          resetLocalState();
+        }
+
+        if (newUserId) {
+          await initApp(true);
         }
       },
       { immediate: true }

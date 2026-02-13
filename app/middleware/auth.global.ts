@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const profileStore = useProfileStore();
 
   // 1. Block guests from protected routes
-  const publicRoutes = ['/auth/login', '/auth/forgot-password', '/auth/update-password', '/'];
+  const publicRoutes = ['/auth/login', '/auth/forgot-password', '/auth/update-password', '/confirm', '/'];
   // Check if the current path is public
   const isPublic = publicRoutes.some((path) => to.path === path || to.path.startsWith(path + '/'));
 

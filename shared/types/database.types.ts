@@ -143,6 +143,7 @@ export type Database = {
         Row: {
           created_at: string | null
           currency: string | null
+          email_verified_at: string | null
           fixed_cost_details: Json | null
           fixed_costs: number | null
           income: number | null
@@ -156,6 +157,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           currency?: string | null
+          email_verified_at?: string | null
           fixed_cost_details?: Json | null
           fixed_costs?: number | null
           income?: number | null
@@ -169,6 +171,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           currency?: string | null
+          email_verified_at?: string | null
           fixed_cost_details?: Json | null
           fixed_costs?: number | null
           income?: number | null
@@ -225,6 +228,7 @@ export type Database = {
     }
     Functions: {
       delete_user_account: { Args: never; Returns: undefined }
+      mark_email_verified: { Args: never; Returns: undefined }
     }
     Enums: {
       chat_role: "user" | "model"

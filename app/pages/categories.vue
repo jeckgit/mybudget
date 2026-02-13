@@ -42,7 +42,6 @@ const handleAdd = async () => {
         newName.value = '';
     } catch (e) {
         console.error('Failed to add category:', e);
-        alert(t('common.error_occurred') || 'Failed to add category');
     }
 };
 
@@ -59,7 +58,6 @@ const handleUpdate = async () => {
         editingId.value = null;
     } catch (e) {
         console.error('Failed to update category:', e);
-        alert(t('common.error_occurred') || 'Failed to update category');
     }
 };
 

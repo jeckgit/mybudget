@@ -125,6 +125,11 @@ export const useTransactionsStore = () => {
     }
   };
 
+  const resetTransactionsState = () => {
+    transactions.value = [];
+    isLoaded.value = false;
+  };
+
   return {
     transactions,
     isLoaded,
@@ -132,6 +137,7 @@ export const useTransactionsStore = () => {
     addTransaction,
     updateTransaction,
     removeTransaction,
-    clearTransactions
+    clearTransactions,
+    resetTransactionsState
   };
 };

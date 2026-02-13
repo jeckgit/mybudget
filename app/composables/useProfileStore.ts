@@ -5,6 +5,7 @@ const DEFAULT_CONFIG: BudgetConfig = {
   monthlyLimit: 0,
   currency: 'EUR',
   onboardingComplete: false,
+  emailVerifiedAt: null,
   language: 'en',
   theme: 'system',
   showRollover: false
@@ -16,7 +17,7 @@ export const useProfileStore = () => {
   const { $i18n } = useNuxtApp();
   const { setLocale, locale } = $i18n as any;
 
-  const config = useState<BudgetConfig>('profile-config', () => DEFAULT_CONFIG);
+  const config = useState<BudgetConfig>('profile-config', () => ({ ...DEFAULT_CONFIG }));
   const isLoaded = useState<boolean>('profile-loaded', () => false);
 
   // Sync i18n locale with state language
@@ -76,6 +77,7 @@ export const useProfileStore = () => {
       monthlyLimit: Number(dbProfile.monthly_limit || 0),
       currency: dbProfile.currency || 'EUR',
       onboardingComplete: dbProfile.onboarding_complete || false,
+      emailVerifiedAt: dbProfile.email_verified_at || null,
       language: dbProfile.language || 'en',
       theme: dbProfile.theme || 'system',
       income: Number(dbProfile.income || 0),
@@ -98,6 +100,7 @@ export const useProfileStore = () => {
         monthly_limit: config.value.monthlyLimit,
         currency: config.value.currency,
         onboarding_complete: config.value.onboardingComplete,
+        email_verified_at: config.value.emailVerifiedAt,
         theme: config.value.theme,
         language: config.value.language,
         income: config.value.income,
@@ -116,10 +119,16 @@ export const useProfileStore = () => {
     }
   };
 
+  const resetProfileState = () => {
+    config.value = { ...DEFAULT_CONFIG };
+    isLoaded.value = false;
+  };
+
   return {
     config,
     isLoaded,
     loadProfile,
-    updateConfig
+    updateConfig,
+    resetProfileState
   };
 };

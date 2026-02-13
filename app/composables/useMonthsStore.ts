@@ -81,12 +81,18 @@ export const useMonthsStore = () => {
     }
   };
 
+  const resetMonthsState = () => {
+    months.value = {};
+    isLoaded.value = false;
+  };
+
   return {
     months,
     isLoaded,
     loadMonths,
     getMonthConfig,
-    upsertMonth
+    upsertMonth,
+    resetMonthsState
   };
 };
 

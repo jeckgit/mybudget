@@ -1,14 +1,32 @@
 <script setup lang="ts">
-const user = useSupabaseUser()
-const { t } = useI18n()
+const user = useSupabaseUser();
+const client = useSupabaseClient();
+const route = useRoute();
+const { t } = useI18n();
+const profileStore = useProfileStore();
 
-useHead({ title: t('common.loading') })
+useHead({ title: t('common.loading') });
 
-watch(user, () => {
-    if (user.value) {
-        return navigateTo('/dashboard')
+const completeVerification = async () => {
+    if (!user.value?.sub) return;
+    if (route.query.verify !== '1') return;
+
+    const { error } = await client.rpc('mark_email_verified');
+    if (error) {
+        console.error('[confirm] mark_email_verified failed:', error.message);
+        return;
     }
-}, { immediate: true })
+
+    const nowIso = new Date().toISOString();
+    await profileStore.updateConfig({ emailVerifiedAt: nowIso });
+};
+
+watch(user, async () => {
+    if (user.value) {
+        await completeVerification();
+        return navigateTo('/dashboard');
+    }
+}, { immediate: true });
 </script>
 
 <template>

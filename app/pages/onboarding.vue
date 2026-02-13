@@ -1,3 +1,196 @@
+<script setup lang="ts">
+import { Wallet, Calculator, Plus, X, Info } from 'lucide-vue-next';
+import type { FixedCostItem } from '~/../shared/types';
+import { v4 as uuidv4 } from 'uuid';
+import { budgetSchema } from '~/schemas/numeric';
+import { formatLocalized2, normalizeDecimalInput, parseLocalizedDecimal, roundTo2 } from '~/utils/numberLocale';
+
+
+
+definePageMeta({
+    hideBottomNav: true
+});
+
+// Use profile store
+const profileStore = useProfileStore();
+const { t, setLocale, locale } = useI18n();
+useHead({ title: t('onboarding.welcome') })
+
+const budgetInput = ref('');
+const currentStep = ref<'language' | 'budget' | 'categories' | 'completing'>('language');
+const selectedCurrency = ref(profileStore.config.value.currency || 'EUR');
+
+// Calculator State
+const showCalculator = ref(false);
+const incomeInput = ref('');
+const fixedCostItems = ref<FixedCostItem[]>([]);
+const showToast = ref(false);
+
+const totalFixedCosts = computed(() => {
+    return fixedCostItems.value.reduce((sum, item) => sum + item.amount, 0);
+});
+
+const validationError = computed(() => {
+    // 1. Calculator specific validation
+    if (showCalculator.value) {
+        const income = parseLocalizedDecimal(incomeInput.value, locale.value) ?? 0;
+        if (fixedCostItems.value.length > 0 && (!incomeInput.value || income <= 0)) {
+            return t('onboarding.error_missing_income');
+        }
+        if (income > 0 && totalFixedCosts.value > income) {
+            return t('onboarding.error_negative_budget');
+        }
+    }
+
+    // 2. General budget validation
+    const parsedBudget = budgetSchema(locale.value).safeParse(budgetInput.value);
+    if (!parsedBudget.success) {
+        return t(parsedBudget.error.issues[0]?.message || 'validation.number_invalid');
+    }
+
+    return null;
+});
+
+const addCostItem = () => {
+    fixedCostItems.value.push({
+        id: uuidv4(),
+        label: '',
+        amount: 0
+    });
+};
+
+const removeCostItem = (id: string) => {
+    fixedCostItems.value = fixedCostItems.value.filter(item => item.id !== id);
+};
+
+// Start with one empty item
+
+// Auto-calculate budget when calculator inputs change
+watch([incomeInput, totalFixedCosts], ([newIncome, newFixed]) => {
+    if (!showCalculator.value) return;
+
+    const income = parseLocalizedDecimal(String(newIncome || ''), locale.value) ?? 0;
+    const fixed = Number(newFixed);
+
+    if (income > 0) {
+        const calculated = roundTo2(Math.max(0, income - fixed));
+        budgetInput.value = formatLocalized2(calculated, locale.value);
+    }
+}, { deep: true });
+
+const currencies = [
+    { code: 'EUR', label: 'Euro (€)' },
+    { code: 'USD', label: 'US Dollar ($)' },
+    { code: 'GBP', label: 'British Pound (£)' },
+    { code: 'CHF', label: 'Swiss Franc (CHF)' },
+    { code: 'JPY', label: 'Japanese Yen (¥)' }
+];
+
+const languages = [
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'en', name: 'English', flag: '🇺🇸' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' }
+];
+
+const costSuggestions = [
+    { key: 'rent', icon: '🏠' },
+    { key: 'electricity', icon: '⚡' },
+    { key: 'internet', icon: '🌐' },
+    { key: 'phone', icon: '📱' },
+    { key: 'insurance', icon: '🛡️' },
+    { key: 'streaming', icon: '🎬' },
+    { key: 'gym', icon: '💪' },
+    { key: 'transport', icon: '🚌' }
+];
+
+const addSuggestion = (suggestion: { key: string, icon: string }) => {
+    fixedCostItems.value.push({
+        id: uuidv4(),
+        label: `${suggestion.icon} ${t(`onboarding.costs.${suggestion.key}`)}`,
+        amount: 0
+    });
+};
+
+// Redirect if already complete - but not if we're in completing state
+watchEffect(() => {
+    if (profileStore.config.value?.onboardingComplete && currentStep.value !== 'completing') {
+        navigateTo('/dashboard');
+    }
+});
+
+const handleSelectLanguage = async (code: string) => {
+    await setLocale(code as any);
+    await profileStore.updateConfig({ language: code });
+    currentStep.value = 'budget';
+};
+
+const handleSetBudget = async () => {
+    // Validation Check
+    if (validationError.value) {
+        showToast.value = true;
+        setTimeout(() => {
+            showToast.value = false;
+        }, 3000);
+        return;
+    }
+
+    const amountResult = budgetSchema(locale.value).safeParse(budgetInput.value);
+    if (!amountResult.success) {
+        showToast.value = true;
+        setTimeout(() => {
+            showToast.value = false;
+        }, 3000);
+        return;
+    }
+
+    if (amountResult.data >= 0) {
+        currentStep.value = 'categories';
+
+        await profileStore.updateConfig({
+            monthlyLimit: amountResult.data,
+            currency: selectedCurrency.value,
+            income: showCalculator.value ? (parseLocalizedDecimal(incomeInput.value, locale.value) ?? 0) : undefined,
+            fixedCosts: showCalculator.value ? totalFixedCosts.value : undefined,
+            fixedCostDetails: showCalculator.value ? fixedCostItems.value : undefined
+        });
+    }
+};
+
+const handleBudgetInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    budgetInput.value = normalizeDecimalInput(target.value);
+};
+
+const handleBudgetBlur = () => {
+    const parsed = parseLocalizedDecimal(budgetInput.value, locale.value);
+    if (parsed !== null) {
+        budgetInput.value = formatLocalized2(parsed, locale.value);
+    }
+};
+
+watch(() => locale.value, () => {
+    const parsed = parseLocalizedDecimal(budgetInput.value, locale.value);
+    if (parsed !== null) {
+        budgetInput.value = formatLocalized2(parsed, locale.value);
+    }
+});
+
+const handleFinish = async () => {
+    // Immediately switch to completing state to prevent flash
+    currentStep.value = 'completing';
+
+    await profileStore.updateConfig({
+        onboardingComplete: true
+    });
+
+    // Small delay to show the setup screen, then navigate
+    await new Promise(resolve => setTimeout(resolve, 800));
+    navigateTo('/dashboard');
+};
+</script>
+
+
 <template>
     <div class="flex flex-col items-center justify-center min-h-dvh p-6 text-center z-10 relative">
         <div class="max-w-md w-full transition-all duration-500 ease-in-out">
@@ -240,195 +433,3 @@
         <StatusToast :visible="showToast" :message="validationError || ''" />
     </div>
 </template>
-
-<script setup lang="ts">
-import { Wallet, Calculator, Plus, X, Info } from 'lucide-vue-next';
-import type { FixedCostItem } from '~/../shared/types';
-import { v4 as uuidv4 } from 'uuid';
-import { budgetSchema } from '~/schemas/numeric';
-import { formatLocalized2, normalizeDecimalInput, parseLocalizedDecimal, roundTo2 } from '~/utils/numberLocale';
-
-
-
-definePageMeta({
-    hideBottomNav: true
-});
-
-// Use profile store
-const profileStore = useProfileStore();
-const { t, setLocale, locale } = useI18n();
-useHead({ title: t('onboarding.welcome') })
-
-const budgetInput = ref('');
-const currentStep = ref<'language' | 'budget' | 'categories' | 'completing'>('language');
-const selectedCurrency = ref(profileStore.config.value.currency || 'EUR');
-
-// Calculator State
-const showCalculator = ref(false);
-const incomeInput = ref('');
-const fixedCostItems = ref<FixedCostItem[]>([]);
-const showToast = ref(false);
-
-const totalFixedCosts = computed(() => {
-    return fixedCostItems.value.reduce((sum, item) => sum + item.amount, 0);
-});
-
-const validationError = computed(() => {
-    // 1. Calculator specific validation
-    if (showCalculator.value) {
-        const income = parseLocalizedDecimal(incomeInput.value, locale.value) ?? 0;
-        if (fixedCostItems.value.length > 0 && (!incomeInput.value || income <= 0)) {
-            return t('onboarding.error_missing_income');
-        }
-        if (income > 0 && totalFixedCosts.value > income) {
-            return t('onboarding.error_negative_budget');
-        }
-    }
-
-    // 2. General budget validation
-    const parsedBudget = budgetSchema(locale.value).safeParse(budgetInput.value);
-    if (!parsedBudget.success) {
-        return t(parsedBudget.error.issues[0]?.message || 'validation.number_invalid');
-    }
-
-    return null;
-});
-
-const addCostItem = () => {
-    fixedCostItems.value.push({
-        id: uuidv4(),
-        label: '',
-        amount: 0
-    });
-};
-
-const removeCostItem = (id: string) => {
-    fixedCostItems.value = fixedCostItems.value.filter(item => item.id !== id);
-};
-
-// Start with one empty item
-
-// Auto-calculate budget when calculator inputs change
-watch([incomeInput, totalFixedCosts], ([newIncome, newFixed]) => {
-    if (!showCalculator.value) return;
-
-    const income = parseLocalizedDecimal(String(newIncome || ''), locale.value) ?? 0;
-    const fixed = Number(newFixed);
-
-    if (income > 0) {
-        const calculated = roundTo2(Math.max(0, income - fixed));
-        budgetInput.value = formatLocalized2(calculated, locale.value);
-    }
-}, { deep: true });
-
-const currencies = [
-    { code: 'EUR', label: 'Euro (€)' },
-    { code: 'USD', label: 'US Dollar ($)' },
-    { code: 'GBP', label: 'British Pound (£)' },
-    { code: 'CHF', label: 'Swiss Franc (CHF)' },
-    { code: 'JPY', label: 'Japanese Yen (¥)' }
-];
-
-const languages = [
-    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' }
-];
-
-const costSuggestions = [
-    { key: 'rent', icon: '🏠' },
-    { key: 'electricity', icon: '⚡' },
-    { key: 'internet', icon: '🌐' },
-    { key: 'phone', icon: '📱' },
-    { key: 'insurance', icon: '🛡️' },
-    { key: 'streaming', icon: '🎬' },
-    { key: 'gym', icon: '💪' },
-    { key: 'transport', icon: '🚌' }
-];
-
-const addSuggestion = (suggestion: { key: string, icon: string }) => {
-    fixedCostItems.value.push({
-        id: uuidv4(),
-        label: `${suggestion.icon} ${t(`onboarding.costs.${suggestion.key}`)}`,
-        amount: 0
-    });
-};
-
-// Redirect if already complete - but not if we're in completing state
-watchEffect(() => {
-    if (profileStore.config.value?.onboardingComplete && currentStep.value !== 'completing') {
-        navigateTo('/dashboard');
-    }
-});
-
-const handleSelectLanguage = async (code: string) => {
-    await setLocale(code as any);
-    await profileStore.updateConfig({ language: code });
-    currentStep.value = 'budget';
-};
-
-const handleSetBudget = async () => {
-    // Validation Check
-    if (validationError.value) {
-        showToast.value = true;
-        setTimeout(() => {
-            showToast.value = false;
-        }, 3000);
-        return;
-    }
-
-    const amountResult = budgetSchema(locale.value).safeParse(budgetInput.value);
-    if (!amountResult.success) {
-        showToast.value = true;
-        setTimeout(() => {
-            showToast.value = false;
-        }, 3000);
-        return;
-    }
-
-    if (amountResult.data >= 0) {
-        currentStep.value = 'categories';
-
-        await profileStore.updateConfig({
-            monthlyLimit: amountResult.data,
-            currency: selectedCurrency.value,
-            income: showCalculator.value ? (parseLocalizedDecimal(incomeInput.value, locale.value) ?? 0) : undefined,
-            fixedCosts: showCalculator.value ? totalFixedCosts.value : undefined,
-            fixedCostDetails: showCalculator.value ? fixedCostItems.value : undefined
-        });
-    }
-};
-
-const handleBudgetInput = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    budgetInput.value = normalizeDecimalInput(target.value);
-};
-
-const handleBudgetBlur = () => {
-    const parsed = parseLocalizedDecimal(budgetInput.value, locale.value);
-    if (parsed !== null) {
-        budgetInput.value = formatLocalized2(parsed, locale.value);
-    }
-};
-
-watch(() => locale.value, () => {
-    const parsed = parseLocalizedDecimal(budgetInput.value, locale.value);
-    if (parsed !== null) {
-        budgetInput.value = formatLocalized2(parsed, locale.value);
-    }
-});
-
-const handleFinish = async () => {
-    // Immediately switch to completing state to prevent flash
-    currentStep.value = 'completing';
-
-    await profileStore.updateConfig({
-        onboardingComplete: true
-    });
-
-    // Small delay to show the setup screen, then navigate
-    await new Promise(resolve => setTimeout(resolve, 800));
-    navigateTo('/dashboard');
-};
-</script>

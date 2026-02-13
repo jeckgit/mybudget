@@ -12,6 +12,7 @@ const showAddModal = useState('showAddModal', () => false);
         <BackgroundMesh />
         <!-- Main Content -->
         <div class="relative z-10">
+            <VerificationBanner />
             <slot />
 
             <BottomNav v-if="user && !route.meta.hideBottomNav" />
