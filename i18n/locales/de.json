@@ -79,8 +79,11 @@
     "title": "Einstellungen",
     "preferences": "Präferenzen",
     "language": "Sprache",
+    "language_desc": "Ändert die Sprache der App.",
     "theme": "Design",
+    "theme_desc": "Wähle hell, dunkel oder das Systemdesign.",
     "currency": "Währung",
+    "currency_desc": "Legt die Standardwährung für Budgets und Beträge fest.",
     "data": "Daten",
     "reset_data": "Daten zurücksetzen",
     "reset_confirm": "Alle Daten zurücksetzen?",
@@ -92,7 +95,8 @@
     },
     "global_settings": "Allgemeine Einstellungen",
     "monthly_budget": "Monatliches Budget",
-    "monthly_budget_default": "Standard Monatsbudget",
+    "monthly_budget_default": "Budget",
+    "monthly_budget_default_desc": "Wird als Standard-Monatsbudget für neue Monate verwendet.",
     "show_rollover": "Budget übertragen",
     "show_rollover_desc": "Ungenutztes Tagesbudget in die folgenden Tage mitnehmen",
     "save_settings": "Einstellungen speichern"
@@ -176,6 +180,12 @@
       "gym": "Fitnessstudio",
       "transport": "ÖPNV"
     }
+  },
+  "validation": {
+    "number_invalid": "Bitte gib eine gueltige Zahl ein.",
+    "max_two_decimals": "Bitte verwende hoechstens 2 Nachkommastellen.",
+    "min_zero": "Der Wert muss 0 oder groesser sein.",
+    "must_be_positive": "Der Wert muss groesser als 0 sein."
   },
   "day_selector": {
     "today": "Heute",

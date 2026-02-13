@@ -79,8 +79,11 @@
     "title": "Ajustes",
     "preferences": "Preferencias",
     "language": "Idioma",
+    "language_desc": "Cambia el idioma de la aplicacion.",
     "theme": "Tema",
+    "theme_desc": "Elige apariencia clara, oscura o del sistema.",
     "currency": "Moneda",
+    "currency_desc": "Define la moneda predeterminada para presupuestos e importes.",
     "data": "Datos",
     "reset_data": "Restablecer datos",
     "reset_confirm": "¿Restablecer todos los datos?",
@@ -92,6 +95,8 @@
     },
     "global_settings": "Ajustes Globales",
     "monthly_budget": "Presupuesto Mensual",
+    "monthly_budget_default": "Presupuesto mensual predeterminado",
+    "monthly_budget_default_desc": "Se usa como presupuesto mensual predeterminado para meses nuevos.",
     "show_rollover": "Transferir saldo",
     "show_rollover_desc": "Pasa el presupuesto diario no usado a los dias siguientes",
     "save_settings": "Guardar Ajustes"
@@ -175,6 +180,12 @@
       "gym": "Gimnasio",
       "transport": "Transporte"
     }
+  },
+  "validation": {
+    "number_invalid": "Introduce un numero valido.",
+    "max_two_decimals": "Usa como maximo 2 decimales.",
+    "min_zero": "El valor debe ser 0 o mayor.",
+    "must_be_positive": "El valor debe ser mayor que 0."
   },
   "day_selector": {
     "today": "Hoy",

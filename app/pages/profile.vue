@@ -21,10 +21,13 @@ import {
     Trash2,
     ArrowRightLeft
 } from 'lucide-vue-next';
+import { budgetSchema } from '~/schemas/numeric';
+import { formatLocalized2, normalizeDecimalInput, parseLocalizedDecimal } from '~/utils/numberLocale';
 
 const { colorMode, updateTheme } = useTheme();
 const profileStore = useProfileStore();
 const appSync = useAppSync();
+const { getCurrencySymbol } = useCurrency();
 
 // Ensure state is loaded
 await appSync.initApp();
@@ -80,13 +83,22 @@ const languages = [
 // Local state for settings to allow manual save
 const localLanguage = ref(locale.value as string);
 const localCurrency = ref(profileStore.config.value.currency);
-const localBudget = ref(profileStore.config.value.monthlyLimit);
+const localBudget = ref(formatLocalized2(profileStore.config.value.monthlyLimit, locale.value));
 const localShowRollover = ref(profileStore.config.value.showRollover);
 
+const parsedLocalBudget = computed(() => {
+    const parsed = budgetSchema(locale.value).safeParse(localBudget.value);
+    return parsed.success ? parsed.data : null;
+});
+
 const hasChanges = computed(() => {
+    const budgetChanged = parsedLocalBudget.value === null
+        ? localBudget.value !== formatLocalized2(profileStore.config.value.monthlyLimit, locale.value)
+        : parsedLocalBudget.value !== profileStore.config.value.monthlyLimit;
+
     return localLanguage.value !== locale.value ||
         localCurrency.value !== profileStore.config.value.currency ||
-        localBudget.value !== profileStore.config.value.monthlyLimit ||
+        budgetChanged ||
         localShowRollover.value !== profileStore.config.value.showRollover;
 });
 
@@ -95,6 +107,11 @@ const isSaving = ref(false);
 const handleSaveSettings = async () => {
     isSaving.value = true;
     try {
+        const parsedBudget = budgetSchema(locale.value).safeParse(localBudget.value);
+        if (!parsedBudget.success) {
+            throw new Error(t(parsedBudget.error.issues[0]?.message || 'validation.number_invalid'));
+        }
+
         // Update language if changed
         if (localLanguage.value !== locale.value) {
             setLocale(localLanguage.value as any);
@@ -104,7 +121,7 @@ const handleSaveSettings = async () => {
         const success = await profileStore.updateConfig({
             language: localLanguage.value,
             currency: localCurrency.value,
-            monthlyLimit: localBudget.value,
+            monthlyLimit: parsedBudget.data,
             showRollover: localShowRollover.value
         });
 
@@ -121,6 +138,18 @@ const handleToggleRollover = () => {
     localShowRollover.value = !localShowRollover.value;
 };
 
+const handleBudgetInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    localBudget.value = normalizeDecimalInput(target.value);
+};
+
+const handleBudgetBlur = () => {
+    const parsed = parseLocalizedDecimal(localBudget.value, locale.value);
+    if (parsed !== null) {
+        localBudget.value = formatLocalized2(parsed, locale.value);
+    }
+};
+
 // Initialize newEmail and local state from global config
 watchEffect(() => {
     if (user.value?.email && !newEmail.value) {
@@ -130,9 +159,16 @@ watchEffect(() => {
     // Sync local state if global state changes (e.g. on initial load)
     if (profileStore.config.value) {
         localCurrency.value = profileStore.config.value.currency;
-        localBudget.value = profileStore.config.value.monthlyLimit;
+        localBudget.value = formatLocalized2(profileStore.config.value.monthlyLimit, locale.value);
         localLanguage.value = profileStore.config.value.language || 'en';
         localShowRollover.value = profileStore.config.value.showRollover ?? false;
+    }
+});
+
+watch(() => locale.value, () => {
+    const parsed = parseLocalizedDecimal(localBudget.value, locale.value);
+    if (parsed !== null) {
+        localBudget.value = formatLocalized2(parsed, locale.value);
     }
 });
 
@@ -274,8 +310,13 @@ const handleDeleteAccount = async () => {
                                 class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
                                 <Globe class="w-5 h-5" />
                             </div>
-                            <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.language')
                                 }}</span>
+                                <Tooltip :text="t('settings.language_desc')">
+                                    <Info class="w-3.5 h-3.5 text-slate-400 hover:text-purple-500 transition-colors" />
+                                </Tooltip>
+                            </div>
                         </div>
                         <select v-model="localLanguage"
                             class="w-32 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white rounded-lg px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500">
@@ -295,8 +336,13 @@ const handleDeleteAccount = async () => {
                                 <Sun class="w-5 h-5" v-else-if="colorMode === 'light'" />
                                 <Monitor class="w-5 h-5" v-else />
                             </div>
-                            <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.theme')
                                 }}</span>
+                                <Tooltip :text="t('settings.theme_desc')">
+                                    <Info class="w-3.5 h-3.5 text-slate-400 hover:text-purple-500 transition-colors" />
+                                </Tooltip>
+                            </div>
                         </div>
                         <div class="flex bg-slate-100 dark:bg-white/10 rounded-lg p-1 w-32">
                             <button v-for="theme in ['light', 'system', 'dark']" :key="theme"
@@ -318,8 +364,13 @@ const handleDeleteAccount = async () => {
                                 class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
                                 <span class="text-sm font-bold">{{ profileStore.config.value.currency }}</span>
                             </div>
-                            <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-medium text-slate-700 dark:text-slate-200">{{ t('settings.currency')
                                 }}</span>
+                                <Tooltip :text="t('settings.currency_desc')">
+                                    <Info class="w-3.5 h-3.5 text-slate-400 hover:text-purple-500 transition-colors" />
+                                </Tooltip>
+                            </div>
                         </div>
                         <div class="flex gap-2">
                             <select v-model="localCurrency"
@@ -336,16 +387,23 @@ const handleDeleteAccount = async () => {
                         <div class="flex items-center gap-3">
                             <div
                                 class="w-10 h-10 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center text-pink-600 dark:text-pink-400">
-                                <span class="text-xs font-bold">{{ profileStore.config.value.currency }}</span>
+                                <span class="text-xs font-bold">{{ getCurrencySymbol(profileStore.config.value.currency)
+                                    }}</span>
                             </div>
-                            <span class="font-medium text-slate-700 dark:text-slate-200">{{
-                                t('settings.monthly_budget_default') }}</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-medium text-slate-700 dark:text-slate-200">{{
+                                    t('settings.monthly_budget_default') }}</span>
+                                <Tooltip :text="t('settings.monthly_budget_default_desc')">
+                                    <Info class="w-3.5 h-3.5 text-slate-400 hover:text-purple-500 transition-colors" />
+                                </Tooltip>
+                            </div>
                         </div>
                         <div class="relative w-32">
                             <span
-                                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-sm">{{
-                                    localCurrency }}</span>
-                            <input v-model="localBudget" type="number"
+                                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 font-bold text-sm">
+                                {{ getCurrencySymbol(localCurrency) }}</span>
+                            <input :value="localBudget" type="text" inputmode="decimal" @input="handleBudgetInput"
+                                @blur="handleBudgetBlur"
                                 class="w-full bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-white rounded-lg pl-8 pr-3 py-2 text-right text-sm font-bold focus:outline-none focus:ring-2 focus:ring-purple-500" />
                         </div>
                     </div>

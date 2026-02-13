@@ -4,6 +4,8 @@ const profileStore = useProfileStore();
 const monthStore = useMonthsStore();
 const { initApp } = useAppSync();
 const { t, locale } = useI18n();
+import { budgetSchema } from '~/schemas/numeric';
+import { formatLocalized2, normalizeDecimalInput, parseLocalizedDecimal } from '~/utils/numberLocale';
 
 useHead({ title: t('common.dashboard') })
 const { calculateBudgetData } = useBudget();
@@ -14,8 +16,11 @@ await initApp();
 
 // Budget Editing
 const showBudgetEdit = ref(false);
-const editingBudget = ref<number | null>(null);
+const editingBudget = ref('');
 const isSavingBudget = ref(false);
+const showToast = ref(false);
+const toastMessage = ref('');
+let toastTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const budgetData = computed(() => calculateBudgetData());
 const currentMonthBudget = computed(() => {
@@ -33,23 +38,66 @@ const formatMonthYear = (date: Date) => {
 const openBudgetEdit = () => {
     // Edit the budget for the current real month, as displayed in the dashboard
     const config = monthStore.getMonthConfig(new Date());
-    editingBudget.value = config.budget;
+    editingBudget.value = formatLocalized2(config.budget, locale.value);
     showBudgetEdit.value = true;
 };
 
+const triggerErrorToast = (message: string) => {
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+    toastMessage.value = message;
+    showToast.value = true;
+    toastTimeout = setTimeout(() => {
+        showToast.value = false;
+    }, 3000);
+};
+
+const handleBudgetInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    editingBudget.value = normalizeDecimalInput(target.value);
+};
+
+const handleBudgetBlur = () => {
+    const parsed = parseLocalizedDecimal(editingBudget.value, locale.value);
+    if (parsed !== null) {
+        editingBudget.value = formatLocalized2(parsed, locale.value);
+    }
+};
+
 const saveMonthlyBudget = async () => {
+    const parsed = budgetSchema(locale.value).safeParse(editingBudget.value);
+    if (!parsed.success) {
+        triggerErrorToast(t(parsed.error.issues[0]?.message || 'validation.number_invalid'));
+        return;
+    }
+
     isSavingBudget.value = true;
     try {
         const now = new Date();
         const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        await monthStore.upsertMonth(key, { budget: editingBudget.value });
+        await monthStore.upsertMonth(key, { budget: parsed.data });
         showBudgetEdit.value = false;
     } catch (e) {
         console.error("Failed to save budget", e);
+        triggerErrorToast(t('common.error_occurred'));
     } finally {
         isSavingBudget.value = false;
     }
 };
+
+watch(() => locale.value, () => {
+    const parsed = parseLocalizedDecimal(editingBudget.value, locale.value);
+    if (showBudgetEdit.value && parsed !== null) {
+        editingBudget.value = formatLocalized2(parsed, locale.value);
+    }
+});
+
+onBeforeUnmount(() => {
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+    }
+});
 </script>
 <template>
     <div class="flex flex-col px-6 pt-12">
@@ -115,7 +163,8 @@ const saveMonthlyBudget = async () => {
                         <div class="mb-6 relative">
                             <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">{{
                                 profileStore.config.value.currency }}</span>
-                            <input v-model="editingBudget" type="number"
+                            <input :value="editingBudget" type="text" inputmode="decimal" @input="handleBudgetInput"
+                                @blur="handleBudgetBlur"
                                 class="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl pl-12 pr-4 py-4 text-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all text-center"
                                 placeholder="0" />
                         </div>
@@ -136,5 +185,7 @@ const saveMonthlyBudget = async () => {
                 </div>
             </Transition>
         </Teleport>
+
+        <StatusToast :visible="showToast" :message="toastMessage" type="error" />
     </div>
 </template>

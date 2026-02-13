@@ -19,13 +19,15 @@
 </template>
 
 <script setup lang="ts">
+import { getDecimalSeparator } from '~/utils/numberLocale';
+
 interface Props {
   value: string;
   submitLabel?: string;
 }
 
 const props = defineProps<Props>();
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 const emit = defineEmits<{
   input: [value: string];
@@ -33,16 +35,16 @@ const emit = defineEmits<{
   submit: [];
 }>();
 
-const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, ',', 0, 'del'];
+const decimalKey = computed(() => getDecimalSeparator(locale.value));
+const numbers = computed(() => [1, 2, 3, 4, 5, 6, 7, 8, 9, decimalKey.value, 0, 'del']);
 
 const handleInput = (n: string | number) => {
   if (n === 'del') {
     emit('delete');
-  } else if (n === ',') {
+  } else if (n === '.' || n === ',') {
     // Prevent multiple decimals
-    if (props.value && props.value.includes('.')) return;
-    // Emit as dot for logic, but it was presented as comma
-    emit('input', '.');
+    if (props.value && /[.,]/.test(props.value)) return;
+    emit('input', n);
   } else {
     emit('input', n.toString());
   }

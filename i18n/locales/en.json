@@ -79,8 +79,11 @@
     "title": "Settings",
     "preferences": "Preferences",
     "language": "Language",
+    "language_desc": "Changes the app language.",
     "theme": "Theme",
+    "theme_desc": "Choose light, dark, or system appearance.",
     "currency": "Currency",
+    "currency_desc": "Sets the default currency for budgets and amounts.",
     "data": "Data",
     "reset_data": "Reset Data",
     "reset_confirm": "Reset all data?",
@@ -93,6 +96,7 @@
     "global_settings": "Global Settings",
     "monthly_budget": "Monthly Budget",
     "monthly_budget_default": "Default Monthly Budget",
+    "monthly_budget_default_desc": "Used as the default monthly budget for new months.",
     "show_rollover": "Carry Over Balance",
     "show_rollover_desc": "Carry unused daily budget into the following days",
     "save_settings": "Save Settings"
@@ -176,6 +180,12 @@
       "gym": "Gym",
       "transport": "Public Transport"
     }
+  },
+  "validation": {
+    "number_invalid": "Please enter a valid number.",
+    "max_two_decimals": "Please use at most 2 decimal places.",
+    "min_zero": "Value must be 0 or greater.",
+    "must_be_positive": "Value must be greater than 0."
   },
   "day_selector": {
     "today": "Today",

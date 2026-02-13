@@ -57,7 +57,8 @@
                         class="flex items-center gap-4 mb-8 border-b-2 border-slate-200/50 dark:border-white/10 focus-within:border-accent transition-colors pb-2">
                         <span class="text-3xl font-medium text-slate-400 dark:text-slate-500">{{
                             selectedCurrency }}</span>
-                        <input v-model="budgetInput" type="number"
+                        <input :value="budgetInput" type="text" inputmode="decimal" @input="handleBudgetInput"
+                            @blur="handleBudgetBlur"
                             class="w-full bg-transparent border-none p-0 text-5xl font-bold text-slate-800 focus:ring-0 focus:outline-none placeholder-slate-200 dark:text-white dark:placeholder-slate-700 leading-none outline-none"
                             placeholder="0" />
                     </div>
@@ -244,6 +245,8 @@
 import { Wallet, Calculator, Plus, X, Info } from 'lucide-vue-next';
 import type { FixedCostItem } from '~/../shared/types';
 import { v4 as uuidv4 } from 'uuid';
+import { budgetSchema } from '~/schemas/numeric';
+import { formatLocalized2, normalizeDecimalInput, parseLocalizedDecimal, roundTo2 } from '~/utils/numberLocale';
 
 
 
@@ -273,17 +276,19 @@ const totalFixedCosts = computed(() => {
 const validationError = computed(() => {
     // 1. Calculator specific validation
     if (showCalculator.value) {
-        if (fixedCostItems.value.length > 0 && (!incomeInput.value || Number(incomeInput.value) <= 0)) {
+        const income = parseLocalizedDecimal(incomeInput.value, locale.value) ?? 0;
+        if (fixedCostItems.value.length > 0 && (!incomeInput.value || income <= 0)) {
             return t('onboarding.error_missing_income');
         }
-        if (Number(incomeInput.value) > 0 && totalFixedCosts.value > Number(incomeInput.value)) {
+        if (income > 0 && totalFixedCosts.value > income) {
             return t('onboarding.error_negative_budget');
         }
     }
 
     // 2. General budget validation
-    if (!budgetInput.value || Number(budgetInput.value) <= 0) {
-        return t('onboarding.error_missing_budget');
+    const parsedBudget = budgetSchema(locale.value).safeParse(budgetInput.value);
+    if (!parsedBudget.success) {
+        return t(parsedBudget.error.issues[0]?.message || 'validation.number_invalid');
     }
 
     return null;
@@ -307,12 +312,12 @@ const removeCostItem = (id: string) => {
 watch([incomeInput, totalFixedCosts], ([newIncome, newFixed]) => {
     if (!showCalculator.value) return;
 
-    const income = Number(newIncome);
+    const income = parseLocalizedDecimal(String(newIncome || ''), locale.value) ?? 0;
     const fixed = Number(newFixed);
 
     if (income > 0) {
-        const calculated = Math.max(0, income - fixed);
-        budgetInput.value = calculated.toString();
+        const calculated = roundTo2(Math.max(0, income - fixed));
+        budgetInput.value = formatLocalized2(calculated, locale.value);
     }
 }, { deep: true });
 
@@ -373,19 +378,46 @@ const handleSetBudget = async () => {
         return;
     }
 
-    const amount = Number(budgetInput.value);
-    if (amount > 0) {
+    const amountResult = budgetSchema(locale.value).safeParse(budgetInput.value);
+    if (!amountResult.success) {
+        showToast.value = true;
+        setTimeout(() => {
+            showToast.value = false;
+        }, 3000);
+        return;
+    }
+
+    if (amountResult.data >= 0) {
         currentStep.value = 'categories';
 
         await profileStore.updateConfig({
-            monthlyLimit: amount,
+            monthlyLimit: amountResult.data,
             currency: selectedCurrency.value,
-            income: showCalculator.value ? Number(incomeInput.value) : undefined,
+            income: showCalculator.value ? (parseLocalizedDecimal(incomeInput.value, locale.value) ?? 0) : undefined,
             fixedCosts: showCalculator.value ? totalFixedCosts.value : undefined,
             fixedCostDetails: showCalculator.value ? fixedCostItems.value : undefined
         });
     }
 };
+
+const handleBudgetInput = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    budgetInput.value = normalizeDecimalInput(target.value);
+};
+
+const handleBudgetBlur = () => {
+    const parsed = parseLocalizedDecimal(budgetInput.value, locale.value);
+    if (parsed !== null) {
+        budgetInput.value = formatLocalized2(parsed, locale.value);
+    }
+};
+
+watch(() => locale.value, () => {
+    const parsed = parseLocalizedDecimal(budgetInput.value, locale.value);
+    if (parsed !== null) {
+        budgetInput.value = formatLocalized2(parsed, locale.value);
+    }
+});
 
 const handleFinish = async () => {
     // Immediately switch to completing state to prevent flash

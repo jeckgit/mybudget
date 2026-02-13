@@ -79,8 +79,11 @@
     "title": "Paramètres",
     "preferences": "Préférences",
     "language": "Langue",
+    "language_desc": "Change la langue de l'application.",
     "theme": "Thème",
+    "theme_desc": "Choisissez l'apparence claire, sombre ou système.",
     "currency": "Devise",
+    "currency_desc": "Définit la devise par défaut pour les budgets et les montants.",
     "data": "Données",
     "reset_data": "Réinitialiser les données",
     "reset_confirm": "Réinitialiser toutes les données ?",
@@ -92,6 +95,8 @@
     },
     "global_settings": "Paramètres globaux",
     "monthly_budget": "Budget mensuel",
+    "monthly_budget_default": "Budget mensuel par défaut",
+    "monthly_budget_default_desc": "Utilisé comme budget mensuel par défaut pour les nouveaux mois.",
     "show_rollover": "Reporter le solde",
     "show_rollover_desc": "Reporter le budget quotidien non utilise aux jours suivants",
     "save_settings": "Enregistrer les paramètres"
@@ -175,6 +180,12 @@
       "gym": "Salle de sport",
       "transport": "Transport"
     }
+  },
+  "validation": {
+    "number_invalid": "Veuillez saisir un nombre valide.",
+    "max_two_decimals": "Veuillez utiliser au maximum 2 decimales.",
+    "min_zero": "La valeur doit etre superieure ou egale a 0.",
+    "must_be_positive": "La valeur doit etre strictement superieure a 0."
   },
   "day_selector": {
     "today": "Aujourd'hui",

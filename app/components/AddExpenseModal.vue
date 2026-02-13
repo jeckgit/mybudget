@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { Transaction } from '~/../shared/types';
 import { Trash2 } from 'lucide-vue-next'; // Added Icon
+import { positiveAmountSchema } from '~/schemas/numeric';
 
 const props = defineProps<{
     editingTransaction?: Transaction | null;
@@ -16,6 +17,9 @@ const emit = defineEmits(['close']);
 
 // Initialize state based on props
 const inputValue = ref("");
+const showValidationToast = ref(false);
+const validationToastMessage = ref('');
+let validationToastTimeout: ReturnType<typeof setTimeout> | null = null;
 const currentStep = ref(1);
 // We start with a placeholder, but we will compute the correct one
 const selectedCategory = ref(categories.value[0]!);
@@ -113,9 +117,25 @@ const formattedDateDisplay = computed(() => {
     });
 });
 
+const triggerValidationToast = (message: string) => {
+    if (validationToastTimeout) {
+        clearTimeout(validationToastTimeout);
+    }
+    validationToastMessage.value = message;
+    showValidationToast.value = true;
+    validationToastTimeout = setTimeout(() => {
+        showValidationToast.value = false;
+    }, 2500);
+};
+
 const handleAddTransaction = async (cat?: typeof categories.value[0]) => {
-    let amount = parseFloat(inputValue.value);
-    if (isNaN(amount) || amount <= 0) return;
+    const parsedAmount = positiveAmountSchema(locale.value).safeParse(inputValue.value);
+    if (!parsedAmount.success) {
+        triggerValidationToast(t(parsedAmount.error.issues[0]?.message || 'validation.number_invalid'));
+        return;
+    }
+
+    let amount = parsedAmount.data;
 
     // [NEW] Negate amount if Income
     if (isIncome.value) {
@@ -190,6 +210,12 @@ const { lengthY, isSwiping } = useSwipe(modalCard, {
         if (lengthY.value < -100) {
             emit('close');
         }
+    }
+});
+
+onBeforeUnmount(() => {
+    if (validationToastTimeout) {
+        clearTimeout(validationToastTimeout);
     }
 });
 
@@ -268,6 +294,7 @@ const { lengthY, isSwiping } = useSwipe(modalCard, {
                     </div>
                 </div>
             </Transition>
+            <StatusToast :visible="showValidationToast" :message="validationToastMessage" type="error" />
         </div>
     </Teleport>
-</template>\
+</template>

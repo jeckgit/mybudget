@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { hasMaxTwoDecimals, normalizeDecimalInput } from '~/utils/numberLocale';
+
 const props = defineProps<{
     amount: string;
     isIncome: boolean;
@@ -14,7 +16,9 @@ const emit = defineEmits<{
 }>();
 
 const handleInput = (val: string) => {
-    emit('update:amount', props.amount + val);
+    const next = normalizeDecimalInput(`${props.amount}${val}`);
+    if (!hasMaxTwoDecimals(next)) return;
+    emit('update:amount', next);
 };
 
 const handleDelete = () => {
