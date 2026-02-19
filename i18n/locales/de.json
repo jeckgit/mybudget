@@ -237,6 +237,7 @@
     "new_password": "Neues Passwort",
     "updating": "Wird aktualisiert...",
     "verifying": "Link wird überprüft...",
-    "invalid_link": "Ungültiger oder abgelaufener Link."
+    "invalid_link": "Ungültiger oder abgelaufener Link.",
+    "verification_email_sent": "Verifizierungs-E-Mail gesendet!"
   }
 }

@@ -237,6 +237,7 @@
     "new_password": "New Password",
     "updating": "Updating...",
     "verifying": "Verifying reset link...",
-    "invalid_link": "Invalid or expired password reset link."
+    "invalid_link": "Invalid or expired password reset link.",
+    "verification_email_sent": "Verification email sent!"
   }
 }

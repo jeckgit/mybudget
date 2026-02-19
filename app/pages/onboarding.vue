@@ -119,6 +119,13 @@ watchEffect(() => {
     }
 });
 
+// Skip language step if already set in profile
+watchEffect(() => {
+    if (profileStore.isLoaded.value && profileStore.config.value.language && currentStep.value === 'language') {
+        currentStep.value = 'budget';
+    }
+});
+
 const handleSelectLanguage = async (code: string) => {
     await setLocale(code as any);
     await profileStore.updateConfig({ language: code });
@@ -337,8 +344,6 @@ const handleFinish = async () => {
                                         <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{
                                             totalFixedCosts }} {{ selectedCurrency }}</span>
                                     </div>
-
-                                    <!-- Suggestions Cloud -->
                                 </div>
                             </div>
                         </div>

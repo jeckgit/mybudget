@@ -1,15 +1,15 @@
 import type { BudgetConfig } from '~/../shared/types';
 import type { Database } from '~/../shared/types/database.types';
 
-const DEFAULT_CONFIG: BudgetConfig = {
+const getInitialConfig = (currentLocale: string): BudgetConfig => ({
   monthlyLimit: 0,
   currency: 'EUR',
   onboardingComplete: false,
   emailVerifiedAt: null,
-  language: 'en',
+  language: currentLocale || 'en',
   theme: 'system',
   showRollover: false
-};
+});
 
 export const useProfileStore = () => {
   const client = useSupabaseClient<Database>();
@@ -17,7 +17,7 @@ export const useProfileStore = () => {
   const { $i18n } = useNuxtApp();
   const { setLocale, locale } = $i18n as any;
 
-  const config = useState<BudgetConfig>('profile-config', () => ({ ...DEFAULT_CONFIG }));
+  const config = useState<BudgetConfig>('profile-config', () => getInitialConfig(locale.value));
   const isLoaded = useState<boolean>('profile-loaded', () => false);
 
   // Sync i18n locale with state language
@@ -52,7 +52,7 @@ export const useProfileStore = () => {
               user_id: user.value.sub,
               currency: 'EUR',
               onboarding_complete: false,
-              language: 'en',
+              language: locale.value || 'en',
               theme: 'system',
               show_rollover: false
             },
@@ -88,11 +88,11 @@ export const useProfileStore = () => {
   };
 
   const updateConfig = async (partialConfig: Partial<BudgetConfig>) => {
-    if (!user.value?.sub) return false;
-
-    // Optimistically update local state
+    // Optimistically update local state (handles guest state too)
     const previousConfig = { ...config.value };
     config.value = { ...config.value, ...partialConfig };
+
+    if (!user.value?.sub) return true;
 
     try {
       const { error } = await client.from('profiles').upsert({
@@ -120,7 +120,7 @@ export const useProfileStore = () => {
   };
 
   const resetProfileState = () => {
-    config.value = { ...DEFAULT_CONFIG };
+    config.value = getInitialConfig(locale.value);
     isLoaded.value = false;
   };
 

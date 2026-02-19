@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronLeft } from 'lucide-vue-next';
-const { t } = useI18n();
+const { t, locale } = useI18n();
 
 
 definePageMeta({
@@ -28,17 +28,52 @@ const toggleSignup = () => {
     isSignUp.value = !isSignUp.value;
 };
 
+const showToast = ref(false);
+const toastMessage = ref('');
+const toastType = ref<'success' | 'error'>('success');
+
 const handleAuth = async () => {
     loading.value = true;
     errorMsg.value = '';
 
     try {
         if (isSignUp.value) {
-            const { error } = await supabase.auth.signUp({
+            const result = await $fetch<{ ok: boolean; verificationMailSent?: boolean; message?: string }>(
+                '/api/auth/signup',
+                {
+                    method: 'POST',
+                    body: {
+                        email: email.value,
+                        password: password.value,
+                        options: {
+                            data: {
+                                language: locale.value
+                            }
+                        }
+                    }
+                }
+            );
+
+            if (!result.ok) {
+                throw new Error(result.message || t('common.error_occurred'));
+            }
+
+            // Auto-login after successful signup (Optional Verification Flow)
+            const { error: signInError } = await supabase.auth.signInWithPassword({
                 email: email.value,
                 password: password.value,
             });
-            if (error) throw error;
+
+            if (signInError) throw signInError;
+
+            // Optional: Notify user about email verification
+            if (result.verificationMailSent) {
+                toastMessage.value = t('auth.verification_email_sent', 'Verification email sent!');
+                toastType.value = 'success';
+                showToast.value = true;
+                setTimeout(() => { showToast.value = false; }, 5000);
+            }
+
         } else {
             const { error } = await supabase.auth.signInWithPassword({
                 email: email.value,
@@ -47,7 +82,7 @@ const handleAuth = async () => {
             if (error) throw error;
         }
     } catch (error: any) {
-        errorMsg.value = error.message;
+        errorMsg.value = error?.data?.message || error.message;
     } finally {
         loading.value = false;
     }
@@ -162,5 +197,7 @@ const handleOAuth = async (provider: 'google' | 'github') => {
                 </button>
             </div>
         </GlassCard>
+
+        <StatusToast :visible="showToast" :message="toastMessage" :type="toastType" />
     </div>
 </template>

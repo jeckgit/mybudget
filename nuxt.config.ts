@@ -16,6 +16,17 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   css: ['./app/assets/css/main.css'],
+  runtimeConfig: {
+    supabaseUrl: process.env.SUPABASE_URL || '',
+    supabaseAnonKey: process.env.SUPABASE_KEY || '',
+    supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+    supabaseResendApiKey: process.env.SUPABASE_RESEND_API_KEY || '',
+    resendApiKey: process.env.RESEND_API_KEY || '',
+    verifyEmailFrom: process.env.VERIFY_EMAIL_FROM || '',
+    verifyEmailReplyTo: process.env.VERIFY_EMAIL_REPLY_TO || '',
+    optionalVerifyAppUrl: process.env.OPTIONAL_VERIFY_APP_URL || process.env.SITE_URL || '',
+    optionalVerifyRedirectUrl: process.env.OPTIONAL_VERIFY_REDIRECT_URL || ''
+  },
 
   devServer: {
     host: '0.0.0.0',
