@@ -111,6 +111,10 @@ const handleOAuth = async (provider: 'google' | 'github') => {
     <div class="min-h-dvh flex items-center justify-center p-6 relative overflow-hidden">
         <BackgroundMesh />
 
+        <div class="absolute top-6 right-6 z-20">
+            <LanguageSelector />
+        </div>
+
         <div class="absolute top-6 left-6 z-20">
             <NuxtLink to="/">
                 <GlassButton variant="ghost" class="px-3! py-3! rounded-full!">

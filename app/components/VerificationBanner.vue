@@ -9,6 +9,8 @@ const profileStore = useProfileStore();
 const isVisible = useState('verificationBannerVisible', () => true);
 const loading = ref(false);
 const sent = ref(false);
+const cooldown = ref(45);
+let timer: any = null;
 
 // Robust check: Profile store OR Supabase auth metadata
 const isConfirmed = computed(() => {
@@ -17,12 +19,34 @@ const isConfirmed = computed(() => {
     return false;
 });
 
+const startTimer = () => {
+    if (timer) clearInterval(timer);
+    cooldown.value = 45;
+    timer = setInterval(() => {
+        if (cooldown.value > 0) {
+            cooldown.value--;
+        } else {
+            clearInterval(timer);
+        }
+    }, 1000);
+};
+
+onMounted(() => {
+    if (!isConfirmed.value) {
+        startTimer();
+    }
+});
+
+onUnmounted(() => {
+    if (timer) clearInterval(timer);
+});
+
 const dismiss = () => {
     isVisible.value = false;
 };
 
 const resendEmail = async () => {
-    if (loading.value || sent.value) return;
+    if (loading.value || sent.value || cooldown.value > 0) return;
     loading.value = true;
 
     try {
@@ -33,6 +57,7 @@ const resendEmail = async () => {
 
         if (response.ok) {
             sent.value = true;
+            startTimer();
             setTimeout(() => { sent.value = false; }, 10000); // Reset after 10s
         }
     } catch (error) {
@@ -65,9 +90,10 @@ const resendEmail = async () => {
                     </div>
 
                     <div class="flex items-center gap-2">
-                        <button v-if="!sent" @click="resendEmail" :disabled="loading"
+                        <button v-if="!sent" @click="resendEmail" :disabled="loading || cooldown > 0"
                             class="px-3 py-1.5 text-xs font-bold bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
-                            {{ loading ? t('verification_banner.sending') : t('verification_banner.resend') }}
+                            {{ loading ? t('verification_banner.sending') : (cooldown > 0 ?
+                                `${t('verification_banner.resend')} (${cooldown}s)` : t('verification_banner.resend')) }}
                         </button>
                         <span v-else class="text-xs font-bold text-green-600 dark:text-green-400 px-3 py-1.5">
                             {{ t('verification_banner.sent') }}

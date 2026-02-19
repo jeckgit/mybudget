@@ -112,10 +112,21 @@ const addSuggestion = (suggestion: { key: string, icon: string }) => {
     });
 };
 
+// 4. Onboarding Progress Logic
+const hasAttemptedSkip = ref(false);
+
 // Redirect if already complete - but not if we're in completing state
 watchEffect(() => {
     if (profileStore.config.value?.onboardingComplete && currentStep.value !== 'completing') {
         navigateTo('/dashboard');
+    }
+});
+
+// Skip language step if already set in profile (e.g. from signup)
+watchEffect(() => {
+    if (!hasAttemptedSkip.value && profileStore.isLoaded.value && profileStore.config.value.language && currentStep.value === 'language') {
+        hasAttemptedSkip.value = true;
+        currentStep.value = 'budget';
     }
 });
 
