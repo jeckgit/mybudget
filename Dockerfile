@@ -16,12 +16,19 @@ RUN pnpm install --frozen-lockfile
 # Copy the rest of the source code
 COPY . .
 
-# Build the application
-# We pass build args for Supabase if needed during build (e.g. for static generation or plugins)
+# Build stage environment
 ARG SUPABASE_URL
 ARG SUPABASE_KEY
+ARG OPTIONAL_VERIFY_REDIRECT_URL
+ARG VERIFY_EMAIL_FROM
+
 ENV SUPABASE_URL=$SUPABASE_URL
 ENV SUPABASE_KEY=$SUPABASE_KEY
+ENV OPTIONAL_VERIFY_REDIRECT_URL=$OPTIONAL_VERIFY_REDIRECT_URL
+ENV VERIFY_EMAIL_FROM=$VERIFY_EMAIL_FROM
+
+# NOTE: Sensitive keys like SUPABASE_SERVICE_ROLE_KEY and RESEND_API_KEY 
+# should be passed at RUNTIME (e.g. docker run -e ...) to keep them out of the image layers.
 
 RUN pnpm build
 

@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event);
   const supabaseUrl = config.supabaseUrl as string;
   const supabaseServiceRoleKey = config.supabaseServiceRoleKey as string;
-  const resendApiKey = (config.supabaseResendApiKey as string) || (config.resendApiKey as string);
+  const resendApiKey = config.supabaseResendApiKey as string;
   const verifyEmailFrom = (config.verifyEmailFrom as string) || 'MyBudget <notifications@zeitnode.com>';
   const verifyEmailReplyTo = (config.verifyEmailReplyTo as string) || null;
 

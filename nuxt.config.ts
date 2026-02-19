@@ -21,7 +21,6 @@ export default defineNuxtConfig({
     supabaseAnonKey: process.env.SUPABASE_KEY || '',
     supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
     supabaseResendApiKey: process.env.SUPABASE_RESEND_API_KEY || '',
-    resendApiKey: process.env.RESEND_API_KEY || '',
     verifyEmailFrom: process.env.VERIFY_EMAIL_FROM || '',
     verifyEmailReplyTo: process.env.VERIFY_EMAIL_REPLY_TO || '',
     optionalVerifyAppUrl: process.env.OPTIONAL_VERIFY_APP_URL || process.env.SITE_URL || '',
