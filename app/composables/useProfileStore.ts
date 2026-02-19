@@ -43,27 +43,7 @@ export const useProfileStore = () => {
 
       if (error) throw error;
 
-      if (!profile) {
-        // Initialize new profile if not found
-        const { data: newProfile, error: pError } = await client
-          .from('profiles')
-          .upsert(
-            {
-              user_id: user.value.sub,
-              currency: 'EUR',
-              onboarding_complete: false,
-              language: locale.value || 'en',
-              theme: 'system',
-              show_rollover: false
-            },
-            { onConflict: 'user_id' }
-          )
-          .select()
-          .single();
-
-        if (pError) throw pError;
-        if (newProfile) setProfileFromDb(newProfile);
-      } else {
+      if (profile) {
         setProfileFromDb(profile);
       }
       isLoaded.value = true;

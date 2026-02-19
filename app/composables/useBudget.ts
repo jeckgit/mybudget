@@ -45,19 +45,24 @@ export const useBudget = () => {
     const avgDaily = monthlyLimit / daysInMonth;
 
     const dayMoneyMap = new Map<string, number>();
+    const dayExpensesMap = new Map<string, number>();
     txStore.transactions.value.forEach((tx) => {
       if (!tx.date) return;
       const localDate = new Date(tx.date);
       if (localDate.getFullYear() === year && localDate.getMonth() === month) {
         const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(localDate.getDate()).padStart(2, '0')}`;
         dayMoneyMap.set(key, (dayMoneyMap.get(key) || 0) + tx.amount);
+        if (tx.amount > 0) {
+          dayExpensesMap.set(key, (dayExpensesMap.get(key) || 0) + tx.amount);
+        }
       }
     });
 
     const dailyBreakdown: Array<{
       date: Date;
       key: string;
-      spent: number;
+      netSpent: number;
+      expensesOnly: number;
       available: number;
       dailyBalance: number;
       isSkipped: boolean;
@@ -68,27 +73,30 @@ export const useBudget = () => {
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(year, month, i);
       const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-      const daySpent = dayMoneyMap.get(key) || 0;
+      const dayNetSpent = dayMoneyMap.get(key) || 0;
+      const dayExpenses = dayExpensesMap.get(key) || 0;
 
       if (date.getTime() < startDate.getTime()) {
         dailyBreakdown.push({
           date,
           key,
-          spent: daySpent,
+          netSpent: dayNetSpent,
+          expensesOnly: dayExpenses,
           available: 0,
           dailyBalance: 0,
           isSkipped: true
         });
       } else {
         const daysActive = Math.floor((date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-        totalSpentSinceStart += daySpent;
+        totalSpentSinceStart += dayNetSpent;
         const available = daysActive * avgDaily - totalSpentSinceStart;
         dailyBreakdown.push({
           date,
           key,
-          spent: daySpent,
+          netSpent: dayNetSpent,
+          expensesOnly: dayExpenses,
           available,
-          dailyBalance: avgDaily - daySpent,
+          dailyBalance: avgDaily - dayNetSpent,
           isSkipped: false
         });
       }
@@ -121,11 +129,17 @@ export const useBudget = () => {
       return tKey === dateKey;
     });
 
-    const totalSpentMonth = monthTransactions.reduce((acc, t) => acc + t.amount, 0);
-    const remainingMonthly = monthlyLimit - totalSpentMonth;
+    const netSpentMonth = monthTransactions.reduce((acc, t) => acc + t.amount, 0);
+    const remainingMonthly = monthlyLimit - netSpentMonth;
 
-    const spentToday = isCurrentMonth
+    const netSpentToday = isCurrentMonth
       ? monthTransactions.filter((t) => new Date(t.date).getDate() === currentDay).reduce((acc, t) => acc + t.amount, 0)
+      : 0;
+
+    const spentTodayExpensesOnly = isCurrentMonth
+      ? monthTransactions
+          .filter((t) => new Date(t.date).getDate() === currentDay && t.amount > 0)
+          .reduce((acc, t) => acc + t.amount, 0)
       : 0;
 
     const avgDaily = monthlyLimit / daysInMonth;
@@ -144,9 +158,9 @@ export const useBudget = () => {
       }
     }
 
-    const budgetAvailableForTodayAndFuture = effectiveRemainingForDailyCalc + spentToday;
+    const budgetAvailableForTodayAndFuture = effectiveRemainingForDailyCalc + netSpentToday;
     const dailyTarget = budgetAvailableForTodayAndFuture / daysRemaining;
-    const remainingToday = dailyTarget - spentToday;
+    const remainingToday = dailyTarget - netSpentToday;
     const isOverBudget = remainingToday < 0;
 
     // Calculate total saved from previous days in the budget period
@@ -172,9 +186,10 @@ export const useBudget = () => {
       currentDay,
       daysRemaining,
       monthTransactions,
-      totalSpentMonth,
+      netSpentMonth,
       remainingMonthly,
-      spentToday,
+      netSpentToday,
+      spentTodayExpensesOnly,
       dailyTarget,
       remainingToday,
       isOverBudget,

@@ -9,8 +9,8 @@ const profileStore = useProfileStore();
 const isVisible = useState('verificationBannerVisible', () => true);
 const loading = ref(false);
 const sent = ref(false);
-const cooldown = ref(45);
-let timer: any = null;
+const cooldown = ref(0);
+let timer: ReturnType<typeof setInterval> | null = null;
 
 // Robust check: Profile store OR Supabase auth metadata
 const isConfirmed = computed(() => {
@@ -19,21 +19,30 @@ const isConfirmed = computed(() => {
     return false;
 });
 
-const startTimer = () => {
+const startTimer = (duration = 45) => {
     if (timer) clearInterval(timer);
-    cooldown.value = 45;
+    cooldown.value = duration;
     timer = setInterval(() => {
         if (cooldown.value > 0) {
             cooldown.value--;
         } else {
-            clearInterval(timer);
+            if (timer) clearInterval(timer);
+            timer = null;
         }
     }, 1000);
 };
 
 onMounted(() => {
     if (!isConfirmed.value) {
-        startTimer();
+        if (user.value?.created_at) {
+            const createdAt = new Date(user.value.created_at).getTime();
+            const now = Date.now();
+            const diffSeconds = Math.floor((now - createdAt) / 1000);
+
+            if (diffSeconds < 45) {
+                startTimer(45 - diffSeconds);
+            }
+        }
     }
 });
 
@@ -57,7 +66,7 @@ const resendEmail = async () => {
 
         if (response.ok) {
             sent.value = true;
-            startTimer();
+            startTimer(45);
             setTimeout(() => { sent.value = false; }, 10000); // Reset after 10s
         }
     } catch (error) {

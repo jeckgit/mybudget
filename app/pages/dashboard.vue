@@ -28,7 +28,7 @@ const currentMonthBudget = computed(() => {
 });
 const remainingPercentage = computed(() => {
     if (currentMonthBudget.value === 0) return 0;
-    return Math.max(0, (currentMonthBudget.value - budgetData.value.totalSpentMonth) / currentMonthBudget.value);
+    return Math.min(1, Math.max(0, (currentMonthBudget.value - budgetData.value.netSpentMonth) / currentMonthBudget.value));
 });
 
 const formatMonthYear = (date: Date) => {
@@ -108,10 +108,11 @@ onBeforeUnmount(() => {
                     <p class="text-slate-600 font-medium text-sm mb-1 dark:text-slate-300">{{
                         t('dashboard.spent_today') }}</p>
                     <h2 class="text-4xl font-bold tracking-tighter">
-                        {{ formatCurrency(budgetData.spentToday, profileStore.config.value.currency, false, {
-                            minimumFractionDigits:
-                                2
-                        }) }}
+                        {{ formatCurrency(budgetData.spentTodayExpensesOnly, profileStore.config.value.currency, false,
+                            {
+                                minimumFractionDigits:
+                                    2
+                            }) }}
                     </h2>
                     <div class="mt-2 flex items-center gap-1.5">
                         <span

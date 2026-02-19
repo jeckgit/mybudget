@@ -182,42 +182,44 @@ const exportAsJSON = () => {
         </div>
 
         <!-- Main Stats Card -->
-        <GlassCard variant="glass" class="p-6 mb-6 dark:bg-white/5 dark:border-white/10 overflow-hidden">
-            <div class="flex items-center justify-between mb-8">
+        <GlassCard variant="glass" class="p-8 mb-6 overflow-hidden shadow-2xl shadow-purple-900/5">
+            <div class="flex items-start justify-between mb-8 relative z-10">
                 <div>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">{{
-                        t('analytics.total_spent') }}</p>
-                    <h3 class="text-3xl font-bold text-slate-800 dark:text-white">
-                        {{ formatCurrency(budgetData.totalSpentMonth, profileStore.config.value.currency) }}
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-3">
+                        {{ t('analytics.total_spent') }}
+                    </p>
+                    <h3 class="text-5xl font-bold text-slate-800 dark:text-white tracking-tighter">
+                        {{ formatCurrency(Math.abs(budgetData.netSpentMonth), profileStore.config.value.currency, false,
+                            { minimumFractionDigits: 2 }) }}
                     </h3>
                 </div>
                 <!-- Mini Halo for target progress -->
                 <div v-if="profileStore.config.value.monthlyLimit > 0" class="h-12 w-12 relative">
                     <HaloRing :size="48" :stroke-width="5"
-                        :progress="budgetData.totalSpentMonth / profileStore.config.value.monthlyLimit" color="#C084FC"
+                        :progress="budgetData.netSpentMonth / profileStore.config.value.monthlyLimit" color="#C084FC"
                         track-color="rgba(0,0,0,0.05)" />
                     <span
                         class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300">
-                        {{ Math.round((budgetData.totalSpentMonth / profileStore.config.value.monthlyLimit) * 100) }}%
+                        {{ Math.round((budgetData.netSpentMonth / profileStore.config.value.monthlyLimit) * 100) }}%
                     </span>
                 </div>
             </div>
 
-            <SpendingChart :data="dailyData" :daily-limit="budgetData.avgDaily" />
+            <SpendingChart :data="dailyData" :daily-limit="budgetData.avgDaily"
+                :currency-code="profileStore.config.value.currency" />
         </GlassCard>
 
         <!-- Category Visualization Section -->
         <div v-if="categoryStats.length > 0" class="mb-8">
-            <h3 class="font-bold text-lg text-slate-800 mb-4 px-1 dark:text-white">{{ t('analytics.categories') }}</h3>
-
-            <GlassCard variant="glass" class="p-6 mb-6 dark:bg-white/5 dark:border-white/10">
-                <CategoryDonutChart :data="categoryStats" :total="totalSpent" :currency-code="profileStore.config.value.currency" />
+            <GlassCard variant="glass" class="p-8 mb-6 overflow-hidden shadow-2xl shadow-purple-900/5">
+                <CategoryDonutChart :data="categoryStats" :total="totalSpent"
+                    :currency-code="profileStore.config.value.currency" />
             </GlassCard>
 
             <!-- Unified Insight List -->
-            <GlassCard variant="white" class="p-0! overflow-hidden dark:bg-white/5! dark:border-white/10!">
+            <GlassCard variant="white" class="p-0! overflow-hidden shadow-xl shadow-purple-900/5">
                 <div v-for="(cat, index) in categoryStats" :key="cat.id"
-                    class="group relative p-4 flex items-center gap-4 border-b border-slate-100 dark:border-white/5 last:border-0 transition-all hover:bg-purple-50/50 dark:hover:bg-white/5">
+                    class="group relative p-5 flex items-center gap-4 border-b border-slate-100/50 dark:border-white/5 last:border-0 transition-all hover:bg-slate-50/80 dark:hover:bg-white/5">
 
                     <!-- Rank / Icon -->
                     <div
@@ -230,12 +232,9 @@ const exportAsJSON = () => {
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-slate-700 dark:text-white text-sm truncate">{{
                                 getCategoryName(cat) }}</span>
-                            <div class="text-right flex items-center gap-2">
+                            <div class="text-right flex items-center gap-3">
                                 <span
-                                    class="text-xs font-semibold text-slate-400 bg-slate-100 dark:bg-white/10 px-1.5 py-0.5 rounded-md">
-                                    {{ Math.round(cat.percentage) }}%
-                                </span>
-                                <span class="font-bold text-slate-800 dark:text-white tabular-nums text-sm">
+                                    class="font-bold text-slate-800 dark:text-white tabular-nums text-base tracking-tight">
                                     {{ formatCurrency(cat.amount, profileStore.config.value.currency, false) }}
                                 </span>
                             </div>

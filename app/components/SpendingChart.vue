@@ -16,12 +16,15 @@ interface ChartData {
 interface Props {
   data: ChartData[];
   dailyLimit?: number;
+  currencyCode?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  dailyLimit: 50
+  dailyLimit: 50,
+  currencyCode: 'EUR'
 });
 
+const { formatCurrency } = useCurrency();
 const mounted = ref(false);
 
 onMounted(() => {
@@ -53,13 +56,16 @@ const chartOption = computed(() => ({
   },
   series: [
     {
-      data: props.data.map(d => ({
-        value: d.amount,
-        itemStyle: {
-          color: d.amount > props.dailyLimit * 1.5 ? '#F87171' : '#C084FC',
-          borderRadius: [2, 2, 0, 0]
-        }
-      })),
+      data: props.data.map(d => {
+        const absAmount = Math.abs(d.amount);
+        return {
+          value: absAmount,
+          itemStyle: {
+            color: absAmount > props.dailyLimit * 1.5 ? '#F87171' : '#C084FC',
+            borderRadius: [2, 2, 0, 0]
+          }
+        };
+      }),
       type: 'bar',
       barWidth: '60%',
       showBackground: false
@@ -80,7 +86,7 @@ const chartOption = computed(() => ({
     formatter: (params: any) => {
       const data = params[0];
       return `<div style="font-size: 10px; opacity: 0.6; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em">Day ${data.axisValue}</div>
-              <div style="font-size: 14px">$${data.value}</div>`;
+              <div style="font-size: 14px; font-weight: 800">${formatCurrency(data.value, props.currencyCode, false)}</div>`;
     }
   }
 }));

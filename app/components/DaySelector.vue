@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { computed, nextTick, onMounted, ref } from 'vue';
 
 const profileStore = useProfileStore();
-const txStore = useTransactionsStore();
-const monthStore = useMonthsStore();
 const { t, locale } = useI18n();
 const { formatCurrency } = useCurrency();
 const { calculateMonthlyBreakdown } = useBudget();
@@ -135,7 +133,6 @@ const formatBudgetDisplay = (amount: number) => {
                 <h3 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-[0.15em]">
                     {{ formatMonthYear(currentMonthDate) }}
                 </h3>
-
                 <div class="flex items-center gap-2">
                     <button @click="handleTodayClick"
                         class="h-8 px-4 rounded-xl text-[10px] font-bold uppercase tracking-widest bg-white/60 border border-white/80 text-slate-600 dark:bg-white/10 dark:border-white/10 dark:text-slate-300 active:scale-95 transition-all">
@@ -220,7 +217,7 @@ const formatBudgetDisplay = (amount: number) => {
                                 {{ formatDay(day.date) }}
                             </span>
                             <span class="text-xl font-bold leading-none tracking-tighter">{{ formatDate(day.date)
-                            }}</span>
+                                }}</span>
                         </div>
 
                         <!-- Divider -->
@@ -233,8 +230,7 @@ const formatBudgetDisplay = (amount: number) => {
                                 <span
                                     :class="['text-[9px] font-black uppercase tracking-[0.2em] mb-0.5 opacity-60', isToday(day.date) ? 'text-white/60' : 'text-slate-400']">
                                     {{ (isRolloverMode ? day.available : day.dailyBalance) >= 0
-                                        ? (isRolloverMode ? t('day_selector.rollover') :
-                                            t('day_selector.daily_balance')) :
+                                        ? t('day_selector.available') :
                                         t('day_selector.over') }}
                                 </span>
                                 <div :class="[
@@ -262,7 +258,7 @@ const formatBudgetDisplay = (amount: number) => {
                             </span>
                             <span
                                 :class="['text-xs font-bold tracking-tight', isToday(day.date) ? 'text-white/80' : 'text-slate-500']">
-                                {{ formatBudgetDisplay(day.spent) }}
+                                {{ formatBudgetDisplay(day.expensesOnly) }}
                             </span>
                         </div>
                     </button>

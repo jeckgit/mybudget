@@ -1,5 +1,6 @@
 import type { Category } from '~/../shared/types';
 import type { Database } from '~/../shared/types/database.types';
+import { DEFAULT_CATEGORIES, INCOME_CATEGORIES } from '~/../shared/constants/categories';
 
 export const useCategoriesStore = () => {
   const { $i18n } = useNuxtApp();
@@ -13,22 +14,6 @@ export const useCategoriesStore = () => {
 
   const expenseCategories = computed(() => categories.value.filter((c) => c.type !== 'income'));
   const incomeCategories = computed(() => categories.value.filter((c) => c.type === 'income'));
-
-  const DEFAULT_CATEGORIES = [
-    { emoji: '🛍️', key: 'shopping', type: 'expense' },
-    { emoji: '🍔', key: 'food', type: 'expense' },
-    { emoji: '🚗', key: 'transport', type: 'expense' },
-    { emoji: '🎬', key: 'entertainment', type: 'expense' },
-    { emoji: '☕', key: 'coffee', type: 'expense' },
-    { emoji: '🏠', key: 'utilities', type: 'expense' }
-  ];
-
-  const INCOME_CATEGORIES = [
-    { emoji: '💰', key: 'salary', type: 'income' },
-    { emoji: '🎁', key: 'gift', type: 'income' },
-    { emoji: '💸', key: 'refund', type: 'income' },
-    { emoji: '🏷️', key: 'sale', type: 'income' }
-  ];
 
   const loadCategories = async () => {
     if (!user.value?.sub) return;
@@ -47,8 +32,6 @@ export const useCategoriesStore = () => {
           type: (c.type as 'income' | 'expense') || 'expense',
           user_id: c.user_id
         }));
-      } else {
-        await seedDefaultCategories();
       }
       isLoaded.value = true;
     } catch (e) {

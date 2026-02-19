@@ -196,7 +196,8 @@
     "rollover": "Rollover",
     "details_title": "Tagesdetails",
     "back": "Zurück",
-    "over": "Drüber um"
+    "over": "Drüber um",
+    "income_label": "Einnahmen"
   },
   "verification_banner": {
     "title": "E-Mail bestätigen",

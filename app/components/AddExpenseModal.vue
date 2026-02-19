@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { Transaction } from '~/../shared/types';
-import { Trash2 } from 'lucide-vue-next'; // Added Icon
+import { Trash2, ChevronLeft } from 'lucide-vue-next';
 import { positiveAmountSchema } from '~/schemas/numeric';
 
 const props = defineProps<{
@@ -11,7 +11,7 @@ const props = defineProps<{
 const route = useRoute();
 const txStore = useTransactionsStore();
 const catStore = useCategoriesStore();
-const { categories, expenseCategories, incomeCategories, getCategoryByEmoji, getCategoryName } = catStore;
+const { categories, expenseCategories, incomeCategories, getCategoryById, getCategoryByEmoji, getCategoryName } = catStore;
 const { t, locale } = useI18n();
 const emit = defineEmits(['close']);
 
@@ -49,7 +49,7 @@ watch(() => props.isOpen, (newVal) => {
         // Wait for next tick so displayedCategories update based on isIncome
         nextTick(() => {
             selectedCategory.value = props.editingTransaction
-                ? getCategoryByEmoji(props.editingTransaction.category || '') || displayedCategories.value[0]!
+                ? getCategoryById(props.editingTransaction.category || '') || displayedCategories.value[0]!
                 : displayedCategories.value[0]!;
         });
 
@@ -148,9 +148,6 @@ const handleAddTransaction = async (cat?: typeof categories.value[0]) => {
     }
 
     let finalCategory = cat || selectedCategory.value;
-
-
-
     const finalDate = new Date(selectedDate.value).toISOString();
 
     if (props.editingTransaction) {
@@ -240,56 +237,57 @@ onBeforeUnmount(() => {
                     <div class="pointer-events-auto" ref="modalCard" :style="modalCardStyle">
                         <GlassCard variant="white"
                             class="p-8 pb-10 rounded-[2.5rem]! shadow-2xl shadow-purple-900/10 dark:bg-white/5! dark:backdrop-blur-2xl dark:border! dark:border-white/10! dark:shadow-black/50">
-                            <div @click="emit('close')"
-                                class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6 dark:bg-white/10 cursor-pointer hover:bg-slate-300 dark:hover:bg-white/20 transition-colors z-20 relative" />
+                            <!-- Header with drag handle and delete button -->
+                            <div class="relative w-full h-8 mb-4 pointer-events-auto">
+                                <div @click="emit('close')"
+                                    class="w-12 h-1.5 bg-slate-200 rounded-full dark:bg-white/10 cursor-pointer hover:bg-slate-300 dark:hover:bg-white/20 transition-colors absolute left-1/2 -translate-x-1/2 top-0 z-20" />
 
-                            <!-- Edit Mode Header with Delete -->
-                            <div v-if="editingTransaction"
-                                class="flex justify-between items-center absolute top-6 right-6 left-6 pointer-events-none z-30">
-                                <div /> <!-- Spacer -->
-                                <button @click="handleDeleteTransaction"
-                                    class="p-2 text-red-500 bg-red-50 rounded-full hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 transition-colors pointer-events-auto">
+                                <button v-if="editingTransaction" @click="handleDeleteTransaction"
+                                    class="absolute -top-3 right-0 p-2.5 text-red-500 bg-red-50/80 backdrop-blur-md rounded-full ring-1 ring-red-100/50 hover:bg-red-100 dark:text-red-400 dark:bg-red-900/30 dark:hover:bg-red-900/50 dark:ring-red-900/20 transition-all z-30 shadow-sm">
                                     <Trash2 class="w-5 h-5" />
                                 </button>
                             </div>
 
-                            <template v-if="currentStep === 1">
-                                <ExpenseAmountInput v-model:amount="inputValue" v-model:is-income="isIncome"
-                                    :is-editing="!!editingTransaction" :submit-label="t('common.next')"
-                                    @submit="handleAddTransaction" />
-                            </template>
-
-                            <template v-else>
-                                <div class="flex items-center justify-between mb-6">
-                                    <button @click="handleBack"
-                                        class="p-3 rounded-full bg-slate-100 text-slate-400 active:scale-95 transition-all dark:bg-white/5 dark:text-slate-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                d="M15 19l-7-7 7-7" />
-                                        </svg>
-                                    </button>
-                                    <div class="text-center">
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest dark:text-slate-500 transition-colors"
-                                            :class="{ 'text-green-500!': isIncome }">
-                                            {{ t('common.select_category') }}
-                                        </p>
-                                        <p class="text-2xl font-bold text-slate-800 dark:text-white transition-colors"
-                                            :class="{ 'text-green-600! dark:text-green-400!': isIncome }">
-                                            <!-- Removed Currency Symbol here too -->
-                                            {{ inputValue }}
-                                        </p>
-                                    </div>
-                                    <div class="w-12 h-12" /> <!-- Spacer for centering -->
+                            <!-- Content Grid mapping both steps overlapping to retain constant height -->
+                            <div class="grid relative min-h-[460px]">
+                                <!-- Step 1 -->
+                                <div class="col-start-1 row-start-1 transition-all duration-300 ease-in-out"
+                                    :class="currentStep === 1 ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 -translate-x-8 pointer-events-none'">
+                                    <ExpenseAmountInput v-model:amount="inputValue" v-model:is-income="isIncome"
+                                        :is-editing="!!editingTransaction" :submit-label="t('common.next')"
+                                        @submit="handleAddTransaction" />
                                 </div>
 
-                                <DateBadge v-model="selectedDate" :is-income="isIncome"
-                                    :formatted-date="formattedDateDisplay" />
+                                <!-- Step 2 -->
+                                <div class="col-start-1 row-start-1 transition-all duration-300 ease-in-out flex flex-col"
+                                    :class="currentStep === 2 ? 'opacity-100 translate-x-0 z-10' : 'opacity-0 translate-x-8 pointer-events-none'">
+                                    <div class="flex items-center justify-between mb-6">
+                                        <button @click="handleBack"
+                                            class="p-3 rounded-full bg-slate-100 text-slate-400 active:scale-95 transition-all dark:bg-white/5 dark:text-slate-500 pointer-events-auto">
+                                            <ChevronLeft class="w-6 h-6 stroke-[2.5]" />
+                                        </button>
+                                        <div class="text-center">
+                                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest dark:text-slate-500 transition-colors"
+                                                :class="{ 'text-green-500!': isIncome }">
+                                                {{ t('common.select_category') }}
+                                            </p>
+                                            <p class="text-2xl font-bold text-slate-800 dark:text-white transition-colors"
+                                                :class="{ 'text-green-600! dark:text-green-400!': isIncome }">
+                                                <!-- Removed Currency Symbol here too -->
+                                                {{ inputValue }}
+                                            </p>
+                                        </div>
+                                        <div class="w-12 h-12" /> <!-- Spacer for centering -->
+                                    </div>
 
-                                <CategoryPicker :categories="displayedCategories" :selected-id="selectedCategory.id"
-                                    :is-income="isIncome" :get-category-name="getCategoryName"
-                                    @select="handleAddTransaction" />
-                            </template>
+                                    <DateBadge v-model="selectedDate" :is-income="isIncome"
+                                        :formatted-date="formattedDateDisplay" />
+
+                                    <CategoryPicker :categories="displayedCategories" :selected-id="selectedCategory.id"
+                                        :is-income="isIncome" :get-category-name="getCategoryName"
+                                        @select="handleAddTransaction" />
+                                </div>
+                            </div>
                         </GlassCard>
                     </div>
                 </div>

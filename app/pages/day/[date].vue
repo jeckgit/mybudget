@@ -36,8 +36,16 @@ const dayTransactions = computed(() => {
 
 const { formatCurrency } = useCurrency();
 
-const totalForDay = computed(() => {
-    return dayTransactions.value.reduce((sum, tx) => sum + tx.amount, 0);
+const expensesOnly = computed(() => {
+    return dayTransactions.value
+        .filter(tx => tx.amount > 0)
+        .reduce((sum, tx) => sum + tx.amount, 0);
+});
+
+const incomeOnly = computed(() => {
+    return dayTransactions.value
+        .filter(tx => tx.amount < 0)
+        .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
 });
 
 const formatTime = (date: string) => {
@@ -62,13 +70,26 @@ const openNewExpenseModal = () => {
     selectedTransaction.value = null;
     isModalOpen.value = true;
 };
+
+const { confirm } = useConfirm();
+
+const handleDeleteTransaction = async (id: string) => {
+    if (await confirm({
+        title: t('common.delete_confirm'),
+        message: t('common.delete_confirm_desc') || t('common.delete_confirm'),
+        confirmText: t('common.delete'),
+        isDestructive: true
+    })) {
+        txStore.removeTransaction(id);
+    }
+}
 </script>
 
 <template>
-    <div class="flex flex-col min-h-dvh bg-slate-50 dark:bg-[#050505] pb-32">
+    <div class="flex flex-col min-h-dvh pb-32">
         <!-- Header -->
         <div
-            class="sticky top-[env(safe-area-inset-top)] z-20 px-6 pt-12 pb-6 bg-slate-50/80 backdrop-blur-xl dark:bg-[#050505]/80 border-b border-transparent transition-all duration-300">
+            class="sticky top-[env(safe-area-inset-top)] z-20 px-6 pt-12 pb-6 bg-white/5 backdrop-blur-xl border-b border-white/5">
             <div class="flex items-center gap-4">
                 <button @click="goBack"
                     class="w-12 h-12 rounded-full bg-white/40 backdrop-blur-md border border-white/50 flex items-center justify-center shadow-sm text-slate-600 active:scale-95 transition-transform dark:text-white dark:bg-white/5 dark:border-white/10">
@@ -88,18 +109,22 @@ const openNewExpenseModal = () => {
 
         <div class="px-6 pt-4">
             <!-- Daily Summary Card -->
-            <GlassCard variant="white"
-                class="p-8 mb-8 bg-white/80! dark:bg-white/5! dark:border-white/10! shadow-2xl shadow-purple-900/5 dark:shadow-none">
+            <GlassCard variant="glass" class="p-8 mb-8 shadow-2xl shadow-purple-900/5 dark:shadow-none">
                 <button @click="openNewExpenseModal" type="button"
                     class="w-full flex flex-col items-center transition-transform active:scale-95 cursor-pointer outline-none">
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-3">
                         {{ t('day_selector.daily_spending') }}
                     </p>
                     <h2 class="text-5xl font-bold text-slate-800 dark:text-white tracking-tighter">
-                        {{ formatCurrency(totalForDay, profileStore.config.value.currency, false, {
+                        {{ formatCurrency(expensesOnly, profileStore.config.value.currency, false, {
                             minimumFractionDigits: 2
                         }) }}
                     </h2>
+                    <p v-if="incomeOnly > 0"
+                        class="mt-2 text-sm font-semibold text-emerald-500 dark:text-emerald-400 tracking-tight">
+                        {{ t('day_selector.income_label') }}: +{{ formatCurrency(incomeOnly,
+                            profileStore.config.value.currency, false, { minimumFractionDigits: 2 }) }}
+                    </p>
                 </button>
             </GlassCard>
 
@@ -108,35 +133,13 @@ const openNewExpenseModal = () => {
                 <h3 class="font-bold text-lg text-slate-800 px-1 dark:text-white">{{ t('dashboard.recent') }}</h3>
 
                 <div class="space-y-3">
-                    <div v-for="tx in dayTransactions" :key="tx.id" @click="handleTransactionClick(tx)"
-                        class="group relative flex items-center justify-between p-4 rounded-4xl bg-white/60 dark:bg-white/5 border border-white/40 dark:border-white/10 active:scale-95 transition-all duration-300 cursor-pointer hover:bg-white/80 dark:hover:bg-white/10 hover:shadow-xl hover:shadow-purple-900/5 dark:hover:shadow-none">
-
-                        <!-- Transaction Details -->
-                        <div class="flex items-center gap-4 min-w-0 flex-1">
-                            <div
-                                class="w-12 h-12 shrink-0 rounded-2xl bg-white/80 dark:bg-white/10 flex items-center justify-center text-xl shadow-sm border border-white dark:border-white/5 group-hover:scale-110 transition-transform duration-300">
-                                {{ getCategoryById(tx.category)?.emoji || '💸' }}
-                            </div>
-                            <div class="min-w-0">
-                                <p class="font-bold text-slate-800 text-sm dark:text-white truncate tracking-tight">
-                                    {{ getCategoryName(getCategoryById(tx.category)) || tx.note ||
-                                        t('dashboard.default_note') }}
-                                </p>
-                                <p
-                                    class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 dark:text-slate-500">
-                                    {{ formatTime(tx.date) }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Amount -->
-                        <div class="flex flex-col items-end gap-1">
-                            <span class="font-black text-base tracking-tighter whitespace-nowrap transition-colors"
-                                :class="{ 'text-emerald-500 dark:text-emerald-400': tx.amount < 0, 'text-slate-800 dark:text-white': tx.amount >= 0 }">
-                                {{ tx.amount < 0 ? '+' : '' }} {{ formatCurrency(Math.abs(tx.amount),
-                                    profileStore.config.value.currency, false, { minimumFractionDigits: 2 }) }} </span>
-                        </div>
-                    </div>
+                    <SwipeableTransaction v-for="tx in dayTransactions" :key="tx.id" :transaction="tx"
+                        :category-emoji="getCategoryById(tx.category)?.emoji"
+                        :category-name="getCategoryName(getCategoryById(tx.category))"
+                        :formatted-time="formatTime(tx.date)"
+                        :formatted-amount="formatCurrency(Math.abs(tx.amount), profileStore.config.value.currency, false, { minimumFractionDigits: 2 })"
+                        :is-income="tx.amount < 0" @click="handleTransactionClick(tx)"
+                        @delete="handleDeleteTransaction" />
 
                     <div v-if="dayTransactions.length === 0"
                         class="flex flex-col items-center justify-center py-20 text-slate-400 bg-white/30 dark:bg-white/5 backdrop-blur-md rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10">

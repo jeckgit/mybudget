@@ -46,7 +46,7 @@ onMounted(() => {
 });
 
 const formattedTotal = computed(() => {
-    return formatCurrency(props.total, props.currencyCode, false, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    return formatCurrency(Math.abs(props.total), props.currencyCode, false, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 });
 
 const chartOption = computed(() => ({
@@ -56,7 +56,7 @@ const chartOption = computed(() => ({
             return `<div class="flex items-center gap-2">
             <span>${params.data.emoji}</span>
             <span class="font-bold">${params.name}</span>
-            <span>${formatCurrency(params.value, props.currencyCode)}</span>
+            <span>${formatCurrency(Math.abs(params.value), props.currencyCode, false)}</span>
         </div>`;
         },
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -89,7 +89,7 @@ const chartOption = computed(() => ({
                 show: false
             },
             data: props.data.map((d, i) => ({
-                value: Math.round(d.amount),
+                value: Math.round(Math.abs(d.amount)),
                 name: d.name,
                 emoji: d.emoji,
                 itemStyle: {

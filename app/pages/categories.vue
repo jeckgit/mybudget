@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { Check, ChevronLeft, Edit2, Plus, Trash2, X } from 'lucide-vue-next';
 const catStore = useCategoriesStore();
-const { categories, expenseCategories, incomeCategories, getCategoryName } = catStore;
+const { expenseCategories, incomeCategories, getCategoryName, getCategoryById } = catStore;
 const appSync = useAppSync();
-const profileStore = useProfileStore();
 const { t } = useI18n();
 
 useHead({ title: t('common.manage_categories') })
@@ -34,13 +33,65 @@ watch(currentTab, () => {
 const editEmoji = ref('');
 const editName = ref('');
 
+// Force single emoji input
+const extractEmoji = (val: string) => {
+    const emojiRegex = /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu;
+    const matches = val.match(emojiRegex);
+    return matches ? (matches[matches.length - 1] || '') : '';
+};
+
+watch(newEmoji, (val) => {
+    const emoji = extractEmoji(val);
+    if (val !== emoji) newEmoji.value = emoji;
+});
+
+watch(editEmoji, (val) => {
+    const emoji = extractEmoji(val);
+    if (val !== emoji) editEmoji.value = emoji;
+});
+
+const toastVisible = ref(false);
+const toastMessage = ref('');
+const toastType = ref<'success' | 'error'>('error');
+let toastTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const showToast = (message: string, type: 'success' | 'error' = 'error') => {
+    toastMessage.value = message;
+    toastType.value = type;
+    toastVisible.value = true;
+
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        toastVisible.value = false;
+    }, 3000);
+};
+
+onBeforeUnmount(() => {
+    if (toastTimeout) clearTimeout(toastTimeout);
+});
+
 const handleAdd = async () => {
     if (!newName.value.trim()) return;
+
+    // Save for rollback
+    const fallbackEmoji = newEmoji.value;
+    const fallbackName = newName.value.trim();
+    const fallbackTab = currentTab.value;
+
+    // Optimistic UI Update
+    isAdding.value = false;
+    newName.value = '';
+
     try {
-        await catStore.addCategory(newEmoji.value, newName.value.trim(), currentTab.value);
-        isAdding.value = false;
-        newName.value = '';
+        await catStore.addCategory(fallbackEmoji, fallbackName, fallbackTab);
     } catch (e) {
+        // Rollback
+        isAdding.value = true;
+        newEmoji.value = fallbackEmoji;
+        newName.value = fallbackName;
+        currentTab.value = fallbackTab;
+
+        showToast(t('common.error_occurred'));
         console.error('Failed to add category:', e);
     }
 };
@@ -53,19 +104,77 @@ const startEdit = (cat: any) => {
 
 const handleUpdate = async () => {
     if (!editingId.value || !editName.value.trim()) return;
+
+    const id = editingId.value;
+    const currentCat = getCategoryById(id);
+    if (!currentCat) return;
+
+    // Save for rollback
+    const fallbackEmoji = currentCat.emoji;
+    const fallbackName = currentCat.name;
+
+    const newEmojiVal = editEmoji.value;
+    const newNameVal = editName.value.trim();
+
+    // Optimistic UI Update
+    editingId.value = null;
+
+    // Optimistically update the store state before API call completes
+    const index = catStore.categories.value.findIndex((c) => c.id === id);
+    if (index !== -1) {
+        catStore.categories.value[index] = {
+            ...catStore.categories.value[index]!,
+            emoji: newEmojiVal,
+            name: newNameVal
+        };
+    }
+
     try {
-        await catStore.updateCategory(editingId.value, editEmoji.value, editName.value.trim());
-        editingId.value = null;
+        await catStore.updateCategory(id, newEmojiVal, newNameVal);
     } catch (e) {
+        // Rollback store state
+        const revertIndex = catStore.categories.value.findIndex((c) => c.id === id);
+        if (revertIndex !== -1) {
+            catStore.categories.value[revertIndex] = {
+                ...catStore.categories.value[revertIndex]!,
+                emoji: fallbackEmoji,
+                name: fallbackName
+            };
+        }
+
+        // Re-open editor if the rollback happens
+        editingId.value = id;
+        editEmoji.value = fallbackEmoji;
+        editName.value = getCategoryName(currentCat);
+
+        showToast(t('common.error_occurred'));
         console.error('Failed to update category:', e);
     }
 };
 
 const handleDelete = async (id: string) => {
     if (confirm(t('common.delete_confirm'))) {
+        const catToDelete = getCategoryById(id);
+        if (!catToDelete) return;
+
+        // Save for rollback
+        const fallbackId = catToDelete.id;
+        const fallbackEmoji = catToDelete.emoji;
+        const fallbackName = catToDelete.name;
+        const fallbackType = catToDelete.type;
+        const fallbackKey = catToDelete.key;
+        const fallbackUserId = catToDelete.user_id;
+
+        // Optimistically remove from store state
+        const originalCategories = [...catStore.categories.value];
+        catStore.categories.value = originalCategories.filter((c) => c.id !== id);
+
         try {
             await catStore.deleteCategory(id);
         } catch (e) {
+            // Rollback store state
+            catStore.categories.value = originalCategories;
+            showToast(t('common.error_occurred'));
             console.error('Failed to delete category:', e);
         }
     }
@@ -84,7 +193,7 @@ const cancelEdit = () => {
 <template>
     <div class="min-h-dvh pb-32">
         <header class="p-6 pt-12 flex items-center justify-between relative z-20">
-            <button @click="router.back()"
+            <button @click="router.back()" aria-label="Go back"
                 class="p-3 rounded-full bg-white/80 backdrop-blur-md shadow-sm text-slate-600 active:scale-95 transition-all dark:bg-white/10 dark:text-white dark:border dark:border-white/10">
                 <ChevronLeft class="w-6 h-6" />
             </button>
@@ -114,22 +223,39 @@ const cancelEdit = () => {
                 {{ currentTab === 'expense' ? t('common.my_expenses') : t('common.my_income') }}
             </h2>
 
+            <!-- Categories List Skeleton Loader -->
+            <div v-if="appSync.isInitialLoading.value" class="space-y-3">
+                <div v-for="i in 5" :key="`skeleton-${i}`">
+                    <div
+                        class="px-4 py-3 rounded-3xl! border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5 shadow-none animate-pulse flex items-center justify-between h-[74px]">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-slate-200 dark:bg-white/10 rounded-2xl"></div>
+                            <div class="h-5 w-24 bg-slate-200 dark:bg-white/10 rounded-full"></div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-slate-200 dark:bg-white/10 rounded-xl"></div>
+                            <div class="w-8 h-8 bg-slate-200 dark:bg-white/10 rounded-xl"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Categories List -->
-            <div class="space-y-3">
+            <div v-else class="space-y-3">
                 <div v-for="cat in filteredCategories" :key="cat.id">
                     <GlassCard variant="white"
                         class="p-4 rounded-3xl! border border-slate-100 dark:border-white/5 shadow-sm">
                         <div v-if="editingId === cat.id" class="flex items-center gap-3">
                             <input v-model="editEmoji"
-                                class="w-12 h-12 text-2xl text-center bg-slate-100 dark:bg-white/10 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none" />
+                                class="w-12 h-12 shrink-0 text-2xl text-center bg-slate-100 dark:bg-white/10 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none" />
                             <input v-model="editName"
-                                class="flex-1 bg-slate-100 dark:bg-white/10 px-4 py-2 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none dark:text-white" />
-                            <button @click="handleUpdate"
-                                class="p-2 text-green-500 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-xl transition-colors">
+                                class="flex-1 min-w-0 bg-slate-100 dark:bg-white/10 px-4 py-2 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none dark:text-white" />
+                            <button @click="handleUpdate" aria-label="Save category"
+                                class="p-2 shrink-0 text-green-500 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-xl transition-colors">
                                 <Check class="w-5 h-5" />
                             </button>
-                            <button @click="cancelEdit"
-                                class="p-2 text-slate-400 hover:bg-slate-50 dark:hover:bg-white/10 rounded-xl transition-colors">
+                            <button @click="cancelEdit" aria-label="Cancel edit"
+                                class="p-2 shrink-0 text-slate-400 hover:bg-slate-50 dark:hover:bg-white/10 rounded-xl transition-colors">
                                 <X class="w-5 h-5" />
                             </button>
                         </div>
@@ -142,11 +268,11 @@ const cancelEdit = () => {
                                 <span class="font-bold text-slate-800 dark:text-white">{{ getCategoryName(cat) }}</span>
                             </div>
                             <div class="flex items-center gap-1">
-                                <button @click="startEdit(cat)"
+                                <button @click="startEdit(cat)" aria-label="Edit category"
                                     class="p-2 text-slate-400 hover:bg-slate-50 dark:hover:bg-white/10 rounded-xl transition-colors">
                                     <Edit2 class="w-4 h-4" />
                                 </button>
-                                <button @click="handleDelete(cat.id)"
+                                <button @click="handleDelete(cat.id)" aria-label="Delete category"
                                     class="p-2 text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-colors">
                                     <Trash2 class="w-4 h-4" />
                                 </button>
@@ -162,18 +288,18 @@ const cancelEdit = () => {
                         :class="{ 'border-green-200 dark:border-green-500/20': currentTab === 'income' }">
                         <div class="flex items-center gap-3">
                             <input v-model="newEmoji"
-                                class="w-12 h-12 text-2xl text-center bg-slate-50 dark:bg-white/10 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none"
+                                class="w-12 h-12 shrink-0 text-2xl text-center bg-slate-50 dark:bg-white/10 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none"
                                 :class="{ 'focus:ring-green-500': currentTab === 'income' }" />
                             <input v-model="newName" :placeholder="t('categories.category_name')"
-                                class="flex-1 bg-slate-50 dark:bg-white/10 px-4 py-2 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none dark:text-white"
+                                class="flex-1 min-w-0 bg-slate-50 dark:bg-white/10 px-4 py-2 rounded-2xl border-none focus:ring-2 focus:ring-purple-500 outline-none dark:text-white"
                                 :class="{ 'focus:ring-green-500': currentTab === 'income' }" />
-                            <button @click="handleAdd"
-                                class="p-2 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-xl transition-colors"
+                            <button @click="handleAdd" aria-label="Confirm add"
+                                class="p-2 shrink-0 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-xl transition-colors"
                                 :class="{ 'text-green-600 hover:bg-green-50 dark:hover:bg-green-500/10': currentTab === 'income' }">
                                 <Check class="w-5 h-5" />
                             </button>
-                            <button @click="cancelAdd"
-                                class="p-2 text-slate-400 hover:bg-slate-50 dark:hover:bg-white/10 rounded-xl transition-colors">
+                            <button @click="cancelAdd" aria-label="Cancel add"
+                                class="p-2 shrink-0 text-slate-400 hover:bg-slate-50 dark:hover:bg-white/10 rounded-xl transition-colors">
                                 <X class="w-5 h-5" />
                             </button>
                         </div>
@@ -188,5 +314,7 @@ const cancelEdit = () => {
                 </button>
             </div>
         </main>
+
+        <StatusToast :message="toastMessage" :type="toastType" :visible="toastVisible" />
     </div>
 </template>

@@ -32,7 +32,7 @@ describe('state loader auth transitions', () => {
   it('resets state and forces reload when account is recreated with same email', async () => {
     userRef.value = { sub: 'old-user-id', email: 'same@example.com' };
 
-    const plugin = (await import('./state-loader')).default;
+    const plugin = (await import('../../plugins/state-loader')).default;
     plugin({
       runWithContext: (fn: () => unknown) => fn()
     } as any);

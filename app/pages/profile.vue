@@ -7,19 +7,19 @@ const { t, locale, setLocale } = useI18n();
 useHead({ title: t('profile.title') })
 import {
     AlertCircle,
+    ArrowRightLeft,
     ChevronRight,
     Globe,
+    Info,
     LogOut,
     Mail,
     Monitor,
     Moon,
-    Info,
     Save,
     Scale,
     Sun,
     Tag,
-    Trash2,
-    ArrowRightLeft
+    Trash2
 } from 'lucide-vue-next';
 import { budgetSchema } from '~/schemas/numeric';
 import { formatLocalized2, normalizeDecimalInput, parseLocalizedDecimal } from '~/utils/numberLocale';
@@ -191,11 +191,6 @@ const handleUpdateEmail = async () => {
         loading.value = false;
     }
 };
-
-const displayName = computed(() => {
-    if (!user.value) return t('common.guest');
-    return user.value.user_metadata?.full_name || user.value.email?.split('@')[0] || t('common.user');
-});
 
 const handleReset = async () => {
     if (confirm(t('settings.reset_confirm'))) {
