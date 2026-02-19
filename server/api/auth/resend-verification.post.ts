@@ -1,11 +1,5 @@
 import { serverSupabaseUser } from '#supabase/server';
-import {
-  fetchProfileLocale,
-  generateVerificationLink,
-  sendResendMail,
-  normalizeLocale,
-  type SupportedLocale
-} from '../../utils/auth-mail';
+import { fetchProfileLocale, generateVerificationLink, sendResendMail } from '../../utils/auth-mail';
 
 const sanitizeBaseUrl = (url: string) => url.replace(/\/+$/, '');
 

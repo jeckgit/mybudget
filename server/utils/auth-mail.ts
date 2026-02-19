@@ -1,7 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
-
-export type SupportedLocale = 'de' | 'en' | 'fr' | 'es';
-
 export const SUBJECTS: Record<SupportedLocale, string> = {
   de: 'Bitte bestaetigen Sie Ihre E-Mail',
   en: 'Please verify your email',
@@ -34,16 +30,6 @@ export const COPY: Record<SupportedLocale, { intro: string; cta: string; fallbac
     fallback: 'Si el boton no funciona, usa este enlace:',
     ignore: 'Si no solicitaste esto, puedes ignorar este correo.'
   }
-};
-
-export const normalizeLocale = (raw: string | null | undefined): SupportedLocale => {
-  console.log('[AuthMail] Normalizing locale for:', raw);
-  if (!raw) return 'en';
-  const lower = raw.toLowerCase();
-  if (lower.startsWith('de')) return 'de';
-  if (lower.startsWith('fr')) return 'fr';
-  if (lower.startsWith('es')) return 'es';
-  return 'en';
 };
 
 export const fetchProfileLocale = async (

@@ -1,12 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { runSignupFlow } from '../../utils/signupFlow';
-import {
-  normalizeLocale,
-  fetchProfileLocale,
-  generateVerificationLink,
-  sendResendMail,
-  type SupportedLocale
-} from '../../utils/auth-mail';
+import { fetchProfileLocale, generateVerificationLink, sendResendMail } from '../../utils/auth-mail';
 
 const sanitizeBaseUrl = (url: string) => url.replace(/\/+$/, '');
 

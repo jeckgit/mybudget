@@ -49,8 +49,8 @@ jobs:
           echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> ./envfile
           echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> ./envfile
           echo "SUPABASE_RESEND_API_KEY=${{ secrets.SUPABASE_RESEND_API_KEY }}" >> ./envfile
-          echo "OPTIONAL_VERIFY_REDIRECT_URL=${{ secrets.OPTIONAL_VERIFY_REDIRECT_URL }}" >> ./envfile
-          echo "VERIFY_EMAIL_FROM=${{ secrets.VERIFY_EMAIL_FROM }}" >> ./envfile
+          echo "OPTIONAL_VERIFY_REDIRECT_URL=${{ vars.OPTIONAL_VERIFY_REDIRECT_URL }}" >> ./envfile
+          echo "VERIFY_EMAIL_FROM=${{ vars.VERIFY_EMAIL_FROM }}" >> ./envfile
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1
