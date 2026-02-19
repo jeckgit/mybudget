@@ -196,7 +196,8 @@
     "rollover": "Cumulé",
     "details_title": "Détails quotidiens",
     "back": "Retour",
-    "over": "Dépassé de"
+    "over": "Dépassé de",
+    "income_label": "Revenus"
   },
   "verification_banner": {
     "title": "Vérifiez votre e-mail",
@@ -206,5 +207,38 @@
     "resend": "Renvoyer",
     "sending": "Envoi...",
     "sent": "Envoyé !"
+  },
+  "auth": {
+    "welcome": "Bienvenue",
+    "sign_in_desc": "Connectez-vous pour continuer",
+    "create_account": "Créer un compte",
+    "continue_google": "Continuer avec Google",
+    "continue_github": "Continuer avec GitHub",
+    "or_email": "Ou par e-mail",
+    "email": "E-mail",
+    "email_placeholder": "bonjour{'@'}exemple.com",
+    "password": "Mot de passe",
+    "password_placeholder": "••••••••",
+    "forgot_password": "Mot de passe oublié ?",
+    "sign_in": "Se connecter",
+    "sign_up": "S'inscrire",
+    "loading": "Chargement...",
+    "have_account": "Déjà un compte ? Se connecter",
+    "no_account": "Pas de compte ? S'inscrire",
+    "account_created_optional_verify": "Compte créé. Nous avons envoyé un e-mail de vérification. Vous pouvez utiliser l'app sans vérification.",
+    "check_email": "Vérifiez votre e-mail pour le lien de connexion !",
+    "reset_password": "Réinitialiser le mot de passe",
+    "reset_desc": "Entrez votre e-mail pour recevoir les instructions",
+    "send_reset_link": "Envoyer le lien",
+    "sending_reset": "Envoi...",
+    "check_email_reset": "Vérifiez votre e-mail pour le lien de réinitialisation.",
+    "back_to_sign_in": "Retour à la connexion",
+    "session_expired": "Session expirée. Veuillez demander un nouveau lien.",
+    "update_password": "Mettre à jour le mot de passe",
+    "new_password": "Nouveau mot de passe",
+    "updating": "Mise à jour...",
+    "verifying": "Vérification du lien...",
+    "invalid_link": "Lien invalide ou expiré.",
+    "verification_email_sent": "E-mail de vérification envoyé !"
   }
 }

@@ -196,7 +196,8 @@
     "rollover": "Acumulado",
     "details_title": "Detalles diarios",
     "back": "Volver",
-    "over": "Excedido por"
+    "over": "Excedido por",
+    "income_label": "Ingresos"
   },
   "verification_banner": {
     "title": "Verifica tu correo",
@@ -206,5 +207,38 @@
     "resend": "Reenviar",
     "sending": "Enviando...",
     "sent": "¡Enviado!"
+  },
+  "auth": {
+    "welcome": "Bienvenido",
+    "sign_in_desc": "Inicia sesión para continuar",
+    "create_account": "Crear una cuenta",
+    "continue_google": "Continuar con Google",
+    "continue_github": "Continuar con GitHub",
+    "or_email": "O con correo electrónico",
+    "email": "Correo electrónico",
+    "email_placeholder": "hola{'@'}ejemplo.com",
+    "password": "Contraseña",
+    "password_placeholder": "••••••••",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "sign_in": "Iniciar sesión",
+    "sign_up": "Registrarse",
+    "loading": "Cargando...",
+    "have_account": "¿Ya tienes cuenta? Iniciar sesión",
+    "no_account": "¿No tienes cuenta? Registrarse",
+    "account_created_optional_verify": "Cuenta creada. Hemos enviado un correo de verificación. Puedes usar la app sin verificar.",
+    "check_email": "¡Revisa tu correo para el enlace de inicio de sesión!",
+    "reset_password": "Restablecer contraseña",
+    "reset_desc": "Introduce tu correo para recibir instrucciones",
+    "send_reset_link": "Enviar enlace",
+    "sending_reset": "Enviando...",
+    "check_email_reset": "Revisa tu correo para el enlace de restablecimiento.",
+    "back_to_sign_in": "Volver a iniciar sesión",
+    "session_expired": "Sesión expirada. Por favor solicita un nuevo enlace.",
+    "update_password": "Actualizar contraseña",
+    "new_password": "Nueva contraseña",
+    "updating": "Actualizando...",
+    "verifying": "Verificando enlace...",
+    "invalid_link": "Enlace inválido o expirado.",
+    "verification_email_sent": "¡Correo de verificación enviado!"
   }
 }

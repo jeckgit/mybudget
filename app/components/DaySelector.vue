@@ -220,7 +220,7 @@ const formatBudgetDisplay = (amount: number) => {
                                 {{ formatDay(day.date) }}
                             </span>
                             <span class="text-xl font-bold leading-none tracking-tighter">{{ formatDate(day.date)
-                            }}</span>
+                                }}</span>
                         </div>
 
                         <!-- Divider -->
@@ -262,7 +262,7 @@ const formatBudgetDisplay = (amount: number) => {
                             </span>
                             <span
                                 :class="['text-xs font-bold tracking-tight', isToday(day.date) ? 'text-white/80' : 'text-slate-500']">
-                                {{ formatBudgetDisplay(day.spent) }}
+                                {{ formatBudgetDisplay(day.expensesOnly) }}
                             </span>
                         </div>
                     </button>

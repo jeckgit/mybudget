@@ -188,17 +188,17 @@ const exportAsJSON = () => {
                     <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">{{
                         t('analytics.total_spent') }}</p>
                     <h3 class="text-3xl font-bold text-slate-800 dark:text-white">
-                        {{ formatCurrency(budgetData.totalSpentMonth, profileStore.config.value.currency) }}
+                        {{ formatCurrency(budgetData.netSpentMonth, profileStore.config.value.currency) }}
                     </h3>
                 </div>
                 <!-- Mini Halo for target progress -->
                 <div v-if="profileStore.config.value.monthlyLimit > 0" class="h-12 w-12 relative">
                     <HaloRing :size="48" :stroke-width="5"
-                        :progress="budgetData.totalSpentMonth / profileStore.config.value.monthlyLimit" color="#C084FC"
+                        :progress="budgetData.netSpentMonth / profileStore.config.value.monthlyLimit" color="#C084FC"
                         track-color="rgba(0,0,0,0.05)" />
                     <span
                         class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-300">
-                        {{ Math.round((budgetData.totalSpentMonth / profileStore.config.value.monthlyLimit) * 100) }}%
+                        {{ Math.round((budgetData.netSpentMonth / profileStore.config.value.monthlyLimit) * 100) }}%
                     </span>
                 </div>
             </div>
@@ -211,7 +211,8 @@ const exportAsJSON = () => {
             <h3 class="font-bold text-lg text-slate-800 mb-4 px-1 dark:text-white">{{ t('analytics.categories') }}</h3>
 
             <GlassCard variant="glass" class="p-6 mb-6 dark:bg-white/5 dark:border-white/10">
-                <CategoryDonutChart :data="categoryStats" :total="totalSpent" :currency-code="profileStore.config.value.currency" />
+                <CategoryDonutChart :data="categoryStats" :total="totalSpent"
+                    :currency-code="profileStore.config.value.currency" />
             </GlassCard>
 
             <!-- Unified Insight List -->

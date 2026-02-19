@@ -196,7 +196,8 @@
     "rollover": "Rollover",
     "details_title": "Daily Details",
     "back": "Back",
-    "over": "Over by"
+    "over": "Over by",
+    "income_label": "Income"
   },
   "verification_banner": {
     "title": "Verify your email",

@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { runSignupFlow } from '../../utils/signupFlow';
 import { fetchProfileLocale, generateVerificationLink, sendResendMail } from '../../utils/auth-mail';
+import { initializeUserSetup } from '../../utils/signupInitialization';
 
 const sanitizeBaseUrl = (url: string) => url.replace(/\/+$/, '');
 
@@ -43,9 +44,24 @@ export default defineEventHandler(async (event) => {
           options: signupOptions
         });
 
+        const userId = data.user?.id || null;
+
+        // Initialize profile and categories if signup was successful
+        if (userId && !error) {
+          const initResult = await initializeUserSetup(
+            supabaseUrl,
+            supabaseServiceRoleKey,
+            userId,
+            signupOptions?.data?.language || 'en'
+          );
+          if (!initResult.ok) {
+            console.warn('[Signup] Initialization failed background task:', initResult.error);
+          }
+        }
+
         return {
           error,
-          userId: data.user?.id || null
+          userId
         };
       },
       sendVerificationEmail: async (targetEmail, userId, language) => {

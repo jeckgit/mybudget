@@ -36,8 +36,16 @@ const dayTransactions = computed(() => {
 
 const { formatCurrency } = useCurrency();
 
-const totalForDay = computed(() => {
-    return dayTransactions.value.reduce((sum, tx) => sum + tx.amount, 0);
+const expensesOnly = computed(() => {
+    return dayTransactions.value
+        .filter(tx => tx.amount > 0)
+        .reduce((sum, tx) => sum + tx.amount, 0);
+});
+
+const incomeOnly = computed(() => {
+    return dayTransactions.value
+        .filter(tx => tx.amount < 0)
+        .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
 });
 
 const formatTime = (date: string) => {
@@ -96,10 +104,15 @@ const openNewExpenseModal = () => {
                         {{ t('day_selector.daily_spending') }}
                     </p>
                     <h2 class="text-5xl font-bold text-slate-800 dark:text-white tracking-tighter">
-                        {{ formatCurrency(totalForDay, profileStore.config.value.currency, false, {
+                        {{ formatCurrency(expensesOnly, profileStore.config.value.currency, false, {
                             minimumFractionDigits: 2
                         }) }}
                     </h2>
+                    <p v-if="incomeOnly > 0"
+                        class="mt-2 text-sm font-semibold text-emerald-500 dark:text-emerald-400 tracking-tight">
+                        {{ t('day_selector.income_label') }}: +{{ formatCurrency(incomeOnly,
+                            profileStore.config.value.currency, false, { minimumFractionDigits: 2 }) }}
+                    </p>
                 </button>
             </GlassCard>
 
