@@ -43,14 +43,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: create env file
+        env:
+          GIT_COMMIT_HASH: ${{ github.sha }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_RESEND_API_KEY: ${{ secrets.SUPABASE_RESEND_API_KEY }}
+          OPTIONAL_VERIFY_REDIRECT_URL: ${{ vars.OPTIONAL_VERIFY_REDIRECT_URL }}
+          VERIFY_EMAIL_FROM: ${{ vars.VERIFY_EMAIL_FROM }}
         run: |
-          echo "GIT_COMMIT_HASH=${{ github.sha }}" >> ./envfile
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> ./envfile
-          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> ./envfile
-          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> ./envfile
-          echo "SUPABASE_RESEND_API_KEY=${{ secrets.SUPABASE_RESEND_API_KEY }}" >> ./envfile
-          echo "OPTIONAL_VERIFY_REDIRECT_URL=${{ vars.OPTIONAL_VERIFY_REDIRECT_URL }}" >> ./envfile
-          echo "VERIFY_EMAIL_FROM=${{ vars.VERIFY_EMAIL_FROM }}" >> ./envfile
+          echo "GIT_COMMIT_HASH=$GIT_COMMIT_HASH" >> ./envfile
+          echo "SUPABASE_URL=$SUPABASE_URL" >> ./envfile
+          echo "SUPABASE_KEY=$SUPABASE_KEY" >> ./envfile
+          echo "SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY" >> ./envfile
+          echo "SUPABASE_RESEND_API_KEY=$SUPABASE_RESEND_API_KEY" >> ./envfile
+          echo "OPTIONAL_VERIFY_REDIRECT_URL=$OPTIONAL_VERIFY_REDIRECT_URL" >> ./envfile
+          echo "VERIFY_EMAIL_FROM=$VERIFY_EMAIL_FROM" >> ./envfile
 
       - name: Docker Stack Deploy
         uses: cssnr/stack-deploy-action@v1

@@ -4,8 +4,18 @@ services:
     networks:
       - proxy-net
     environment:
+      # Standard Env Vars
       - SUPABASE_URL=${SUPABASE_URL}
       - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+
+      # Nuxt Runtime Config Overrides (Essential for Production)
+      - NUXT_SUPABASE_URL=${SUPABASE_URL}
+      - NUXT_SUPABASE_ANON_KEY=${SUPABASE_KEY}
+      - NUXT_SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - NUXT_SUPABASE_RESEND_API_KEY=${SUPABASE_RESEND_API_KEY}
+      - NUXT_OPTIONAL_VERIFY_REDIRECT_URL=${OPTIONAL_VERIFY_REDIRECT_URL}
+      - NUXT_VERIFY_EMAIL_FROM=${VERIFY_EMAIL_FROM}
     deploy:
       labels:
         - 'traefik.enable=true'
